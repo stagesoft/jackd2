@@ -1,0 +1,4 @@
+debian/tmp/usr/bin/jack*
+debian/tmp/usr/share/*
+debian/bash_completion.d etc
+debian/audio.conf etc/security/limits.d

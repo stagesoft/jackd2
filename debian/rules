@@ -1,0 +1,97 @@
+#!/usr/bin/make -f
+
+-include /usr/share/cdbs/1/rules/upstream-tarball.mk
+include /usr/share/cdbs/1/rules/utils.mk
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/makefile.mk
+
+# suppress optional build-dependencies
+CDBS_BUILD_DEPENDS_rules_upstream-tarball =
+CDBS_BUILD_DEPENDS_rules_utils_copyright-check =
+CDBS_BUILD_DEPENDS_rules_utils_buildinfo =
+
+DEB_UPSTREAM_PACKAGE = jack
+DEB_UPSTREAM_URL = http://www.grame.fr/~letz/
+DEB_UPSTREAM_TARBALL_EXTENSION = tar.bz2
+
+# unneeded and possibly sourceless binaries
+DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.Lib ./windows/**.lib ./windows/**.dll
+DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./macosx/libportaudio.a
+
+# unneeded sources copyright-protected without licence
+DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.rc
+
+# ignore oddly packaged bzip2 archive to not upset dpkg
+DEB_COPYRIGHT_CHECK_IGNORE_REGEX = ^\./waf|\./debian/(changelog|copyright(|_hints|_newhints))$
+
+# Minimum assured version referenced upstream as library API/ABI
+ABI = 0.118.0
+
+# Let's try to cut down noisy symbols to the official API
+CFLAGS += -fvisibility=hidden
+CXXFLAGS += -fvisibility=hidden
+
+waf-configure-options = --prefix=/usr --classic --dbus
+waf-configure-options += $(if $(filter linux,$(DEB_HOST_ARCH_OS)),--alsa)
+waf-configure-options += $(if $(filter amd64 i386 powerpc,$(DEB_HOST_ARCH)),--firewire)
+waf-configure-options += $(if $(filter amd64,$(DEB_HOST_ARCH)),--mixed)
+
+DEB_MAKE_INVOKE = ./waf -v --destdir=$(CURDIR)/debian/tmp
+DEB_MAKE_INSTALL_TARGET = install
+
+# TODO: use distclean and drop related clean target, when (or if)
+# upstream stop shipping waf dir
+DEB_MAKE_CLEAN_TARGET = clean
+clean::
+	rm -f .lock-wscript
+	find ./.waf-* -iname '*.pyc' -exec rm '{}' \;
+	rm -rf build
+
+DEB_DH_MAKESHLIBS_ARGS = -V 'libjack0 (>= $(ABI))' -Xintime -Xinprocess -Xjack_alsa -Xjack_oss -Xjack_dummy -Xjack_firewire
+
+# too noisy symbols, so only watch disappearing ones for now
+DEB_DH_MAKESHLIBS_ARGS += -- -c1
+
+# Generate (and cleanup) files containing variables static per build
+infiles = $(filter-out debian/control.in, $(wildcard debian/*.in))
+outfiles = $(basename $(infiles))
+DEB_PHONY_RULES += $(outfiles)
+pre-build:: $(outfiles)
+$(outfiles): update-config debian/stamp-copyright-check
+	sed 's/__ABI__/$(ABI)/' <$@.in >$@
+clean::
+	rm -f $(outfiles)
+
+common-configure-arch common-configure-indep:: common-configure-impl
+common-configure-impl:: debian/stamp-waf-configure
+debian/stamp-waf-configure:
+	./waf configure $(waf-configure-options)
+	touch $@
+clean::
+	rm -f debian/stamp-waf-configure
+
+install/jackd::
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+	dh_install -pjackd debian/tmp/usr/bin/alsa_in
+	dh_install -pjackd debian/tmp/usr/bin/alsa_out
+endif  
+
+install/libjack0::
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+	dh_install -plibjack0 debian/tmp/usr/lib/jack/jack_alsa.so
+	dh_install -plibjack0 debian/tmp/usr/lib/jack/audioadapter.so
+endif	
+
+# TODO: drop libstdc++6 override when bug#374049 closed in stable
+binary-post-install/libjack0::
+	d-devlibdeps \
+		--override s/libjackserver0-dev// \
+		--override s/libffado2-dev/libffado-dev/ \
+		--override s/libcelt0-0-dev/libcelt-dev/ \
+		--override s/libstdc++6-4.1-dev// \
+		debian/libjack-dev.substvars \
+		debian/tmp/usr/lib/*.so \
+		debian/tmp/usr/lib/jack/*.so
+
+#common-binary-post-install-arch::
+#        ln -s jackdmp debian/jackdmp/usr/bin/jackd

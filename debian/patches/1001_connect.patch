@@ -1,0 +1,51 @@
+From: Free Ekanayaka <free@64studio.com>
+Description: Fix lost connection on multiple fast reconnections
+ Fix a problem with jack_connect using a hard coded JACK client name and
+ when calling jack_connect or jack_disconnect multiple times in a fast
+ sequence, then the subsequent jack_(dis)connect calls fail.
+Last-Update: 2010-04-03
+--- a/example-clients/connect.c
++++ b/example-clients/connect.c
+@@ -20,6 +20,7 @@
+ #include <errno.h>
+ #ifndef WIN32
+ #include <unistd.h>
++#include <sys/types.h> /* for getpid() */
+ #endif
+ #include <string.h>
+ #include <stdlib.h>
+@@ -37,6 +38,7 @@
+ {
+ 	jack_client_t* client = NULL;
+ 	char *my_name = strrchr(argv[0], '/');
++	char my_client_name[80];
+ 	connecting = disconnecting = FALSE;
+ 	if (my_name == 0) {
+ 		my_name = argv[0];
+@@ -56,6 +58,8 @@
+ 		return 1;
+ 	}
+ 
++	printf("connecting %ld\n",connecting);
++
+ 	if (argc != 3) {
+ 		fprintf (stderr, "usage: %s <src_port> <dst_port>\n", my_name);
+ 		fprintf(stderr, "The source port must be an output port of the source client.\n");
+@@ -63,9 +67,16 @@
+ 		return 1;
+ 	}
+ 
++#ifndef WIN32
++	/* try to assemble an unique JACK client name */
++	sprintf(my_client_name, "jack_connect%d", getpid());
++#else
++	sprintf(my_client_name, "jack_connect");
++#endif
++
+ 	/* try to become a client of the JACK server */
+ 
+-	if ((client = jack_client_open (my_name, JackNullOption, NULL)) == 0) {
++	if ((client = jack_client_new (my_client_name)) == 0) {
+ 		fprintf (stderr, "jack server not running?\n");
+ 		return 1;
+ 	}

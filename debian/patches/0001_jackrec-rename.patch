@@ -1,0 +1,19 @@
+From: Adrian Knoth <adi@drcomp.erfurt.thur.de>
+Bug: http://trac.jackaudio.org/ticket/167
+Description: Rename jack_rec to jackrec
+ jackd1 calls it jackrec, jackd2 calls it jack_rec. This is inconvenient,
+ as it prevents scripts to work with both, jackd1 and jackd2.
+ .
+ I decided to stick to the jackd1 name, as it has always been around.
+Last-Update: 2010-04-03
+--- a/example-clients/wscript
++++ b/example-clients/wscript
+@@ -114,7 +114,7 @@
+         if bld.env['IS_SUN']:
+             prog.uselib = 'RT SNDFILE'
+         prog.uselib_local = 'clientlib'
+-        prog.target = 'jack_rec'
++        prog.target = 'jackrec'
+ 
+     if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
+         prog = bld.new_task_gen('cc', 'program')
