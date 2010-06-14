@@ -64,11 +64,11 @@ Architecture: amd64 i386 powerpc
 Depends: ${shlibs:Depends},
  ${misc:Depends},
  jackd (= ${binary:Version})
-Description: JACK Audio Connection Kit (FFADO and FreeBoB backends)
+Description: JACK Audio Connection Kit (FFADO backend)
  JACK is a low-latency sound server, allowing multiple applications to
  connect to one audio device, and to share audio between themselves.
  .
- This package contains the IEEE1394 (FireWire) backends FFADO and FreeBoB.
+ This package contains the IEEE1394 (FireWire) backend (FFADO).
 
 Package: libjack-dev
 Architecture: any
