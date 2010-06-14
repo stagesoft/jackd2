@@ -70,10 +70,10 @@ debian/stamp-waf-configure:
 clean::
 	rm -f debian/stamp-waf-configure
 
-install/jackd::
+install/jackd2::
 ifeq ($(DEB_HOST_ARCH_OS),linux)
-	dh_install -pjackd debian/tmp/usr/bin/alsa_in
-	dh_install -pjackd debian/tmp/usr/bin/alsa_out
+	dh_install -pjackd2 debian/tmp/usr/bin/alsa_in
+	dh_install -pjackd2 debian/tmp/usr/bin/alsa_out
 endif  
 
 install/libjack0::
