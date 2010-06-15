@@ -1,9 +1,1 @@
-debian/tmp/usr/lib/lib*.so.*
-debian/tmp/usr/lib/jack/netmanager.so
-debian/tmp/usr/lib/jack/profiler.so
-debian/tmp/usr/lib/jack/inprocess.so
-debian/tmp/usr/lib/jack/jack_net.so
-debian/tmp/usr/lib/jack/jack_loopback.so
-debian/tmp/usr/lib/jack/jack_netone.so
-debian/tmp/usr/lib/jack/netadapter.so
-debian/tmp/usr/lib/jack/jack_dummy.so
+debian/tmp/usr/lib/libjack.so.*
