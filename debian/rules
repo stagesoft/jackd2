@@ -47,7 +47,7 @@ clean::
 	find ./.waf-* -iname '*.pyc' -exec rm '{}' \;
 	rm -rf build
 
-DEB_DH_MAKESHLIBS_ARGS = -V 'libjack0 (>= $(ABI))' -Xintime -Xinprocess -Xjack_alsa -Xjack_oss -Xjack_dummy -Xjack_firewire
+DEB_DH_MAKESHLIBS_ARGS = -Xintime -Xinprocess -Xjack_alsa -Xjack_oss -Xjack_dummy -Xjack_firewire
 
 # too noisy symbols, so only watch disappearing ones for now
 DEB_DH_MAKESHLIBS_ARGS += -- -c1
