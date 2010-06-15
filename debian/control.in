@@ -60,6 +60,9 @@ Description: JACK Audio Connection Kit (libraries)
 
 Package: jackd2-firewire
 Architecture: amd64 i386 powerpc
+Provides: jackd-firewire
+Replaces: jackd-firewire
+Conflicts: jackd-firewire
 Depends: ${shlibs:Depends},
  ${misc:Depends},
  jackd2 (= ${binary:Version})
