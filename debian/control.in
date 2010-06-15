@@ -26,6 +26,10 @@ Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/jack-audio-connection-kit.g
 
 Package: jackd2
 Architecture: any
+Replaces: libjack0 (<= 1.9.5~dfsg-13),
+    jackd
+Provides: jackd
+Conflicts: jackd
 Depends: ${shlibs:Depends},
  ${misc:Depends},
  coreutils (>= 4.0),
