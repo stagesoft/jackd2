@@ -76,3 +76,23 @@ Description: JACK Audio Connection Kit (FFADO and FreeBoB backends)
  connect to one audio device, and to share audio between themselves.
  .
  This package contains the IEEE1394 (FireWire) backends FFADO and FreeBoB.
+
+Package: libjack-jackd2-dev
+Architecture: any
+Section: libdevel
+Depends: libjack-jackd2-0 (= ${binary:Version}), 
+ ${asound:Depends},
+ ${misc:Depends},
+ ${shlibs:Depends},
+ pkg-config,
+ libdbus-1-dev
+Conflicts: libjack0.100.0-dev (<< 0.102.20-2),
+ libjack-dev
+Provides: libjack0.100.0-dev
+Replaces: libjack0.71.2-0 (<< 0.75.0-1)
+Description: JACK Audio Connection Kit (development files)
+ JACK is a low-latency sound server, allowing multiple applications to
+ connect to one audio device, and to share audio between themselves.
+ .
+ This package contains files needed for the development of JACK applications
+ and an API reference.
