@@ -1,4 +1,4 @@
-Source: jack-audio-connection-kit
+Source: jackd2
 Section: sound
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
