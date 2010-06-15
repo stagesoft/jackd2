@@ -54,9 +54,11 @@ Section: libs
 Depends: ${shlibs:Depends},
  ${misc:Depends}
 Conflicts: jackd2 (>> ${binary:Version}),
- jackd2 (<< ${binary:Version})
+ jackd2 (<< ${binary:Version}),
+ libjack-0.116
 Suggests: jackd2 (= ${binary:Version})
 Provides: libjack-0.116
+Replaces: libjack-0.116
 Description: JACK Audio Connection Kit (libraries)
  JACK is a low-latency sound server, allowing multiple applications to
  connect to one audio device, and to share audio between themselves.
