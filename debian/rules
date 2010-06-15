@@ -74,12 +74,8 @@ install/jackd2::
 ifeq ($(DEB_HOST_ARCH_OS),linux)
 	dh_install -pjackd2 debian/tmp/usr/bin/alsa_in
 	dh_install -pjackd2 debian/tmp/usr/bin/alsa_out
-endif  
-
-install/libjack0::
-ifeq ($(DEB_HOST_ARCH_OS),linux)
-	dh_install -plibjack0 debian/tmp/usr/lib/jack/jack_alsa.so
-	dh_install -plibjack0 debian/tmp/usr/lib/jack/audioadapter.so
+	dh_install -pjackd2 debian/tmp/usr/lib/jack/jack_alsa.so
+	dh_install -pjackd2 debian/tmp/usr/lib/jack/audioadapter.so
 endif	
 
 # TODO: drop libstdc++6 override when bug#374049 closed in stable
