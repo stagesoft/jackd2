@@ -1,11 +1,12 @@
-jackd2 (1.9.5~dfsg-14) UNRELEASED; urgency=low
+jackd2 (1.9.5~dfsg-14) unstable; urgency=low
 
   * Rename source package to jackd2
   * Don't provide libjack-dev anymore
   * Don't compile libjack0, use libjack-jackd2-0 instead
   * Move inprocess clients from libjack0 into jackd2 package
+  * Update to upstream SVN revision 4024
 
- -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Tue, 15 Jun 2010 15:14:17 +0200
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Thu, 17 Jun 2010 18:20:21 +0200
 
 jack-audio-connection-kit (1.9.5~dfsg-13) unstable; urgency=low
 
