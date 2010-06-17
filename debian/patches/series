@@ -3,6 +3,5 @@ hppa-parallel.patch
 kfreebsd-fix
 alpha_ia64-sigsegv
 0001_jackrec-rename.patch
-0002_manpages.patch
 1001_connect.patch
 hurd.patch
