@@ -3,7 +3,8 @@ Section: sound
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
 Uploaders: Adrian Knoth <adi@drcomp.erfurt.thur.de>, Jonas Smedegaard <dr@jones.dk>
-Build-Depends: cdbs, debhelper (>= 6),
+Build-Depends: cdbs,
+ debhelper (>= 6),
  d-shlibs,
  python,
  libsamplerate-dev,
