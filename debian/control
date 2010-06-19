@@ -3,8 +3,7 @@ Section: sound
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
 Uploaders: Adrian Knoth <adi@drcomp.erfurt.thur.de>, Jonas Smedegaard <dr@jones.dk>
-Build-Depends: cdbs,
- debhelper (>= 6),
+Build-Depends: cdbs, debhelper (>= 6),
  d-shlibs,
  python,
  libsamplerate-dev,
@@ -28,9 +27,11 @@ Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/jackd2.git;a=summary
 Package: jackd2
 Architecture: any
 Replaces: libjack0 (<= 1.9.5~dfsg-13),
-    jackd
-Provides: jackd
-Conflicts: jackd
+	jackd (<< 3),
+	jack-daemon
+Provides: jack-daemon
+Conflicts: jack-daemon,
+	jackd (<< 3)
 Depends: ${shlibs:Depends},
  ${misc:Depends},
  coreutils (>= 4.0),
@@ -57,9 +58,11 @@ Depends: ${shlibs:Depends},
 Conflicts: jackd2 (>> ${binary:Version}),
  jackd2 (<< ${binary:Version}),
  libjack-0.116
+Breaks: libjack0 (<< 1:0.118+svn3796-4)
 Suggests: jackd2 (= ${binary:Version})
 Provides: libjack-0.116
-Replaces: libjack-0.116
+Replaces: libjack0 (<< 1:0.118+svn3796-4),
+ libjack-0.116
 Description: JACK Audio Connection Kit (libraries)
  JACK is a low-latency sound server, allowing multiple applications to
  connect to one audio device, and to share audio between themselves.
