@@ -1,3 +1,21 @@
+jackd2 (1.9.5~dfsg-15) unstable; urgency=low
+
+  [ Adrian Knoth ]
+  * Also provide the shlibs file for libjack-jackd2-0
+  * Fix FTBFS on sparc64 (Closes: #586257)
+
+  [ Reinhard Tartler ]
+  * jackd must not be a virtual package, use 'jack-daemon' for that
+  * add breaks/replaces on old libjack0
+  * change shlibsfile to prefer jackd2's libjack
+  * use conflicts instead of breaks. libjack-jackd2-0 has file conflicts
+    with libjack0 and will keep it
+
+  [ Jonas Smedegaard ]
+  * Update control file.
+
+ -- Reinhard Tartler <siretart@tauware.de>  Sat, 19 Jun 2010 18:54:29 +0200
+
 jackd2 (1.9.5~dfsg-14) unstable; urgency=low
 
   * Rename source package to jackd2
