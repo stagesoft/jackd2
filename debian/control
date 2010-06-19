@@ -2,7 +2,7 @@ Source: jackd2
 Section: sound
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
-Uploaders: Adrian Knoth <adi@drcomp.erfurt.thur.de>, Jonas Smedegaard <dr@jones.dk>
+Uploaders: Adrian Knoth <adi@drcomp.erfurt.thur.de>, Jonas Smedegaard <dr@jones.dk>, Reinhard Tartler <siretart@tauware.de>
 Build-Depends: cdbs,
  debhelper (>= 6),
  d-shlibs,
