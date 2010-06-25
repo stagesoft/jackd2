@@ -1,3 +1,9 @@
+jackd2 (1.9.5~dfsg-16) experimental; urgency=low
+
+  * reupload to experimental
+
+ -- Reinhard Tartler <siretart@tauware.de>  Fri, 25 Jun 2010 22:11:22 +0200
+
 jackd2 (1.9.5~dfsg-15) unstable; urgency=low
 
   [ Adrian Knoth ]
