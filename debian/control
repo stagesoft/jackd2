@@ -19,7 +19,7 @@ Build-Depends: cdbs,
  g++-multilib [amd64],
  po-debconf,
  libcelt-dev (>= 0.7.0)
-Standards-Version: 3.8.4
+Standards-Version: 3.9.0
 DM-Upload-Allowed: yes
 Homepage: http://jackaudio.org/
 Vcs-Git: git://git.debian.org/git/pkg-multimedia/jackd2.git
