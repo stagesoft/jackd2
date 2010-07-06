@@ -1,3 +1,10 @@
+jackd2 (1.9.5~dfsg-17) unstable; urgency=low
+
+  * Augment sigsegv.c patch to support SH4 CPUs (Closes: #588124)
+  * Make RTPRIO handling more robust (allow users to delete audio.conf)
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Tue, 06 Jul 2010 09:40:36 +0200
+
 jackd2 (1.9.5~dfsg-16) experimental; urgency=low
 
   * reupload to experimental
