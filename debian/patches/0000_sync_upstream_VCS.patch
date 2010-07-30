@@ -1,10 +1,10 @@
-Description: Sync with upstream SVN trunk revision 4024
+Description: Sync with upstream SVN trunk revision 4036
 From: Jonas Smedegaard <dr@jones.dk>
 Forwarded: yes
-Last-Update: 2010-06-17
+Last-Update: 2010-07-30
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -19,194 +19,263 @@
+@@ -19,194 +19,274 @@
  Florian Faber
  Michael Voigt
  Torben Hohn  
@@ -18,6 +18,8 @@ Last-Update: 2010-06-17
 +Josh Green
  Mario Lang
 +Arnold Krille
++Jan Engelhardt
++Adrian Knoth
  
  ---------------------------
    Jackdmp changes log
@@ -25,27 +27,40 @@ Last-Update: 2010-06-17
 +---------------------------
  
 -2010-01-29 Gabriel M. Beddingfield <gabriel@teuton.org>
-+2010-06-16 Stephane Letz  <letz@grame.fr>
++2010-07-07 Stephane Letz  <letz@grame.fr>
  
 -	* Change JackEngineProfiling and JackAudioAdapterInterface gnuplot scripts to output SVG instead of PDF.
-+	* David Garcia Garzon unused_pkt_buf_field_jack2 netone patch.
++	* Jan Engelhardt patch for get_cycles on SPARC.
++	* Adrian Knoth hurd.patch, kfreebsd-fix.patch and alpha_ia64-sigsegv.patch from ticket 177.
  
 -2009-12-15 Stephane Letz  <letz@grame.fr>
-+2010-06-13 Stephane Letz  <letz@grame.fr>
++2010-06-29 Stephane Letz  <letz@grame.fr>
  
 -	* Shared memory manager was calling abort in case of fatal error, now return an error in caller.
-+	* Fix JackPosixSemaphore::TimedWait : same behavior as JackPosixSemaphore::Wait regarding EINTR.
++	* Arnold Krille firewire snooping patch.
  
 -2009-12-13 Stephane Letz  <letz@grame.fr>
-+2010-05-31 Stephane Letz  <letz@grame.fr>
++2010-06-16 Stephane Letz  <letz@grame.fr>
  
 -	* Mario Lang alsa_io time calculation overflow patch.
-+	* Fix from Fernando Lopez-Lezcano for compilation on fc13.
++	* David Garcia Garzon unused_pkt_buf_field_jack2 netone patch.
  
 -2009-12-10 Stephane Letz  <letz@grame.fr>
-+2010-05-30 Stephane Letz  <letz@grame.fr>
++2010-06-13 Stephane Letz  <letz@grame.fr>
  
 -	* Use a QUIT notification to properly quit the server channel, the server channel thread can then be 'stopped' instead of 'canceled'.
++	* Fix JackPosixSemaphore::TimedWait : same behavior as JackPosixSemaphore::Wait regarding EINTR.
+ 
+-2009-12-09 Stephane Letz  <letz@grame.fr>
++2010-05-31 Stephane Letz  <letz@grame.fr>
+ 
+-	* When threads are cancelled, the exception has to be rethrown. 
++	* Fix from Fernando Lopez-Lezcano for compilation on fc13.
+ 
+-2009-12-08 Stephane Letz  <letz@grame.fr>
++2010-05-30 Stephane Letz  <letz@grame.fr>
+ 
+-	* Josh Green ALSA driver capture only patch.  
 +	* David Garcia Garzon netone patch.
  
 +2010-05-27 Stephane Letz  <letz@grame.fr>
@@ -116,16 +131,12 @@ Last-Update: 2010-06-17
 +
 +	* Use a QUIT notification to properly quit the server channel, the server channel thread can then be 'stopped' instead of 'canceled'.
 +
- 2009-12-09 Stephane Letz  <letz@grame.fr>
- 
--	* When threads are cancelled, the exception has to be rethrown. 
--
++2009-12-09 Stephane Letz  <letz@grame.fr>
++
 +	* When threads are cancelled, the exception has to be rethrown. 
 +
- 2009-12-08 Stephane Letz  <letz@grame.fr>
- 
--	* Josh Green ALSA driver capture only patch.  
--
++2009-12-08 Stephane Letz  <letz@grame.fr>
++
 +	* Josh Green ALSA driver capture only patch.  
 +
  2009-12-03 Stephane Letz  <letz@grame.fr>
@@ -371,7 +382,7 @@ Last-Update: 2010-06-17
  	* Fix issues in JackNetDriver::DecodeTransportData and JackNetDriver::Initialize.
  
  2009-08-28 Stephane Letz  <letz@grame.fr>
-@@ -557,7 +626,7 @@
+@@ -557,7 +637,7 @@
  2008-11-21 Stephane Letz  <letz@grame.fr>
  
  	* Report ringbuffer.c fixes from JACK1.
@@ -1270,7 +1281,15 @@ Last-Update: 2010-06-17
  }
 --- a/linux/firewire/JackFFADODriver.cpp
 +++ b/linux/firewire/JackFFADODriver.cpp
-@@ -429,7 +429,7 @@
+@@ -338,6 +338,7 @@
+     driver->device_options.verbose = params->verbose_level;
+     driver->capture_frame_latency = params->capture_frame_latency;
+     driver->playback_frame_latency = params->playback_frame_latency;
++    driver->device_options.snoop_mode = params->snoop_mode;
+ 
+     debugPrint(DEBUG_LEVEL_STARTUP, " Driver compiled on %s %s", __DATE__, __TIME__);
+     debugPrint(DEBUG_LEVEL_STARTUP, " Created driver %s", name);
+@@ -429,7 +430,7 @@
  
          driver->capture_channels[chn].stream_type = ffado_streaming_get_capture_stream_type(driver->dev, chn);
          if (driver->capture_channels[chn].stream_type == ffado_stream_type_audio) {
@@ -1279,7 +1298,7 @@ Last-Update: 2010-06-17
              printMessage ("Registering audio capture port %s", buf);
              if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                                JACK_DEFAULT_AUDIO_TYPE,
-@@ -455,7 +455,7 @@
+@@ -455,7 +456,7 @@
              fCaptureChannels++;
  
          } else if (driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
@@ -1288,7 +1307,7 @@ Last-Update: 2010-06-17
              printMessage ("Registering midi capture port %s", buf);
              if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                                JACK_DEFAULT_MIDI_TYPE,
-@@ -502,7 +502,7 @@
+@@ -502,7 +503,7 @@
          driver->playback_channels[chn].stream_type = ffado_streaming_get_playback_stream_type(driver->dev, chn);
  
          if (driver->playback_channels[chn].stream_type == ffado_stream_type_audio) {
@@ -1297,7 +1316,7 @@ Last-Update: 2010-06-17
              printMessage ("Registering audio playback port %s", buf);
              if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                                JACK_DEFAULT_AUDIO_TYPE,
-@@ -530,7 +530,7 @@
+@@ -530,7 +531,7 @@
              jack_log("JackFFADODriver::Attach fPlaybackPortList[i] %ld ", port_index);
              fPlaybackChannels++;
          } else if (driver->playback_channels[chn].stream_type == ffado_stream_type_midi) {
@@ -1306,12 +1325,12 @@ Last-Update: 2010-06-17
              printMessage ("Registering midi playback port %s", buf);
              if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                                JACK_DEFAULT_MIDI_TYPE,
-@@ -753,12 +753,20 @@
+@@ -753,12 +754,20 @@
          strcpy (desc->name, "firewire");                               // size MUST be less then JACK_DRIVER_NAME_MAX + 1
          strcpy(desc->desc, "Linux FFADO API based audio backend");     // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
         
 -        desc->nparams = 11;
-+        desc->nparams = 12;
++        desc->nparams = 13;
  
          params = (jack_driver_param_desc_t *)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
          desc->params = params;
@@ -1328,7 +1347,31 @@ Last-Update: 2010-06-17
          strcpy (params[i].name, "period");
          params[i].character  = 'p';
          params[i].type       = JackDriverParamUInt;
-@@ -881,7 +889,7 @@
+@@ -846,6 +855,14 @@
+         strcpy (params[i].short_desc, "libffado verbose level");
+         strcpy (params[i].long_desc, params[i].short_desc);
+ 
++        i++;
++        strcpy (params[i].name, "snoop");
++        params[i].character  = 'X';
++        params[i].type       = JackDriverParamBool;
++        params[i].value.i    = 0;
++        strcpy (params[i].short_desc, "Snoop firewire traffic");
++        strcpy (params[i].long_desc, params[i].short_desc);
++
+         return desc;
+     }
+ 
+@@ -855,7 +872,7 @@
+ 
+         ffado_jack_settings_t cmlparams;
+ 
+-        char *device_name="hw:0";
++        char *device_name=(char*)"hw:0";
+ 
+         cmlparams.period_size_set = 0;
+         cmlparams.sample_rate_set = 0;
+@@ -881,7 +898,7 @@
  
              switch (param->character) {
                  case 'd':
@@ -1337,6 +1380,15 @@ Last-Update: 2010-06-17
                      break;
                  case 'p':
                      cmlparams.period_size = param->value.ui;
+@@ -911,7 +928,7 @@
+                     cmlparams.slave_mode = param->value.ui;
+                     break;
+                 case 'X':
+-                    cmlparams.snoop_mode = param->value.ui;
++                    cmlparams.snoop_mode = param->value.i;
+                     break;
+                 case 'v':
+                     cmlparams.verbose_level = param->value.ui;
 --- a/macosx/Jack-Info.plist
 +++ b/macosx/Jack-Info.plist
 @@ -7,7 +7,7 @@
@@ -9587,7 +9639,7 @@ Last-Update: 2010-06-17
      opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
      opt.add_option('--classic', action='store_true', default=False, help='Force enable standard JACK (jackd) even if D-Bus JACK (jackdbus) is enabled too')
      opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
-@@ -69,7 +70,10 @@
+@@ -69,13 +70,16 @@
      opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
      opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
      opt.add_option('--ports-per-application', default=768, type="int", dest="application_ports", help='Maximum number of ports per application')
@@ -9599,6 +9651,13 @@ Last-Update: 2010-06-17
      opt.sub_options('dbus')
  
  def configure(conf):
+     platform = Utils.detect_platform()
+     conf.env['IS_MACOSX'] = platform == 'darwin'
+-    conf.env['IS_LINUX'] = platform == 'linux'
++    conf.env['IS_LINUX'] = platform == 'linux' or platform == 'posix'
+     conf.env['IS_SUN'] = platform == 'sunos'
+ 
+     if conf.env['IS_LINUX']:
 @@ -110,6 +114,15 @@
      conf.sub_config('common')
      if conf.env['IS_LINUX']:
@@ -9686,18 +9745,23 @@ Last-Update: 2010-06-17
   * @see jack_port_name_size(), jack_port_type_size()
 --- a/dbus/sigsegv.c
 +++ b/dbus/sigsegv.c
-@@ -99,7 +99,13 @@
+@@ -98,8 +98,18 @@
+     jack_error("info.si_errno = %d", info->si_errno);
      jack_error("info.si_code  = %d (%s)", info->si_code, si_codes[info->si_code]);
      jack_error("info.si_addr  = %p", info->si_addr);
++#if !defined(__alpha__) && !defined(__ia64__) && !defined(__FreeBSD_kernel__) && !defined(__arm__) && !defined(__hppa__) && !defined(__sh__)
      for(i = 0; i < NGREG; i++)
 -        jack_error("reg[%02d]       = 0x" REGFORMAT, i, ucontext->uc_mcontext.gregs[i]);
 +        jack_error("reg[%02d]       = 0x" REGFORMAT, i, 
 +#if defined(__powerpc__)
 +                ucontext->uc_mcontext.uc_regs[i]
++#elif defined(__sparc__) && defined(__arch64__)
++                ucontext->uc_mcontext.mc_gregs[i]
 +#else
 +                ucontext->uc_mcontext.gregs[i]
 +#endif
 +                );
++#endif /* alpha, ia64, kFreeBSD, arm, hppa */
  
  #if defined(SIGSEGV_STACK_X86) || defined(SIGSEGV_STACK_IA64)
  # if defined(SIGSEGV_STACK_IA64)
@@ -10685,10 +10749,41 @@ Last-Update: 2010-06-17
          *status = (jack_status_t)my_status1;
 --- a/linux/cycles.h
 +++ b/linux/cycles.h
-@@ -103,6 +103,20 @@
+@@ -53,6 +53,16 @@
  
  #endif
  
++#ifdef __sparc_v9__
++/* rd is V9 only */
++static inline unsigned long long get_cycles(void)
++{
++	unsigned long long res;
++	__asm__ __volatile__("rd %%tick, %0" : "=r"(res));
++	return res;
++}
++#endif
++
+ #ifdef __PPC__
+ 
+ /* PowerPC */
+@@ -102,6 +112,33 @@
+ }
+ 
+ #endif
++
++#if defined(__FreeBSD_kernel__)
++
++#warning No suitable get_cycles() implementation. Returning 0 instead
++
++typedef unsigned long long cycles_t;
++
++static inline cycles_t get_cycles(void)
++{
++    return 0;
++}
++
++#endif
++
 +/* everything else but x86, amd64 or ppc */
 +#if !defined (__PPC__) && !defined (__x86_64__) && !defined (__i386__)
 +
@@ -10702,10 +10797,9 @@ Last-Update: 2010-06-17
 +}
 +
 +#endif
-+
+ 
  #endif
  
- #endif /* __jack_cycles_h__ */
 --- a/macosx/coremidi/JackCoreMidiDriver.cpp
 +++ b/macosx/coremidi/JackCoreMidiDriver.cpp
 @@ -40,11 +40,13 @@
@@ -10727,6 +10821,15 @@ Last-Update: 2010-06-17
      
 --- a/common/JackClient.cpp
 +++ b/common/JackClient.cpp
+@@ -1012,7 +1012,7 @@
+     if (va->load_name && (strlen(va->load_name) >= JACK_PATH_MAX)) {
+         jack_error("\"%s\" is too long for a shared object name.\n"
+                    "Please use %lu characters or less.",
+-                   va->load_name, PATH_MAX);
++                   va->load_name, JACK_PATH_MAX);
+         int my_status1 = *status | (JackFailure | JackInvalidOption);
+         *status = (jack_status_t)my_status1;
+         return 0;
 @@ -1027,7 +1027,8 @@
          return 0;
      }
@@ -12247,3 +12350,14 @@ Last-Update: 2010-06-17
          if (sem_close(fSemaphore) != 0) {
              jack_error("Disconnect: can't disconnect named semaphore name = %s err = %s", fName, strerror(errno));
              return false;
+--- a/common/jack/systemdeps.h
++++ b/common/jack/systemdeps.h
+@@ -53,7 +53,7 @@
+ 
+ #endif /* WIN32 */
+ 
+-#if defined(__APPLE__) || defined(__linux__) || defined(__sun__) || defined(sun)
++#if defined(__APPLE__) || defined(__linux__) || defined(__sun__) || defined(sun) || defined(__unix__)
+     #include <inttypes.h>
+     #include <pthread.h>
+     #include <sys/types.h>
