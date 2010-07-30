@@ -1,3 +1,9 @@
+jackd2 (1.9.5~dfsg-18) unstable; urgency=low
+
+  * Sync to upstream r4036 (Closes: #582744)
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Fri, 30 Jul 2010 17:57:43 +0200
+
 jackd2 (1.9.5~dfsg-17) unstable; urgency=low
 
   * Augment sigsegv.c patch to support SH4 CPUs (Closes: #588124)
