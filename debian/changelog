@@ -1,6 +1,6 @@
-jackd2 (1.9.5~dfsg-19) UNRELEASED; urgency=low
+jackd2 (1.9.5~dfsg-19) unstable; urgency=low
 
-  * 
+  * Fix FTBFS on kFreeBSD and sparc (Closes: #591247)
 
  -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Sun, 01 Aug 2010 19:54:32 +0200
 
