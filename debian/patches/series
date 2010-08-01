@@ -3,3 +3,4 @@ hppa-parallel.patch
 0001_jackrec-rename.patch
 1001_connect.patch
 sparc-kfreebsd.patch
+hurd.patch
