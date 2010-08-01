@@ -1,3 +1,9 @@
+jackd2 (1.9.5~dfsg-19) UNRELEASED; urgency=low
+
+  * 
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Sun, 01 Aug 2010 19:54:32 +0200
+
 jackd2 (1.9.5~dfsg-18) unstable; urgency=low
 
   * Sync to upstream r4036 (Closes: #582744)
