@@ -1,0 +1,68 @@
+--- a/linux/cycles.h
++++ b/linux/cycles.h
+@@ -51,7 +51,7 @@
+     return (((unsigned long)hi)<<32) | ((unsigned long)lo);
+ }
+ 
+-#endif
++#endif /* __x86_64__ */
+ 
+ #ifdef __sparc_v9__
+ /* rd is V9 only */
+@@ -61,7 +61,7 @@
+ 	__asm__ __volatile__("rd %%tick, %0" : "=r"(res));
+ 	return res;
+ }
+-#endif
++#endif /* __sparc_v9__ */
+ 
+ #ifdef __PPC__
+ 
+@@ -92,7 +92,7 @@
+     return ret;
+ }
+ 
+-#endif
++#endif /* __PPC__ */
+ 
+ #ifdef __i386__
+ 
+@@ -111,9 +111,10 @@
+     return ret;
+ }
+ 
+-#endif
++#endif /* __i386__ */
+ 
+-#if defined(__FreeBSD_kernel__)
++/* everything else but x86, amd64 or ppc */
++#if !defined (__PPC__) && !defined (__x86_64__) && !defined (__i386__)
+ 
+ #warning No suitable get_cycles() implementation. Returning 0 instead
+ 
+@@ -124,10 +125,12 @@
+     return 0;
+ }
+ 
+-#endif
++#endif /* everything else but x86, amd64 or ppc */
+ 
+-/* everything else but x86, amd64 or ppc */
+-#if !defined (__PPC__) && !defined (__x86_64__) && !defined (__i386__)
++#endif /* __linux__ */
++
++
++#if defined(__FreeBSD_kernel__)
+ 
+ #warning No suitable get_cycles() implementation. Returning 0 instead
+ 
+@@ -138,8 +141,7 @@
+     return 0;
+ }
+ 
+-#endif
++#endif /* __FreeBSD_kernel__ */
+ 
+-#endif
+ 
+ #endif /* __jack_cycles_h__ */
