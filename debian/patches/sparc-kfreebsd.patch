@@ -35,8 +35,8 @@
 +#endif /* __i386__ */
  
 -#if defined(__FreeBSD_kernel__)
-+/* everything else but x86, amd64 or ppc */
-+#if !defined (__PPC__) && !defined (__x86_64__) && !defined (__i386__)
++/* everything else but x86, amd64, sparcv9 or ppc */
++#if !defined (__PPC__) && !defined (__x86_64__) && !defined (__i386__) && !defined (__sparc_v9__)
  
  #warning No suitable get_cycles() implementation. Returning 0 instead
  
@@ -45,12 +45,12 @@
  }
  
 -#endif
-+#endif /* everything else but x86, amd64 or ppc */
++#endif /* everything else but x86, amd64, sparcv9 or ppc */
++
++#endif /* __linux__ */
  
 -/* everything else but x86, amd64 or ppc */
 -#if !defined (__PPC__) && !defined (__x86_64__) && !defined (__i386__)
-+#endif /* __linux__ */
-+
 +
 +#if defined(__FreeBSD_kernel__)
  
