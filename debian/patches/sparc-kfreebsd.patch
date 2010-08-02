@@ -1,3 +1,6 @@
+From: Adrian Knoth <adi@drcomp.erfurt.thur.de>
+Forwarded: http://trac.jackaudio.org/ticket/188
+Description: Fix FTBFS on sparc and kFreeBSD
 --- a/linux/cycles.h
 +++ b/linux/cycles.h
 @@ -51,7 +51,7 @@
