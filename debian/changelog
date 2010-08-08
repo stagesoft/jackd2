@@ -2,8 +2,9 @@ jackd2 (1.9.5~dfsg-19ubuntu1) UNRELEASED; urgency=low
 
   * Merge from debian unstable, remaining changes:
     - Drop libcelt build dependency
+  * debian/gbp.conf: Set debian-branch to ubuntu
 
- -- Luke Yelavich <themuso@ubuntu.com>  Mon, 09 Aug 2010 09:24:09 +1000
+ -- Luke Yelavich <themuso@ubuntu.com>  Mon, 09 Aug 2010 09:33:34 +1000
 
 jackd2 (1.9.5~dfsg-19) unstable; urgency=low
 
