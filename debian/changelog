@@ -1,3 +1,10 @@
+jackd2 (1.9.5~dfsg-19ubuntu1) UNRELEASED; urgency=low
+
+  * Merge from debian unstable, remaining changes:
+    - Drop libcelt build dependency
+
+ -- Luke Yelavich <themuso@ubuntu.com>  Mon, 09 Aug 2010 09:24:09 +1000
+
 jackd2 (1.9.5~dfsg-19) unstable; urgency=low
 
   * Fix FTBFS on kFreeBSD and sparc (Closes: #591247)
@@ -9,6 +16,13 @@ jackd2 (1.9.5~dfsg-18) unstable; urgency=low
   * Sync to upstream r4036 (Closes: #582744)
 
  -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Fri, 30 Jul 2010 17:57:43 +0200
+
+jackd2 (1.9.5~dfsg-17ubuntu1) maverick; urgency=low
+
+  * debian/control: Drop libcelt build dependency, in preparation for jackd2
+    moving to main
+
+ -- Luke Yelavich <themuso@ubuntu.com>  Tue, 20 Jul 2010 16:39:44 +0200
 
 jackd2 (1.9.5~dfsg-17) unstable; urgency=low
 
