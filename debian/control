@@ -36,7 +36,7 @@ Conflicts: jack-daemon,
 Depends: ${shlibs:Depends},
  ${misc:Depends},
  coreutils (>= 4.0),
- python,
+ python-dbus,
  debconf | debconf-2.0,
  libjack-jackd2-0 (= ${binary:Version})
 Recommends: qjackctl,
