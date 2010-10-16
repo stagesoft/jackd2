@@ -3,7 +3,8 @@ Name: jackdmp
 Maintainer: JACK developers <jack-devel@jackaudio.org>
 Source: http://jackaudio.org/download
 
-Excluded-Files: ./macosx/libportaudio.a,
+Excluded-Files: ./macosx/libcelt.a,
+	./macosx/libportaudio.a,
 	./windows/**.Lib,
 	./windows/**.lib,
 	./windows/**.dll

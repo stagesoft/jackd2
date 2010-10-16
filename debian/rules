@@ -15,7 +15,7 @@ DEB_UPSTREAM_TARBALL_EXTENSION = tar.bz2
 
 # unneeded and possibly sourceless binaries
 DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.Lib ./windows/**.lib ./windows/**.dll
-DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./macosx/libportaudio.a
+DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./macosx/libcelt.a ./macosx/libportaudio.a
 
 # unneeded sources copyright-protected without licence
 DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.rc
