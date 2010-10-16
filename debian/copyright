@@ -202,7 +202,7 @@ Files: ./dbus/controller.c,
 	./dbus/controller_iface_transport.c,
 	./dbus/controller_internal.h
 Copyright: 2007-2008, Juuso Alasuutari
-	2007-2008, Nedko Arnaudov
+	2007-2008, 2010, Nedko Arnaudov
 License: other-GPL-2-either
 
 Files: ./dbus/controller.h,
@@ -275,7 +275,7 @@ License: LGPL-2.1+
 Files: ./dbus/jackdbus.c,
 	./dbus/jackdbus.h
 Copyright: 2007-2008, Juuso Alasuutari
-	2007-2008, Nedko Arnaudov
+	2007-2008, 2010, Nedko Arnaudov
 	2008, Marc-Olivier Barre
 License: other-GPL-2-either
 
@@ -440,7 +440,7 @@ License: GPL-2+
 
 Files: ./common/Jackdmp.cpp
 Copyright: 2001-2005, Paul Davis
-	2004-2009, Grame <grame@grame.fr>
+	2004-2010, Grame <grame@grame.fr>
 License: GPL-2+
 
 Files: ./tests/cpu.c
