@@ -1,9 +1,17 @@
 jackd2 (1.9.6~dfsg-1) UNRELEASED; urgency=low
 
-  * Imported Upstream version 1.9.6~dfsg
-  * jackrec is now called jack_rec (like in jackd1)
+  * New upstream release.
 
- -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Mon, 30 Aug 2010 14:28:06 +0200
+  [ Adrian Knoth ]
+  * jackrec is now called jack_rec (like in jackd1)
+  * Make libjack-jackd2-dev provide libjack-dev.
+  * Don't suggest libjackasyn0, nobody really uses it.
+
+  [ Jonas Smedegaard ]
+  * Unfuzz patches.
+  * Update copyright file: Extend some copyright years.
+
+ -- Jonas Smedegaard <dr@jones.dk>  Sat, 16 Oct 2010 11:16:09 +0200
 
 jackd2 (1.9.5~dfsg-19) unstable; urgency=low
 

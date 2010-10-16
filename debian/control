@@ -5,6 +5,7 @@ Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alio
 Uploaders: Adrian Knoth <adi@drcomp.erfurt.thur.de>, Jonas Smedegaard <dr@jones.dk>, Reinhard Tartler <siretart@tauware.de>
 Build-Depends: cdbs,
  debhelper (>= 6),
+ dh-buildinfo,
  d-shlibs,
  python,
  libsamplerate-dev,
