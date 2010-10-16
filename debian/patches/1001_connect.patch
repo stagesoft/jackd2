@@ -14,7 +14,7 @@ Last-Update: 2010-04-03
  #endif
  #include <string.h>
  #include <stdlib.h>
-@@ -37,6 +38,7 @@
+@@ -44,6 +45,7 @@
  {
  	jack_client_t* client = NULL;
  	char *my_name = strrchr(argv[0], '/');
@@ -22,7 +22,7 @@ Last-Update: 2010-04-03
  	connecting = disconnecting = FALSE;
  	if (my_name == 0) {
  		my_name = argv[0];
-@@ -56,6 +58,8 @@
+@@ -63,6 +65,8 @@
  		return 1;
  	}
  
@@ -31,7 +31,7 @@ Last-Update: 2010-04-03
  	if (argc != 3) {
  		fprintf (stderr, "usage: %s <src_port> <dst_port>\n", my_name);
  		fprintf(stderr, "The source port must be an output port of the source client.\n");
-@@ -63,9 +67,16 @@
+@@ -70,9 +74,16 @@
  		return 1;
  	}
  
