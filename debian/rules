@@ -8,7 +8,6 @@ include /usr/share/cdbs/1/class/makefile.mk
 # suppress optional build-dependencies
 CDBS_BUILD_DEPENDS_rules_upstream-tarball =
 CDBS_BUILD_DEPENDS_rules_utils_copyright-check =
-CDBS_BUILD_DEPENDS_rules_utils_buildinfo =
 
 DEB_UPSTREAM_PACKAGE = jack
 DEB_UPSTREAM_URL = http://www.grame.fr/~letz/
