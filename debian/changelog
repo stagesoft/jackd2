@@ -13,7 +13,7 @@ jackd2 (1.9.6~dfsg-1) UNRELEASED; urgency=low
   * Extend repackaging of upstream source to strip unneeded and possibly
     sourceless binary ./macosx/libcelt.a.
 
- -- Jonas Smedegaard <dr@jones.dk>  Sat, 16 Oct 2010 11:24:49 +0200
+ -- Jonas Smedegaard <dr@jones.dk>  Sun, 17 Oct 2010 09:52:38 +0200
 
 jackd2 (1.9.5~dfsg-19) unstable; urgency=low
 
