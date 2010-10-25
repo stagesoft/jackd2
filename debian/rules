@@ -1,14 +1,13 @@
 #!/usr/bin/make -f
 
 -include /usr/share/cdbs/1/rules/upstream-tarball.mk
-include /usr/share/cdbs/1/rules/utils.mk
+-include /usr/share/cdbs/1/rules/utils.mk
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/makefile.mk
 
 # suppress optional build-dependencies
 CDBS_BUILD_DEPENDS_rules_upstream-tarball =
 CDBS_BUILD_DEPENDS_rules_utils_copyright-check =
-CDBS_BUILD_DEPENDS_rules_utils_buildinfo =
 
 DEB_UPSTREAM_PACKAGE = jack
 DEB_UPSTREAM_URL = http://www.grame.fr/~letz/
@@ -16,7 +15,7 @@ DEB_UPSTREAM_TARBALL_EXTENSION = tar.bz2
 
 # unneeded and possibly sourceless binaries
 DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.Lib ./windows/**.lib ./windows/**.dll
-DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./macosx/libportaudio.a
+DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./macosx/libcelt.a ./macosx/libportaudio.a
 
 # unneeded sources copyright-protected without licence
 DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.rc
