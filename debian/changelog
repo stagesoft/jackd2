@@ -1,4 +1,4 @@
-jackd2 (1.9.6~dfsg-1) UNRELEASED; urgency=low
+jackd2 (1.9.6~dfsg-1) unstable; urgency=low
 
   * New upstream release.
 
@@ -6,6 +6,7 @@ jackd2 (1.9.6~dfsg-1) UNRELEASED; urgency=low
   * jackrec is now called jack_rec (like in jackd1)
   * Make libjack-jackd2-dev provide libjack-dev.
   * Don't suggest libjackasyn0, nobody really uses it.
+  * Depend on python-dbus (Closes: #595520)
 
   [ Jonas Smedegaard ]
   * Unfuzz patches.
@@ -13,7 +14,7 @@ jackd2 (1.9.6~dfsg-1) UNRELEASED; urgency=low
   * Extend repackaging of upstream source to strip unneeded and possibly
     sourceless binary ./macosx/libcelt.a.
 
- -- Jonas Smedegaard <dr@jones.dk>  Sun, 17 Oct 2010 09:52:38 +0200
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Mon, 25 Oct 2010 16:31:10 +0200
 
 jackd2 (1.9.5~dfsg-19) unstable; urgency=low
 
