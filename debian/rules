@@ -45,8 +45,6 @@ clean::
 	rm -f .lock-wscript
 	find ./.waf-* -iname '*.pyc' -exec rm '{}' \;
 	rm -rf build
-	rm -f man/*.1
-	-rmdir man
 
 DEB_DH_MAKESHLIBS_ARGS = -Xintime -Xinprocess -Xjack_alsa -Xjack_oss -Xjack_dummy -Xjack_firewire
 
