@@ -1,3 +1,29 @@
+jackd2 (1.9.6~dfsg-1ubuntu1) UNRELEASED; urgency=low
+
+  * Merge from debian unstable, remaining changes:
+    - Drop libcelt build dependency
+    - debian/gbp.conf: Set debian-branch to ubuntu
+
+ -- Luke Yelavich <themuso@ubuntu.com>  Tue, 26 Oct 2010 20:07:05 -0400
+
+jackd2 (1.9.6~dfsg-1) unstable; urgency=low
+
+  * New upstream release.
+
+  [ Adrian Knoth ]
+  * jackrec is now called jack_rec (like in jackd1)
+  * Make libjack-jackd2-dev provide libjack-dev.
+  * Don't suggest libjackasyn0, nobody really uses it.
+  * Depend on python-dbus (Closes: #595520)
+
+  [ Jonas Smedegaard ]
+  * Unfuzz patches.
+  * Update copyright file: Extend some copyright years.
+  * Extend repackaging of upstream source to strip unneeded and possibly
+    sourceless binary ./macosx/libcelt.a.
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Mon, 25 Oct 2010 16:31:10 +0200
+
 jackd2 (1.9.5~dfsg-19ubuntu1) maverick; urgency=low
 
   * Merge from debian unstable, remaining changes:

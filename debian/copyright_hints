@@ -11,7 +11,6 @@ Files: ./ChangeLog,
 	./dbus/org.jackaudio.service.in,
 	./dbus/sigsegv.h,
 	./dbus/wscript,
-	./debian/FAQ,
 	./debian/TODO.Debian,
 	./debian/asound.rc,
 	./debian/audio.conf,
@@ -20,27 +19,26 @@ Files: ./ChangeLog,
 	./debian/control,
 	./debian/control.in,
 	./debian/gbp.conf,
-	./debian/jackd-firewire.install,
-	./debian/jackd.README.Debian,
-	./debian/jackd.config,
-	./debian/jackd.docs,
-	./debian/jackd.examples,
-	./debian/jackd.install,
-	./debian/jackd.manpages,
-	./debian/jackd.postinst,
-	./debian/jackd.postrm,
-	./debian/jackd.preinst,
-	./debian/jackd.templates,
-	./debian/libjack-dev.README,
-	./debian/libjack-dev.install,
-	./debian/libjack0.install,
+	./debian/jackd2-firewire.install,
+	./debian/jackd2.config,
+	./debian/jackd2.docs,
+	./debian/jackd2.examples,
+	./debian/jackd2.install,
+	./debian/jackd2.manpages,
+	./debian/jackd2.postinst,
+	./debian/jackd2.postrm,
+	./debian/jackd2.preinst,
+	./debian/jackd2.templates,
+	./debian/libjack-jackd2-0.install,
+	./debian/libjack-jackd2-0.shlibs,
+	./debian/libjack-jackd2-dev.README,
+	./debian/libjack-jackd2-dev.install,
 	./debian/libjack0.lintian-overrides,
 	./debian/libjack0.symbols,
-	./debian/patches/0001_jackrec-rename.patch,
-	./debian/patches/0002_manpages.patch,
 	./debian/patches/1001_connect.patch,
-	./debian/patches/1002_waf_wscript_update.patch,
 	./debian/patches/README,
+	./debian/patches/hppa-parallel.patch,
+	./debian/patches/hurd.patch,
 	./debian/patches/series,
 	./debian/po/POTFILES.in,
 	./debian/rules,
@@ -99,14 +97,11 @@ Files: ./ChangeLog,
 	./windows/JackRouter/JackRouter.def,
 	./windows/JackRouter/JackRouter.dsp,
 	./windows/JackRouter/JackRouter.dsw,
-	./windows/JackRouter/Psapi.Lib,
 	./windows/JackRouter/README,
 	./windows/JackRouter/profport.h,
-	./windows/JackRouter/psapi.dll,
 	./windows/JackRouter/psapi.h,
 	./windows/JackRouter/resource.h,
 	./windows/README,
-	./windows/Setup/JackRouter.dll,
 	./windows/Setup/JackRouter.ini,
 	./windows/Setup/README,
 	./windows/Setup/jack.ci,
@@ -150,9 +145,7 @@ Files: ./ChangeLog,
 	./windows/libjackmp.dsp,
 	./windows/libjackserver.cbp,
 	./windows/libjackservermp.dsp,
-	./windows/libsamplerate-0.lib,
 	./windows/multiple_metro.cbp,
-	./windows/portaudio/portaudio_x86.lib,
 	./windows/resource.h,
 	./windows/resource_vc.h,
 	./windows/testSynchoServerClient.dsp,
@@ -454,21 +447,6 @@ Copyright: 2001, Paul Davis
 License: LGPL-2.1+
  FIXME
 
-Files: ./windows/jackaudioadapter.rc,
-	./windows/jackd.rc,
-	./windows/jacknetadapter.rc,
-	./windows/jacknetdriver.rc,
-	./windows/jacknetmanager.rc,
-	./windows/jackportaudio.rc,
-	./windows/jackwinmme.rc,
-	./windows/libjack.rc,
-	./windows/libjackserver.rc
-Copyright: 2006-2008
-	2006-2008,
-	Grame 2006-2010\0"
-License: UNKNOWN
- FIXME
-
 Files: ./common/JackPhysicalMidiInput.cpp,
 	./common/JackPhysicalMidiInput.h,
 	./common/JackPhysicalMidiOutput.cpp,
@@ -490,6 +468,7 @@ Files: ./dbus/controller.c,
 	./dbus/controller_internal.h
 Copyright: 2007-2008, Juuso Alasuutari
 	2007-2008, Nedko Arnaudov
+	2007-2008,2010, Nedko Arnaudov
 	2008, Juuso Alasuutari
 	2008, Nedko Arnaudov
 License: GPL
@@ -536,14 +515,6 @@ Files: ./example-clients/bufsize.c,
 Copyright: 2003, Jack O'Quin
 	2005, Jack O'Quin
 License: GPL-2+
- FIXME
-
-Files: ./example-clients/alsa_in.c,
-	./example-clients/alsa_out.c,
-	./example-clients/wait.c,
-	./macosx/libportaudio.a
-Copyright: 
-License: UNKNOWN
  FIXME
 
 Files: ./common/JackMidiDriver.cpp,
@@ -594,10 +565,18 @@ Copyright: 2001, Paul Davis
 License: LGPL-2.1+
  FIXME
 
+Files: ./example-clients/alsa_in.c,
+	./example-clients/alsa_out.c,
+	./example-clients/wait.c
+Copyright: 
+License: UNKNOWN
+ FIXME
+
 Files: ./dbus/jackdbus.c,
 	./dbus/jackdbus.h
 Copyright: 2007-2008, Juuso Alasuutari
 	2007-2008, Nedko Arnaudov
+	2007-2008,2010, Nedko Arnaudov
 	2008, Marc-Olivier Barre
 License: GPL
  FIXME
@@ -744,12 +723,6 @@ Copyright: 2009
 License: UNKNOWN
  FIXME
 
-Files: ./windows/JackRouter/resource.rc,
-	./windows/resource.rc
-Copyright: Grame 2006-2010\0"
-License: UNKNOWN
- FIXME
-
 Files: ./debian/po/ru.po,
 	./debian/po/templates.pot
 Copyright: YEAR THE PACKAGE'S HOLDER
@@ -819,7 +792,7 @@ Files: ./common/Jackdmp.cpp
 Copyright: 2001, Paul Davis
 	2001-2005, Paul Davis and others.\n"
 	2004-2008, Grame
-	2004-2009, Grame.\n"
+	2004-2010, Grame.\n"
 License: GPL-2+
  FIXME
 
@@ -899,18 +872,6 @@ Copyright: 1989,90,91,92,93,94,96,97,98 Free Software Foundation, Inc
 License: LGPL-2+
  FIXME
 
-Files: ./debian/patches/0000_sync_upstream_VCS.patch
-Copyright: (isascii && isalnum )
-	(isascii && isblank )
-	2001-2003, Paul Davis
-	2002-2007, Werner Schweer and others
-	2004-2008, Grame
-	2006, Grame
-	2009, Grame
-	re_syntax_table[c
-License: LGPL-2.1+
- FIXME
-
 Files: ./macosx/JackMachThread.h
 Copyright: 2001, Paul Davis
 	2002, Apple Computer, Inc.
@@ -952,9 +913,10 @@ Copyright: 2005, - 2008, Jaco Kroon
 License: Public domain
  FIXME
 
-Files: ./windows/jacknetonedriver.rc
-Copyright: 2006-2008,
-	Grame 2006-2009\0"
+Files: ./macosx/libcelt.a
+Copyright:    Pm  z   P        >  D   Pi  m   P´  «   P        å  ó   R†  ≥   R        ^  †   R„  Ô   Rº  ∆   R        Á     W        ˘  
+	  &†  &ó  &ç  &Ç  +w    '  (≥  )æ  +  )…  a  )“  ™  (€  p      ‘      (Á      ≥   m®  str l∞  file l∞  line l¬    #X  ì       Â        @  st í  R  fin íK  õ  fout í˝  —  *   í¬   -  /@  #  i ô¬   c   -v  p  ñ&õ  &è  &Ñ    #4   ß      ˇ      ô  ï  cfg ¶  Â  fin ¶K    fout ¶˝  +   02  ¨˜  "st ´  "fin ´K  "fout ´˝  !*   ´¬   1Â  i ≤¬    .&õ  &è  &Ñ    2ï         õ      N  i  +•  ö  +∞  „  +º    +…  u  /†  L  )⁄  ´   -v  –  Ø&õ  &è  &Ñ     ì   Á  !⁄   ‡¬   "f ·ñ  !I   ‚  !*   „¬   !ã   ‰ñ  "st Ê  p ËV  m ÈV  1·  j Ó¬    .j ı¬   ..(Ω  («  1  (÷   .(‚       2i  †      Ω!      ·  ◊  +x  -  +Ñ  Ø   +é  \#  +ö  •#  +¶  ›#  +≤  Q$  *Ω  vÑ}*«  và}/   «  )‚  â$  3i  l      :!      ¯&Y  &P  &G  &>  &5  &,  l      :!      )Ω  √$  )«  ˝$  /@  Ú  )÷  7%   'ê  )‚  π%  -i  ‡  ¯&Y  &P  &G  &>  &5  &,  '  )Ω  Û%  )«  -&  /@  ≤  )‚  g&  -i  ê  ¯&Y  &P  &G  &>  &5  &,  '¿  )Ω  °&  )«  €&  /  †  )‚  '  -i  @  ¯&Y  &P  &G  &>  &5  &,  'p  )Ω  O'  )«  â'  /†  é  )‚  √'  -i    ¯&Y  &P  &G  &>  &5  &,  '   )Ω  ˝'  )«  7(  /P  |  )‚  q(  -i  †  ¯&Y  &P  &G  &>  &5  &,  '–  )Ω  ´(  )«  Â(  /   j  )‚  )  -i  P  ¯&Y  &P  &G  &>  &5  &,  'Ä  )Ω  Y)  )«  ì)  /∞  Û  )÷  Õ)   '   )‚  ‘*  -i  @  ¯&Y  &P  &G  &>  &5  &,  'p  )Ω  +  )«  D+  /†  U  )÷  ~+   '‡  )‚  Ö,         '   )÷  ·,      'p	  )÷  Ë-      '¿	  )÷  Ô.      '
+	  /¥	  H  17  ü  .¬	  /Õ	  Ä       "r  p  â  a   Ñ   >  •	  …	  !L    
 License: UNKNOWN
  FIXME
 
@@ -1013,16 +975,6 @@ License: UNKNOWN
 Files: ./debian/po/pt.po
 Copyright: 2009, the jack-audio-connection-kit's holder
 	inaceit√°vel em ambientes de "
-License: UNKNOWN
- FIXME
-
-Files: ./windows/Release/bin/libsamplerate-0.dll
-Copyright: ∏øb:∏A:∏±’9∏è9∏ZH9∏î9∏ª∫8∏–s8∏”,8∏ƒÂ7∏£û7∏pW7∏,7∏’»6∏mÅ6∏Ú96∏fÚ5∏…™5∏c5∏X5∏Ö”4∏°ã4∏™C4∏£˚3∏ä≥3∏_k3∏##3∏’⁄2∏ví2∏J2∏Ñ2∏Ò∏1∏Mp1∏ó'1∏—ﬁ0∏˘ï0∏M0∏0∏
-License: UNKNOWN
- FIXME
-
-Files: ./windows/Release/bin/portaudio_x86.dll
-Copyright: ‘:T;Ñ;<À<=Ñ=¥=;>˚>7?R?h?p? ¿  4   Ï0r1A2¿2‰4ﬂ6ß8ı8999L9: :=|=ò=>D>`>∫?‚?Ë? –  h   ^0Œ1ı1Ï45+5I5s5g6Ï6:7g8ó8
 License: UNKNOWN
  FIXME
 
