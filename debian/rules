@@ -20,6 +20,9 @@ DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./macosx/libcelt.a ./macosx/libportaudio.a
 # unneeded sources copyright-protected without licence
 DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.rc
 
+# pure garbage in upstream tarball
+DEB_UPSTREAM_REPACKAGE_EXCLUDES += .DS_Store
+
 # ignore oddly packaged bzip2 archive to not upset dpkg
 DEB_COPYRIGHT_CHECK_IGNORE_REGEX = ^\./waf|\./debian/(changelog|copyright(|_hints|_newhints))$
 
