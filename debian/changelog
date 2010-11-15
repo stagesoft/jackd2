@@ -1,3 +1,10 @@
+jackd2 (1.9.6~dfsg.1-2) unstable; urgency=low
+
+  * Strip .DS_Store, an OSX specific folder db.
+  * Remove audio.conf.disabled upon purge (Closes: #603457)
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Mon, 15 Nov 2010 15:05:33 +0100
+
 jackd2 (1.9.6~dfsg-1) unstable; urgency=low
 
   * New upstream release.
