@@ -1,3 +1,11 @@
+jackd2 (1.9.6~dfsg.1-3) experimental; urgency=low
+
+  * Sync to upstream r4089
+  * Includes: jack-session support, fixes ALSA suspend/resume and machine
+    lock-up after FFADO crashes
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Mon, 22 Nov 2010 19:31:37 +0100
+
 jackd2 (1.9.6~dfsg.1-2) unstable; urgency=low
 
   * Strip .DS_Store, an OSX specific folder db.
