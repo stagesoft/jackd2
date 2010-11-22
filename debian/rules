@@ -81,6 +81,9 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	dh_install -pjackd2 debian/tmp/usr/lib/jack/audioadapter.so
 endif	
 
+binary-install/jackd2::
+	dh_pysupport -pjackd2
+
 # TODO: drop libstdc++6 override when bug#374049 closed in stable
 binary-post-install/libjack0::
 	d-devlibdeps \
