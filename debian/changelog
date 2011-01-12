@@ -1,3 +1,11 @@
+jackd2 (1.9.6~dfsg.1-4) experimental; urgency=low
+
+  * Add Brazilian Portuguese translation.
+  * Provide libjack-dev-session
+  * Refresh VCS version to r4104
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Wed, 12 Jan 2011 17:46:58 +0100
+
 jackd2 (1.9.6~dfsg.1-3) experimental; urgency=low
 
   * Sync to upstream r4089
