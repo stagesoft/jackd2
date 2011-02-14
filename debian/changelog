@@ -1,10 +1,10 @@
-jackd2 (1.9.6~dfsg.1-5ubuntu1) UNRELEASED; urgency=low
+jackd2 (1.9.6~dfsg.1-5ubuntu1) natty; urgency=low
 
   * Merge from debian experimental, remaining changes:
     - Drop libcelt build dependency
     - debian/gbp.conf: Set debian-branch to ubuntu
 
- -- Luke Yelavich <themuso@ubuntu.com>  Mon, 14 Feb 2011 20:20:21 +1100
+ -- Luke Yelavich <themuso@ubuntu.com>  Mon, 14 Feb 2011 20:28:17 +1100
 
 jackd2 (1.9.6~dfsg.1-5) experimental; urgency=low
 
