@@ -95,6 +95,7 @@ Depends: libjack-jackd2-0 (= ${binary:Version}),
 Conflicts: libjack0.100.0-dev (<< 0.102.20-2),
  libjack-dev
 Provides: libjack0.100.0-dev,
+ libjack-dev-session,
  libjack-dev
 Replaces: libjack0.71.2-0 (<< 0.75.0-1)
 Description: JACK Audio Connection Kit (development files)

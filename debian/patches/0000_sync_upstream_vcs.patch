@@ -1,5 +1,5 @@
 From: Adrian Knoth <adi@drcomp.erfurt.thur.de>
-Description: Sync with upstream SVN trunk revision 4089
+Description: Sync with upstream SVN trunk revision 4104
 Last-Update: 2010-11-22
 Forwarded: not-needed
 --- a/doxyfile
@@ -15,12 +15,16 @@ Forwarded: not-needed
  # base path where the generated documentation will be put. 
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -31,7 +31,38 @@
+@@ -31,7 +31,42 @@
  
  ---------------------------
    Jackdmp changes log
 ----------------------------
 +---------------------------
++
++2011-01-11 Stephane Letz  <letz@grame.fr>
++
++	* Adrian Knoth jack_lsp patch.
 +
 +2010-11-17 Stephane Letz  <letz@grame.fr>
 +
@@ -4642,7 +4646,59 @@ Forwarded: not-needed
  
 --- a/example-clients/lsp.c
 +++ b/example-clients/lsp.c
-@@ -146,7 +146,7 @@
+@@ -39,6 +39,7 @@
+ 	fprintf (stderr, "List active Jack ports, and optionally display extra information.\n");
+ 	fprintf (stderr, "Optionally filter ports which match ALL strings provided after any options.\n\n");
+ 	fprintf (stderr, "Display options:\n");
++	fprintf (stderr, "        -s, --server <name>   Connect to the jack server named <name>\n");
+ 	fprintf (stderr, "        -A, --aliases         List aliases for each port\n");
+ 	fprintf (stderr, "        -c, --connections     List connections to/from each port\n");
+ 	fprintf (stderr, "        -l, --latency         Display per-port latency in frames at each port\n");
+@@ -56,6 +57,7 @@
+ {
+ 	jack_client_t *client;
+ 	jack_status_t status;
++    jack_options_t options = JackNoStartServer;
+ 	const char **ports, **connections;
+ 	unsigned int i, j, k;
+ 	int skip_port;
+@@ -68,9 +70,11 @@
+ 	int c;
+ 	int option_index;
+ 	char* aliases[2];
++	char *server_name = NULL;
+ 	jack_port_t *port;
+ 	
+ 	struct option long_options[] = {
++	    { "server", 1, 0, 's' },
+ 		{ "aliases", 0, 0, 'A' },
+ 		{ "connections", 0, 0, 'c' },
+ 		{ "port-latency", 0, 0, 'l' },
+@@ -89,8 +93,13 @@
+ 		my_name ++;
+ 	}
+ 
+-	while ((c = getopt_long (argc, argv, "AclLphvt", long_options, &option_index)) >= 0) {
++	while ((c = getopt_long (argc, argv, "s:AclLphvt", long_options, &option_index)) >= 0) {
+ 		switch (c) {
++		case 's':
++            server_name = (char *) malloc (sizeof (char) * strlen(optarg));
++            strcpy (server_name, optarg);
++            options |= JackServerName;
++            break;
+ 		case 'A':
+ 			aliases[0] = (char *) malloc (jack_port_name_size());
+ 			aliases[1] = (char *) malloc (jack_port_name_size());
+@@ -131,7 +140,7 @@
+ 	 * specify JackNoStartServer. */
+ 	//JOQ: need a new server name option
+ 
+-	client = jack_client_open ("lsp", JackNoStartServer, &status);
++	client = jack_client_open ("lsp", options, &status, server_name);
+ 	if (client == NULL) {
+ 		if (status & JackServerFailed) {
+ 			fprintf (stderr, "JACK server not running\n");
+@@ -146,7 +155,7 @@
      if (!ports) 
          goto error;
  
@@ -4651,7 +4707,7 @@ Forwarded: not-needed
  		// skip over any that don't match ALL of the strings presented at command line
  		skip_port = 0;
  		for(k = optind; k < argc; k++){
-@@ -227,6 +227,8 @@
+@@ -227,6 +236,8 @@
  	}
      
  error:
@@ -24475,6 +24531,82 @@ Forwarded: not-needed
  APPNAME='jack'
  JACK_API_VERSION = '0.1.0'
  
+@@ -108,8 +108,8 @@
+     #   conf.check_tool('compiler_cxx')
+     #   conf.check_tool('compiler_cc')
+  
+-    conf.env.append_unique('CXXFLAGS', '-O3 -Wall')
+-    conf.env.append_unique('CCFLAGS', '-O3 -Wall')
++    conf.env.append_unique('CXXFLAGS', '-Wall')
++    conf.env.append_unique('CCFLAGS', '-Wall')
+ 
+     conf.sub_config('common')
+     if conf.env['IS_LINUX']:
+@@ -164,7 +164,7 @@
+     else:
+         conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib'
+ 
+-    if Options.options.libdir:
++    if Options.options.mandir:
+         conf.env['MANDIR'] = conf.env['PREFIX'] + Options.options.mandir
+     else:
+         conf.env['MANDIR'] = conf.env['PREFIX'] + '/share/man/man1'
+@@ -198,6 +198,22 @@
+         if m != None:
+             svnrev = m.group(1)
+ 
++    conf.env.append_unique('LINKFLAGS', '-lm -lstdc++')
++
++    if Options.options.mixed == True:
++        env_variant2 = conf.env.copy()
++        conf.set_env_name('lib32', env_variant2)
++        env_variant2.set_variant('lib32')
++        conf.setenv('lib32')
++        conf.env.append_unique('CXXFLAGS', '-m32')
++        conf.env.append_unique('CCFLAGS', '-m32')
++        conf.env.append_unique('LINKFLAGS', '-m32')
++        if Options.options.libdir32:
++            conf.env['LIBDIR'] = conf.env['PREFIX'] + Options.options.libdir32
++        else:
++            conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
++        conf.write_config_header('config.h')
++
+     print
+     display_msg("==================")
+     version_msg = "JACK " + VERSION
+@@ -214,6 +230,9 @@
+     display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
+     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
+     display_feature('Build debuggable binaries', conf.env['BUILD_DEBUG'])
++    display_msg('C compiler flags', repr(conf.env['CCFLAGS']))
++    display_msg('C++ compiler flags', repr(conf.env['CXXFLAGS']))
++    display_msg('Linker flags', repr(conf.env['LINKFLAGS']))
+     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
+     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
+     display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
+@@ -248,22 +267,6 @@
+             print Logs.colors.NORMAL,
+     print
+ 
+-    conf.env.append_unique('LINKFLAGS', '-lm -lstdc++')
+-
+-    if Options.options.mixed == True:
+-	env_variant2 = conf.env.copy()
+-	conf.set_env_name('lib32', env_variant2)
+-	env_variant2.set_variant('lib32')
+-	conf.setenv('lib32')
+-    	conf.env.append_unique('CXXFLAGS', '-m32')
+-    	conf.env.append_unique('CCFLAGS', '-m32')
+-    	conf.env.append_unique('LINKFLAGS', '-m32')
+-    	if Options.options.libdir32:
+-	    conf.env['LIBDIR'] = conf.env['PREFIX'] + Options.options.libdir32
+-    	else:
+-	    conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
+-	conf.write_config_header('config.h')
+-
+ def build(bld):
+     print ("make[1]: Entering directory `" + os.getcwd() + "/" + blddir + "'" )
+     if not os.access('svnversion.h', os.R_OK):
 --- a/dbus/controller_iface_patchbay.c
 +++ b/dbus/controller_iface_patchbay.c
 @@ -323,7 +323,7 @@
@@ -25971,3 +26103,66 @@ Forwarded: not-needed
  };
  
  } // end of namespace
+--- a/linux/cycles.h
++++ b/linux/cycles.h
+@@ -37,8 +37,6 @@
+  * regardless of how fast the machine is.
+  */
+ 
+-#ifdef __linux__
+-
+ #ifdef __x86_64__
+ 
+ typedef unsigned long cycles_t;
+@@ -127,21 +125,5 @@
+ 
+ #endif /* everything else but x86, amd64, sparcv9 or ppc */
+ 
+-#endif /* __linux__ */
+-
+-
+-#if defined(__FreeBSD_kernel__)
+-
+-#warning No suitable get_cycles() implementation. Returning 0 instead
+-
+-typedef unsigned long long cycles_t;
+-
+-static inline cycles_t get_cycles(void)
+-{
+-    return 0;
+-}
+-
+-#endif /* __FreeBSD_kernel__ */
+-
+ 
+ #endif /* __jack_cycles_h__ */
+--- a/windows/jackd.workspace
++++ b/windows/jackd.workspace
+@@ -20,13 +20,13 @@
+ 		<Project filename="jack_netmanager.cbp">
+ 			<Depends filename="libjackserver.cbp" />
+ 		</Project>
+-		<Project filename="jack_audioadapter.cbp" active="1">
++		<Project filename="jack_audioadapter.cbp">
+ 			<Depends filename="libjackserver.cbp" />
+ 		</Project>
+ 		<Project filename="jack_netadapter.cbp">
+ 			<Depends filename="libjackserver.cbp" />
+ 		</Project>
+-		<Project filename="libjack.cbp" />
++		<Project filename="libjack.cbp" active="1" />
+ 		<Project filename="jack_load.cbp">
+ 			<Depends filename="libjack.cbp" />
+ 		</Project>
+--- a/windows/libjack.cbp
++++ b/windows/libjack.cbp
+@@ -174,6 +174,9 @@
+ 		<Unit filename="..\common\JackShmMem.cpp" />
+ 		<Unit filename="..\common\JackTools.cpp" />
+ 		<Unit filename="..\common\JackTransportEngine.cpp" />
++		<Unit filename="..\common\ringbuffer.c">
++			<Option compilerVar="CC" />
++		</Unit>
+ 		<Unit filename="..\common\shm.c">
+ 			<Option compilerVar="CC" />
+ 		</Unit>

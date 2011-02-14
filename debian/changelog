@@ -1,3 +1,25 @@
+jackd2 (1.9.6~dfsg.1-5ubuntu1) UNRELEASED; urgency=low
+
+  * Merge from debian experimental, remaining changes:
+    - Drop libcelt build dependency
+    - debian/gbp.conf: Set debian-branch to ubuntu
+
+ -- Luke Yelavich <themuso@ubuntu.com>  Mon, 14 Feb 2011 20:20:21 +1100
+
+jackd2 (1.9.6~dfsg.1-5) experimental; urgency=low
+
+  * Add no-self-connect patch to provide better ladish support.
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Sat, 29 Jan 2011 19:00:05 +0100
+
+jackd2 (1.9.6~dfsg.1-4) experimental; urgency=low
+
+  * Add Brazilian Portuguese translation.
+  * Provide libjack-dev-session
+  * Refresh VCS version to r4104
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Wed, 12 Jan 2011 17:46:58 +0100
+
 jackd2 (1.9.6~dfsg.1-3ubuntu1) natty; urgency=low
 
   * Merge from debian unstable, remaining changes:
