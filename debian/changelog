@@ -1,3 +1,13 @@
+jackd2 (1.9.7~dfsg-1) unstable; urgency=low
+
+  * New upstream version 1.9.7 (ALSA resume, new latency API)
+  * Build with --mixed on i386 to be compatible with amd64.
+  * Don't patch jack_connect for fast consecutive calls anymore, it's now
+    using the same code as in jackd1 and waits for the port connection to
+    appear.
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Thu, 31 Mar 2011 13:54:50 +0200
+
 jackd2 (1.9.6~dfsg.1-5) experimental; urgency=low
 
   * Add no-self-connect patch to provide better ladish support.
