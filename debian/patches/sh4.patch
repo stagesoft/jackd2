@@ -1,0 +1,17 @@
+From: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+Forwarded: http://trac.jackaudio.org/ticket/223
+Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=622713
+Description: Make it work on SH4 architectures
+diff --git a/linux/JackLinuxTime.c b/linux/JackLinuxTime.c
+index 93f7f03..c80eb17 100644
+--- a/linux/JackLinuxTime.c
++++ b/linux/JackLinuxTime.c
+@@ -166,6 +166,8 @@ static jack_time_t jack_get_mhz (void)
+ 		ret = sscanf(buf, "Clocking:       %" SCNu64, &mhz);
+ #elif defined( __s390__  )
+ 		ret = sscanf(buf, "bogomips per cpu: %" SCNu64, &mhz);
++#elif defined( __sh__  )
++		ret = sscanf(buf, "bogomips        : %" SCNu64, &mhz);
+ #else /* MIPS, ARM, alpha */
+ 		ret = sscanf(buf, "BogoMIPS        : %" SCNu64, &mhz);
+ #endif
