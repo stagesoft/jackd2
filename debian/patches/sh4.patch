@@ -1,6 +1,7 @@
 From: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
 Forwarded: http://trac.jackaudio.org/ticket/223
 Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=622713
+Applied-Upstream: 1.9.8, http://trac.jackaudio.org/changeset/4321
 Description: Make it work on SH4 architectures
 diff --git a/linux/JackLinuxTime.c b/linux/JackLinuxTime.c
 index 93f7f03..c80eb17 100644
