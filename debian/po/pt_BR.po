@@ -1,14 +1,14 @@
-# Debconf translations for jack-audio-connection-kit.
-# Copyright (C) 2009 THE jack-audio-connection-kit'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the jack-audio-connection-kit package.
-# Adriano Rafael Gomes <adrianorg@gmail.com>, 2009.
+# Debconf translations for jackd2.
+# Copyright (C) 2010 THE jackd2'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the jackd2 package.
+# Adriano Rafael Gomes <adrianorg@gmail.com>, 2010.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: jack-audio-connection-kit 0.118+svn3796-8\n"
+"Project-Id-Version: jackd2 1.9.6~dfsg.1-2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-07 10:34+0200\n"
-"PO-Revision-Date: 2010-12-12 00:15-0200\n"
+"POT-Creation-Date: 2010-11-16 10:30+0100\n"
+"PO-Revision-Date: 2010-12-12 19:16-0200\n"
 "Last-Translator: Adriano Rafael Gomes <adrianorg@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <debian-l10n-portuguese@lists.debian."
 "org>\n"
@@ -20,13 +20,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../jackd1.templates:2001
+#: ../jackd2.templates:2001
 msgid "Enable realtime process priority?"
 msgstr "Habilitar prioridade de processo em tempo real?"
 
 #. Type: boolean
 #. Description
-#: ../jackd1.templates:2001
+#: ../jackd2.templates:2001
 msgid ""
 "If you want to run jackd with realtime priorities, the user starting jackd "
 "needs realtime permissions. Accept this option to create the file /etc/"
@@ -40,7 +40,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../jackd1.templates:2001
+#: ../jackd2.templates:2001
 msgid ""
 "Running jackd with realtime priority minimizes latency, but may lead to "
 "complete system lock-ups by requesting all the available physical system "

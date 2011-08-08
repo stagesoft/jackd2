@@ -1,11 +1,14 @@
 From: Adrian Knoth <adi@drcomp.erfurt.thur.de>
 Forwarded: not-needed
 Origin: http://repo.or.cz/w/jack2.git/shortlog/refs/heads/no-self-connect
+Last-Update: 2011-03-31
 Description: Add no-self-connect option to jackd2
  This patch avoids automatic port connections of programs like ardour
  in ladish environments. Depending on the runtime mode, a program cannot
  connect its own ports to other programs or physical ports. These connections
  are handled by ladish instead, so they can be restored and altered later.
+diff --git a/common/JackConstants.h b/common/JackConstants.h
+index c4c816d..52ae7ab 100644
 --- a/common/JackConstants.h
 +++ b/common/JackConstants.h
 @@ -79,4 +79,6 @@
@@ -15,6 +18,8 @@ Description: Add no-self-connect option to jackd2
 +#define JACK_DEFAULT_SELF_CONNECT_MODE JackSelfConnectIgnoreAll
 +
  #endif
+diff --git a/common/JackControlAPI.cpp b/common/JackControlAPI.cpp
+index 4ff69ad..6a8937a 100644
 --- a/common/JackControlAPI.cpp
 +++ b/common/JackControlAPI.cpp
 @@ -47,6 +47,13 @@
@@ -31,7 +36,7 @@ Description: Add no-self-connect option to jackd2
  struct jackctl_server
  {
      JSList * drivers;
-@@ -94,6 +101,12 @@
+@@ -94,6 +101,12 @@ struct jackctl_server
      /* bool, synchronous or asynchronous engine mode */
      union jackctl_parameter_value sync;
      union jackctl_parameter_value default_sync;
@@ -44,7 +49,7 @@ Description: Add no-self-connect option to jackd2
  };
  
  struct jackctl_driver
-@@ -788,6 +801,40 @@
+@@ -788,6 +801,40 @@ EXPORT jackctl_server_t * jackctl_server_create(
          goto fail_free_parameters;
      }
  
@@ -85,7 +90,7 @@ Description: Add no-self-connect option to jackd2
      JackServerGlobals::on_device_acquire = on_device_acquire;
      JackServerGlobals::on_device_release = on_device_release;
  
-@@ -858,6 +905,7 @@
+@@ -863,6 +910,7 @@ jackctl_server_open(
      jackctl_driver *driver_ptr)
  {
      int rc;
@@ -93,7 +98,7 @@ Description: Add no-self-connect option to jackd2
  
      rc = jack_register_server(server_ptr->name.str, server_ptr->replace_registry.b);
      switch (rc)
-@@ -889,6 +937,27 @@
+@@ -894,6 +942,27 @@ jackctl_server_open(
          goto fail;
      }
  
@@ -121,62 +126,19 @@ Description: Add no-self-connect option to jackd2
      /* get the engine/driver started */
      server_ptr->engine = new JackServer(
          server_ptr->sync.b,
-@@ -899,6 +968,7 @@
-         server_ptr->port_max.ui,                                
+@@ -904,6 +973,7 @@ jackctl_server_open(
+         server_ptr->port_max.ui,
          server_ptr->verbose.b,
          (jack_timer_type_t)server_ptr->clock_source.ui,
 +        self_connect_mode,
          server_ptr->name.str);
      if (server_ptr->engine == NULL)
      {
---- a/common/Jackdmp.cpp
-+++ b/common/Jackdmp.cpp
-@@ -180,6 +180,7 @@
-     int replace_registry = 0;
-     
-     const char *options = "-d:X:P:uvshVrRL:STFl:t:mn:p:"
-+        "a:"
- #ifdef __linux__
-         "c:"
- #endif
-@@ -208,6 +209,7 @@
-                                        { "version", 0, 0, 'V' },
-                                        { "silent", 0, 0, 's' },
-                                        { "sync", 0, 0, 'S' },
-+                                       { "autoconnect", 1, 0, 'a' },
-                                        { 0, 0, 0, 0 }
-                                    };
- 
-@@ -276,6 +278,26 @@
-                 break;
-         #endif
- 
-+            case 'a':
-+                param = jackctl_get_parameter(server_parameters, "self-connect-mode");
-+                if (param != NULL) {
-+                    bool value_valid = false;
-+                    for (int k=0; k<jackctl_parameter_get_enum_constraints_count( param ); k++ ) {
-+                        value = jackctl_parameter_get_enum_constraint_value( param, k );
-+                        if( value.c == optarg[0] )
-+                            value_valid = true;
-+                    }
-+
-+                    if( value_valid ) {
-+                        value.c = optarg[0];
-+                        jackctl_parameter_set_value(param, &value);
-+                    } else {
-+                        usage(stdout);
-+                        goto fail_free1;
-+                    }
-+                }
-+                break;
-+
-             case 'd':
-                 seen_audio_driver = true;
-                 audio_driver_name = optarg;
+diff --git a/common/JackEngine.cpp b/common/JackEngine.cpp
+index 2c7db9e..fe77c08 100644
 --- a/common/JackEngine.cpp
 +++ b/common/JackEngine.cpp
-@@ -37,11 +37,13 @@
+@@ -38,11 +38,13 @@ namespace Jack
  
  JackEngine::JackEngine(JackGraphManager* manager,
                         JackSynchro* table,
@@ -191,21 +153,20 @@ Description: Add no-self-connect option to jackd2
      for (int i = 0; i < CLIENT_NUM; i++)
          fClientTable[i] = NULL;
      fLastSwitchUsecs = 0;
-@@ -739,11 +741,11 @@
+@@ -763,10 +765,10 @@ int JackEngine::ClientDeactivate(int refnum)
  
-     // First disconnect all ports and remove their JackPortIsActive state
+     // First disconnect all ports
      for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (input_ports[i] != EMPTY); i++) {
 -        PortDisconnect(refnum, input_ports[i], ALL_PORTS);
 +        PortDisconnect(-1, input_ports[i], ALL_PORTS);
-         fGraphManager->DeactivatePort(input_ports[i]);
      }
      for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (output_ports[i] != EMPTY); i++) {
 -        PortDisconnect(refnum, output_ports[i], ALL_PORTS);
 +        PortDisconnect(-1, output_ports[i], ALL_PORTS);
-         fGraphManager->DeactivatePort(output_ports[i]);
      }
-     
-@@ -798,7 +800,7 @@
+ 
+     // Then issue port registration notification
+@@ -820,7 +822,7 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
      JackClientInterface* client = fClientTable[refnum];
  
      // Disconnect port ==> notification is sent
@@ -214,7 +175,7 @@ Description: Add no-self-connect option to jackd2
  
      if (fGraphManager->ReleasePort(refnum, port_index) == 0) {
          if (client->GetClientControl()->fActive)
-@@ -809,6 +811,72 @@
+@@ -831,6 +833,72 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
      }
  }
  
@@ -287,7 +248,7 @@ Description: Add no-self-connect option to jackd2
  int JackEngine::PortConnect(int refnum, const char* src, const char* dst)
  {
      jack_log("JackEngine::PortConnect src = %s dst = %s", src, dst);
-@@ -848,7 +916,12 @@
+@@ -870,7 +938,12 @@ int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
          return -1;
      }
  
@@ -301,7 +262,7 @@ Description: Add no-self-connect option to jackd2
      if (res == 0)
          NotifyPortConnect(src, dst, true);
      return res;
-@@ -890,15 +963,21 @@
+@@ -912,15 +985,21 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
          }
  
          return ret;
@@ -330,9 +291,11 @@ Description: Add no-self-connect option to jackd2
  }
  
  int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
+diff --git a/common/JackEngine.h b/common/JackEngine.h
+index 185c1b1..355f005 100644
 --- a/common/JackEngine.h
 +++ b/common/JackEngine.h
-@@ -47,6 +47,7 @@
+@@ -47,6 +47,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
  
          JackGraphManager* fGraphManager;
          JackEngineControl* fEngineControl;
@@ -340,7 +303,7 @@ Description: Add no-self-connect option to jackd2
          JackClientInterface* fClientTable[CLIENT_NUM];
          JackSynchro* fSynchroTable;
          JackServerNotifyChannel fChannel;              /*! To communicate between the RT thread and server */
-@@ -90,9 +91,11 @@
+@@ -90,9 +91,11 @@ class SERVER_EXPORT JackEngine : public JackLockAble
              return (refnum >= 0 && refnum < CLIENT_NUM && fClientTable[refnum] != NULL);
          }
  
@@ -353,9 +316,11 @@ Description: Add no-self-connect option to jackd2
          ~JackEngine();
  
          int Open();
+diff --git a/common/JackLockedEngine.h b/common/JackLockedEngine.h
+index c311f57..e885804 100644
 --- a/common/JackLockedEngine.h
 +++ b/common/JackLockedEngine.h
-@@ -74,8 +74,8 @@
+@@ -74,8 +74,8 @@ class SERVER_EXPORT JackLockedEngine
  
      public:
  
@@ -366,9 +331,11 @@ Description: Add no-self-connect option to jackd2
          {}
          ~JackLockedEngine()
          {}
+diff --git a/common/JackServer.cpp b/common/JackServer.cpp
+index cd1915f..a35fa93 100644
 --- a/common/JackServer.cpp
 +++ b/common/JackServer.cpp
-@@ -38,7 +38,7 @@
+@@ -38,7 +38,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  namespace Jack
  {
  
@@ -377,18 +344,33 @@ Description: Add no-self-connect option to jackd2
  {
      if (rt) {
          jack_info("JACK server starting in realtime mode with priority %ld", priority);
-@@ -48,7 +48,7 @@
-     
+@@ -48,7 +48,7 @@ JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int prio
+ 
      fGraphManager = JackGraphManager::Allocate(port_max);
      fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, clock, server_name);
 -    fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
 +    fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl, self_connect_mode);
-     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, GetSynchroTable()));
-     fDriverInfo = new JackDriverInfo();
-     fAudioDriver = NULL;
+ 
+     // A distinction is made between the threaded freewheel driver and the
+     // regular freewheel driver because the freewheel driver needs to run in
+diff --git a/common/JackServer.h b/common/JackServer.h
+index bdbd8ea..b6ce1f2 100644
+--- a/common/JackServer.h
++++ b/common/JackServer.h
+@@ -63,7 +63,7 @@ class SERVER_EXPORT JackServer
+ 
+     public:
+ 
+-        JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, const char* server_name);
++        JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, JackSelfConnectMode self_connect_mode, const char* server_name);
+         ~JackServer();
+ 
+         int Open(jack_driver_desc_t* driver_desc, JSList* driver_params);
+diff --git a/common/JackServerGlobals.cpp b/common/JackServerGlobals.cpp
+index 00127fa..c6d7583 100644
 --- a/common/JackServerGlobals.cpp
 +++ b/common/JackServerGlobals.cpp
-@@ -43,10 +43,11 @@
+@@ -48,10 +48,11 @@ int JackServerGlobals::Start(const char* server_name,
                               int priority,
                               int port_max,
                               int verbose,
@@ -402,18 +384,20 @@ Description: Add no-self-connect option to jackd2
      int res = fInstance->Open(driver_desc, driver_params);
      return (res < 0) ? res : fInstance->Start();
  }
-@@ -292,7 +293,7 @@
+@@ -345,7 +346,7 @@ bool JackServerGlobals::Init()
              free(argv[i]);
          }
  
--        int res = Start(server_name, driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, port_max, verbose_aux, clock_source);
-+        int res = Start(server_name, driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, port_max, verbose_aux, clock_source, JACK_DEFAULT_SELF_CONNECT_MODE);
+-        int res = Start(server_name, driver_desc, master_driver_params, sync, temporary, client_timeout, realtime, realtime_priority, port_max, verbose_aux, clock_source);
++        int res = Start(server_name, driver_desc, master_driver_params, sync, temporary, client_timeout, realtime, realtime_priority, port_max, verbose_aux, clock_source, JACK_DEFAULT_SELF_CONNECT_MODE);
          if (res < 0) {
              jack_error("Cannot start server... exit");
              Delete();
+diff --git a/common/JackServerGlobals.h b/common/JackServerGlobals.h
+index 69b8979..47e9460 100644
 --- a/common/JackServerGlobals.h
 +++ b/common/JackServerGlobals.h
-@@ -56,7 +56,8 @@
+@@ -61,7 +61,8 @@ struct SERVER_EXPORT JackServerGlobals
                       int priority,
                       int port_max,
                       int verbose,
@@ -423,20 +407,11 @@ Description: Add no-self-connect option to jackd2
      static void Stop();
      static void Delete();
  };
---- a/common/JackServer.h
-+++ b/common/JackServer.h
-@@ -62,7 +62,7 @@
- 
-     public:
- 
--        JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, const char* server_name);
-+        JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, JackSelfConnectMode self_connect_mode, const char* server_name);
-         ~JackServer();
- 
-         int Open(jack_driver_desc_t* driver_desc, JSList* driver_params);
+diff --git a/common/JackTypes.h b/common/JackTypes.h
+index b4bad8d..a5a883e 100644
 --- a/common/JackTypes.h
 +++ b/common/JackTypes.h
-@@ -49,4 +49,14 @@
+@@ -55,4 +55,14 @@ typedef enum {
      Finished,
  } jack_client_state_t;
  
@@ -451,3 +426,52 @@ Description: Add no-self-connect option to jackd2
 +};
 +
  #endif
+diff --git a/common/Jackdmp.cpp b/common/Jackdmp.cpp
+index 602aca3..7e57e57 100644
+--- a/common/Jackdmp.cpp
++++ b/common/Jackdmp.cpp
+@@ -193,8 +193,8 @@ int main(int argc, char* argv[])
+     jackctl_driver_t * master_driver_ctl;
+     jackctl_driver_t * loopback_driver_ctl;
+     int replace_registry = 0;
+-
+     const char *options = "-d:X:I:P:uvshVrRL:STFl:t:mn:p:"
++        "a:"
+ #ifdef __linux__
+         "c:"
+ #endif
+@@ -224,6 +224,7 @@ int main(int argc, char* argv[])
+                                        { "version", 0, 0, 'V' },
+                                        { "silent", 0, 0, 's' },
+                                        { "sync", 0, 0, 'S' },
++                                       { "autoconnect", 1, 0, 'a' },
+                                        { 0, 0, 0, 0 }
+                                    };
+ 
+@@ -295,6 +296,26 @@ int main(int argc, char* argv[])
+                 break;
+         #endif
+ 
++            case 'a':
++                param = jackctl_get_parameter(server_parameters, "self-connect-mode");
++                if (param != NULL) {
++                    bool value_valid = false;
++                    for (uint32_t k=0; k<jackctl_parameter_get_enum_constraints_count( param ); k++ ) {
++                        value = jackctl_parameter_get_enum_constraint_value( param, k );
++                        if( value.c == optarg[0] )
++                            value_valid = true;
++                    }
++
++                    if( value_valid ) {
++                        value.c = optarg[0];
++                        jackctl_parameter_set_value(param, &value);
++                    } else {
++                        usage(stdout);
++                        goto destroy_server;
++                    }
++                }
++                break;
++
+             case 'd':
+                 master_driver_name = optarg;
+                 break;

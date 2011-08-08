@@ -1,5 +1,4 @@
-0000_sync_upstream_vcs.patch
 hppa-parallel.patch
-1001_connect.patch
 hurd.patch
 no-selfconnect.patch
+sh4.patch
