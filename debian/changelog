@@ -1,3 +1,18 @@
+jackd2 (1.9.7~dfsg-2) unstable; urgency=low
+
+  * Update Brazilian Portuguese translation (Closes: #621097)
+  * Add patch to support SH4 architectures (Closes: #622713)
+  * Replace hardcoded architecture list by linux-any (Closes: #634296)
+  * Dutch translation of debconf templates (Closes: #637508)
+  * Danish translation for debconf templates (Closes: #621025)
+  * Sync to upstream VCS r4627 (1.9.8-preview)
+  * Refresh no-selfconnect-patch
+  * Bump standards version (3.9.2)
+  * Use linux-any in the architecture list
+  * Drop mixed 32/64bit builds. Will be replaced by multiarch.
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Mon, 05 Dec 2011 16:58:46 +0100
+
 jackd2 (1.9.7~dfsg-1) unstable; urgency=low
 
   * New upstream version 1.9.7 (ALSA resume, new latency API)
