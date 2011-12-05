@@ -2,4 +2,3 @@
 hppa-parallel.patch
 hurd.patch
 no-selfconnect.patch
-sh4.patch
