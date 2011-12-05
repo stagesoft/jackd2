@@ -1,1 +1,2 @@
 debian/tmp/usr/lib/libjack.so.*
+debian/tmp/usr/lib/libjacknet.so.*
