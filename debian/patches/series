@@ -1,3 +1,4 @@
+0000_sync_upstream.patch
 hppa-parallel.patch
 hurd.patch
 no-selfconnect.patch
