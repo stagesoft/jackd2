@@ -11,7 +11,7 @@ CDBS_BUILD_DEPENDS_rules_utils_copyright-check =
 
 DEB_UPSTREAM_PACKAGE = jack
 DEB_UPSTREAM_URL = http://www.grame.fr/~letz/
-DEB_UPSTREAM_TARBALL_EXTENSION = tar.bz2
+DEB_UPSTREAM_TARBALL_EXTENSION = tgz
 
 # unneeded and possibly sourceless binaries
 DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.Lib ./windows/**.lib ./windows/**.dll
