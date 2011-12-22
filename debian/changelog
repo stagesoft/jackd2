@@ -1,3 +1,10 @@
+jackd2 (1.9.8~dfsg-1) unstable; urgency=low
+
+  * Imported Upstream version 1.9.8~dfsg
+  * Refresh no-selfconnect.patch
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Thu, 22 Dec 2011 23:38:24 +0100
+
 jackd2 (1.9.7~dfsg-2) unstable; urgency=low
 
   * Update Brazilian Portuguese translation (Closes: #621097)
