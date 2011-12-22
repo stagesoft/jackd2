@@ -6,29 +6,25 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jack-audio-connection-kit 0.116.2+svn3592-2\n"
-"Report-Msgid-Bugs-To: jack-audio-connection-kit@packages.debian.org\n"
-"POT-Creation-Date: 2009-10-10 14:57+0100\n"
+"Report-Msgid-Bugs-To: jackd2@packages.debian.org\n"
+"POT-Creation-Date: 2011-12-22 23:36+0100\n"
 "PO-Revision-Date: 2009-10-10 18:49+0200\n"
 "Last-Translator: Martin Sin <martin.sin@zshk.cz>\n"
 "Language-Team: Czech <debian-l10n-czech@lists.debian.org>\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Type: boolean
 #. Description
-#: ../jackd.templates:2001
+#: ../jackd2.templates:2001
 msgid "Enable realtime process priority?"
 msgstr "Povolit realtimovou prioritu procesu?"
 
 #. Type: boolean
 #. Description
-#: ../jackd.templates:2001
-#| msgid ""
-#| "If you want to run jackd with realtime priorities, the user starting "
-#| "jackd needs realtime permissions. This is usually accomplished by "
-#| "tweaking rtprio and memlock in /etc/security/limits.conf, either for a "
-#| "specific user or for the audio group in general."
+#: ../jackd2.templates:2001
 msgid ""
 "If you want to run jackd with realtime priorities, the user starting jackd "
 "needs realtime permissions. Accept this option to create the file /etc/"
@@ -37,25 +33,19 @@ msgid ""
 msgstr ""
 "Pokud chcete spouštět jackd s realtimovými prioritami, potřebuje uživatel "
 "který spouští jackd příslušná realtimová oprávnění. Budete-li s tím "
-"souhlasit, dojde k vytvoření souboru /etc/security/limits.d/audio.conf "
-"a přiřazení příslušných práv (realtimové priority a memlock) pro skupinu "
-"audio."
+"souhlasit, dojde k vytvoření souboru /etc/security/limits.d/audio.conf a "
+"přiřazení příslušných práv (realtimové priority a memlock) pro skupinu audio."
 
 #. Type: boolean
 #. Description
-#: ../jackd.templates:2001
-#| msgid ""
-#| "Raising memlock and rtprio limits may lead to complete system lock-ups "
-#| "due to highest scheduler priorities or denial of service attacks by "
-#| "requesting all the available physical system memory, which is "
-#| "unacceptable in multi-user environments."
+#: ../jackd2.templates:2001
 msgid ""
 "Running jackd with realtime priority minimizes latency, but may lead to "
 "complete system lock-ups by requesting all the available physical system "
 "memory, which is unacceptable in multi-user environments."
 msgstr ""
-"Spuštění jackd s realtimovou prioritou minimalizuje reakce počítače, ale může "
-"vést ke kompletnímu zatuhnutí systému způsobenému plným obsazením "
+"Spuštění jackd s realtimovou prioritou minimalizuje reakce počítače, ale "
+"může vést ke kompletnímu zatuhnutí systému způsobenému plným obsazením "
 "fyzické paměti což je nepřípustné zejména ve více-uživatelských prostředích."
 
 #~ msgid "Do you want to enable realtime priorities in /etc/security/limits.d?"
