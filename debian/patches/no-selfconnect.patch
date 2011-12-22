@@ -9,7 +9,7 @@ Description: Add no-self-connect option to jackd2
  are handled by ladish instead, so they can be restored and altered later.
 --- a/common/JackConstants.h
 +++ b/common/JackConstants.h
-@@ -81,4 +81,6 @@
+@@ -82,4 +82,6 @@
  #define EMPTY   0xFFFD
  #define FREE	0xFFFC
  
