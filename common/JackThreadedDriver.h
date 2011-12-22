@@ -28,7 +28,7 @@ namespace Jack
 {
 
 /*!
-\brief The base class for threaded drivers. Threaded drivers are used with blocking devices.
+\brief The base class for threaded drivers using a "decorator" pattern. Threaded drivers are used with blocking devices.
 */
 
 class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, public JackRunnableInterface
@@ -39,6 +39,8 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
         JackThread fThread;
         JackDriver* fDriver;
 
+        void SetRealTime();
+
     public:
 
         JackThreadedDriver(JackDriver* driver);
@@ -47,14 +49,14 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
         virtual int Open();
 
         virtual int Open (bool capturing,
-                     bool playing,
-                     int inchannels,
-                     int outchannels,
-                     bool monitor,
-                     const char* capture_driver_name,
-                     const char* playback_driver_name,
-                     jack_nframes_t capture_latency,
-                     jack_nframes_t playback_latency)
+                         bool playing,
+                         int inchannels,
+                         int outchannels,
+                         bool monitor,
+                         const char* capture_driver_name,
+                         const char* playback_driver_name,
+                         jack_nframes_t capture_latency,
+                         jack_nframes_t playback_latency)
         {
             return -1;
         }
@@ -72,7 +74,6 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
         virtual int Close();
 
         virtual int Process();
-        virtual int ProcessNull();
 
         virtual int Attach();
         virtual int Detach();
@@ -89,10 +90,23 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
 
         virtual void SetMaster(bool onoff);
         virtual bool GetMaster();
+
         virtual void AddSlave(JackDriverInterface* slave);
         virtual void RemoveSlave(JackDriverInterface* slave);
+
         virtual std::list<JackDriverInterface*> GetSlaves();
-        virtual int ProcessSlaves();
+
+        virtual int ProcessReadSlaves();
+        virtual int ProcessWriteSlaves();
+
+        virtual int ProcessRead();
+        virtual int ProcessWrite();
+
+        virtual int ProcessReadSync();
+        virtual int ProcessWriteSync();
+
+        virtual int ProcessReadAsync();
+        virtual int ProcessWriteAsync();
 
         virtual int ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
         virtual JackClientControl* GetClientControl() const;

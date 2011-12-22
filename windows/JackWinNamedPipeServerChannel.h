@@ -23,6 +23,7 @@
 
 #include "JackWinNamedPipe.h"
 #include "JackPlatformPlug.h"
+#include "JackConstants.h"
 #include <list>
 
 namespace Jack
@@ -78,7 +79,7 @@ class JackWinNamedPipeServerChannel : public JackRunnableInterface
         JackWinNamedPipeServer fRequestListenPipe;	// Pipe to create request socket for the client
         JackServer*	fServer;
         JackThread fThread;                         // Thread to execute the event loop
-        char fServerName[64];
+        char fServerName[JACK_SERVER_CONTROL_NAME_SIZE];
 
         std::list<JackClientPipeThread*> fClientList;
 
@@ -93,6 +94,7 @@ class JackWinNamedPipeServerChannel : public JackRunnableInterface
         void Close();                                           // Close the Server/Client connection
 
         int Start();
+        void Stop();
 
         // JackRunnableInterface interface
         bool Init();
