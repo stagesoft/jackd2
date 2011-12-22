@@ -28,7 +28,6 @@ namespace Jack
 
 typedef jack_default_audio_sample_t jack_sample_t;
 
-#define OSS_DRIVER_N_PARAMS	13
 #define OSS_DRIVER_DEF_DEV	"/dev/dsp"
 #define OSS_DRIVER_DEF_FS	48000
 #define OSS_DRIVER_DEF_BLKSIZE	1024
@@ -47,10 +46,10 @@ class JackOSSDriver : public JackAudioDriver
     enum { kRead = 1, kWrite = 2, kReadWrite = 3 };
 
     private:
-    
+
         int fInFD;
         int fOutFD;
-        
+
         int fBits;
         int fSampleFormat;
         int fNperiods;
@@ -58,15 +57,15 @@ class JackOSSDriver : public JackAudioDriver
         int fRWMode;
         bool fExcl;
         bool fIgnoreHW;
-        
+
         unsigned int fInputBufferSize;
         unsigned int fOutputBufferSize;
-        
+
         void* fInputBuffer;
         void* fOutputBuffer;
-        
+
         bool fFirstCycle;
-        
+
         int OpenInput();
         int OpenOutput();
         int OpenAux();
@@ -81,7 +80,7 @@ class JackOSSDriver : public JackAudioDriver
 
         JackOSSDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
                 : JackAudioDriver(name, alias, engine, table),
-                fInFD(-1), fOutFD(-1), fBits(0), 
+                fInFD(-1), fOutFD(-1), fBits(0),
                 fSampleFormat(0), fNperiods(0), fRWMode(0), fExcl(false), fIgnoreHW(true),
                 fInputBufferSize(0), fOutputBufferSize(0),
                 fInputBuffer(NULL), fOutputBuffer(NULL), fFirstCycle(true)
@@ -91,7 +90,7 @@ class JackOSSDriver : public JackAudioDriver
         {}
 
         int Open(jack_nframes_t frames_per_cycle,
-                 int user_nperiods, 
+                 int user_nperiods,
                  jack_nframes_t rate,
                  bool capturing,
                  bool playing,
