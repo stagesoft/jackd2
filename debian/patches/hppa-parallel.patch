@@ -2,8 +2,8 @@ Description: Disable parallel build on hppa architecture.
 Bug-Debian: http://bugs.debian.org/580824
 Origin: http://code.google.com/p/waf/source/browse/tags/waf-1.5.0/playground/serial.py
 
---- a/.waf-1.5.0-8e39a4c1c16303c1e8f010bf330305f6/wafadmin/Runner.py
-+++ b/.waf-1.5.0-8e39a4c1c16303c1e8f010bf330305f6/wafadmin/Runner.py
+--- a/wafadmin/Runner.py
++++ b/wafadmin/Runner.py
 @@ -143,3 +143,100 @@
  					self.consumers=[TaskConsumer(self)for i in xrange(self.numjobs)]
  		assert(self.count==0 or self.stop)
