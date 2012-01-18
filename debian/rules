@@ -33,8 +33,8 @@ ABI = 0.118.0
 CFLAGS += -fvisibility=hidden
 CXXFLAGS += -fvisibility=hidden
 
-waf-configure-options = --prefix=/usr --classic --dbus
-waf-configure-options += $(if $(filter linux,$(DEB_HOST_ARCH_OS)),--alsa)
+waf-configure-options = --prefix=/usr --classic
+waf-configure-options += $(if $(filter linux,$(DEB_HOST_ARCH_OS)),--alsa --dbus)
 waf-configure-options += $(if $(filter amd64 i386 powerpc,$(DEB_HOST_ARCH)),--firewire)
 waf-configure-options += $(if $(filter i386,$(DEB_HOST_ARCH)),--mixed)
 
