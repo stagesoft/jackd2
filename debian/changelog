@@ -1,3 +1,12 @@
+jackd2 (1.9.8~dfsg.1-1) unstable; urgency=low
+
+  * Add patch to fix FTBFS on kFreeBSD (Closes: #651108)
+  * Add Korean debconf translation
+  * Limit jackdbus to Linux platforms
+  * Repackage upstream tarball without binary waf (Closes: #654477)
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Wed, 18 Jan 2012 14:27:38 +0100
+
 jackd2 (1.9.8~dfsg-1) unstable; urgency=low
 
   * Imported Upstream version 1.9.8~dfsg
