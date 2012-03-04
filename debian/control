@@ -20,7 +20,7 @@ Build-Depends: cdbs,
  libffado-dev (>= 2.0.0) [amd64 i386 powerpc],
  po-debconf,
  libcelt-dev (>= 0.7.0)
-Standards-Version: 3.9.2
+Standards-Version: 3.9.3
 DM-Upload-Allowed: yes
 Homepage: http://jackaudio.org/
 Vcs-Git: git://git.debian.org/git/pkg-multimedia/jackd2.git
