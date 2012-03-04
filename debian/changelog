@@ -1,3 +1,10 @@
+jackd2 (1.9.8~dfsg.2-1) unstable; urgency=low
+
+  * Install ALSA raw midi driver on Linux (Closes: #661820)
+  * Reimport tarball because of pristine-tar bug #661902
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Sun, 04 Mar 2012 11:49:15 +0100
+
 jackd2 (1.9.8~dfsg.1-1) unstable; urgency=low
 
   * Add patch to fix FTBFS on kFreeBSD (Closes: #651108)
