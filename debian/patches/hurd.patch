@@ -4,7 +4,7 @@ Description: Fix FTBFS on hurd
  setting it.
 --- a/dbus/sigsegv.c
 +++ b/dbus/sigsegv.c
-@@ -171,7 +171,9 @@
+@@ -177,7 +177,9 @@
  
      memset(&action, 0, sizeof(action));
      action.sa_sigaction = signal_segv;
