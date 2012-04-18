@@ -1,4 +1,3 @@
-hppa-parallel.patch
 hurd.patch
 no-selfconnect.patch
 netjack-kfreebsd.patch
