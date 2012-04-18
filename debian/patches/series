@@ -1,2 +1,3 @@
 hurd.patch
 no-selfconnect.patch
+inprocess.patch
