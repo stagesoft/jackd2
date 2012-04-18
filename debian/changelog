@@ -1,3 +1,13 @@
+jackd2 (1.9.8~dfsg.3+20120418gitf82ec715-1) unstable; urgency=low
+
+  * New Upstream version (supports FFADO buffersize changes)
+  * Disable hppa build patch
+  * Disable kFreeBSD patch
+  * Refresh hurd.patch
+  * Update no-selfconnect.patch
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Wed, 18 Apr 2012 22:29:58 +0200
+
 jackd2 (1.9.8~dfsg.2-1) unstable; urgency=low
 
   * Install ALSA raw midi driver on Linux (Closes: #661820)
