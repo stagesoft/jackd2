@@ -46,7 +46,7 @@ DEB_MAKE_INSTALL_TARGET = install
 DEB_MAKE_CLEAN_TARGET = clean
 clean::
 	rm -f .lock-wscript
-	find wafadmin -name "*.pyc" -delete
+	find waflib -name "*.pyc" -delete
 	rm -f man/*.1
 	rm -rf build
 
