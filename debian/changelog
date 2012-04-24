@@ -1,3 +1,9 @@
+jackd2 (1.9.8~dfsg.3+20120418gitf82ec715-3) unstable; urgency=low
+
+  * Add patch to fix FTBFS on kFreeBSD (Closes: #669566)
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Tue, 24 Apr 2012 21:57:15 +0200
+
 jackd2 (1.9.8~dfsg.3+20120418gitf82ec715-1) unstable; urgency=low
 
   * New Upstream version (supports FFADO buffersize changes)
