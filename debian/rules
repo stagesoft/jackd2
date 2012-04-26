@@ -36,7 +36,6 @@ CXXFLAGS += -fvisibility=hidden
 waf-configure-options = --prefix=/usr --classic
 waf-configure-options += $(if $(filter linux,$(DEB_HOST_ARCH_OS)),--alsa --dbus)
 waf-configure-options += $(if $(filter amd64 i386 powerpc,$(DEB_HOST_ARCH)),--firewire)
-waf-configure-options += $(if $(filter i386,$(DEB_HOST_ARCH)),--mixed)
 
 DEB_MAKE_INVOKE = ./waf -v --destdir=$(CURDIR)/debian/tmp
 DEB_MAKE_INSTALL_TARGET = install
