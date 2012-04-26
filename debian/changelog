@@ -1,3 +1,10 @@
+jackd2 (1.9.8~dfsg.3+20120418gitf82ec715-4) unstable; urgency=low
+
+  * Disabled --mixed builds.
+  * Add detection for GNU/Hurd.
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Thu, 26 Apr 2012 13:23:50 +0200
+
 jackd2 (1.9.8~dfsg.3+20120418gitf82ec715-3) unstable; urgency=low
 
   * Add patch to fix FTBFS on kFreeBSD (Closes: #669566)
