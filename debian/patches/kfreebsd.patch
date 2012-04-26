@@ -1,10 +1,10 @@
 From: Adrian Knoth <adi@drcomp.erfurt.thur.de>
 Bugs-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=669566
 Forwarded: Not-Yet
-Description: Fix FTBFS on kFreeBSD
+Description: Fix FTBFS on kFreeBSD and HURD
 --- a/wscript
 +++ b/wscript
-@@ -79,10 +79,14 @@
+@@ -79,10 +79,15 @@
      opt.sub_options('dbus')
  
  def configure(conf):
@@ -14,7 +14,8 @@ Description: Fix FTBFS on kFreeBSD
      conf.env['IS_MACOSX'] = platform == 'darwin'
      conf.env['IS_LINUX'] = platform == 'linux' or platform == 'linux2' or platform == 'posix'
      conf.env['IS_SUN'] = platform == 'sunos'
-+    if "kfreebsd" in platform:
++    # GNU/kFreeBSD and GNU/Hurd are treated as Linux
++    if platform.startswith('gnu0') or platform.startswith('gnukfreebsd'):
 +        conf.env['IS_LINUX'] = True
  
      if conf.env['IS_LINUX']:
