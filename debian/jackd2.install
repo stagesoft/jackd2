@@ -1,14 +1,14 @@
 debian/tmp/usr/bin/jack*
 debian/tmp/usr/share/*
-debian/tmp/usr/lib/libjackserver.so.*
-debian/tmp/usr/lib/jack/netmanager.so
-debian/tmp/usr/lib/jack/profiler.so
-debian/tmp/usr/lib/jack/inprocess.so
-debian/tmp/usr/lib/jack/jack_net.so
-debian/tmp/usr/lib/jack/jack_loopback.so
-debian/tmp/usr/lib/jack/jack_netone.so
-debian/tmp/usr/lib/jack/netadapter.so
-debian/tmp/usr/lib/jack/jack_dummy.so
+debian/tmp/usr/lib/*/libjackserver.so.*
+debian/tmp/usr/lib/*/jack/netmanager.so
+debian/tmp/usr/lib/*/jack/profiler.so
+debian/tmp/usr/lib/*/jack/inprocess.so
+debian/tmp/usr/lib/*/jack/jack_net.so
+debian/tmp/usr/lib/*/jack/jack_loopback.so
+debian/tmp/usr/lib/*/jack/jack_netone.so
+debian/tmp/usr/lib/*/jack/netadapter.so
+debian/tmp/usr/lib/*/jack/jack_dummy.so
 debian/bash_completion.d etc
 debian/audio.conf etc/security/limits.d
 debian/audio.conf usr/share/jackd
