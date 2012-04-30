@@ -1,3 +1,10 @@
+jackd2 (1.9.8~dfsg.3+20120418gitf82ec715-5) unstable; urgency=low
+
+  * Bump compat to 9 for multiarch
+  * Mark libjack-jackd2-0 as multiarch (Closes: #670608)
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Mon, 30 Apr 2012 14:46:00 +0200
+
 jackd2 (1.9.8~dfsg.3+20120418gitf82ec715-4) unstable; urgency=low
 
   * Disabled --mixed builds.
