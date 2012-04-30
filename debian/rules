@@ -12,6 +12,7 @@ CDBS_BUILD_DEPENDS_rules_utils_copyright-check =
 # Explicitly require these versions until cdbs knows about multiarch
 CDBS_BUILD_DEPENDS += , cdbs (>= 0.4.93~),\
 						debhelper (>= 8.1.3)
+CDBS_BUILD_DEPENDS_rules_debhelper_buildinfo =
 
 
 DEB_UPSTREAM_PACKAGE = jack
