@@ -39,6 +39,7 @@ Depends: ${shlibs:Depends},
  python-dbus,
  debconf | debconf-2.0,
  libjack-jackd2-0 (= ${binary:Version})
+Pre-Depends: ${misc:Pre-Depends}
 Recommends: qjackctl,
  libpam-modules,
  jackd2-firewire [amd64 i386 powerpc]
@@ -75,6 +76,7 @@ Architecture: amd64 i386 powerpc
 Provides: jackd-firewire
 Replaces: jackd-firewire
 Conflicts: jackd-firewire
+Pre-Depends: ${misc:Pre-Depends}
 Depends: ${shlibs:Depends},
  ${misc:Depends},
  jackd2 (= ${binary:Version})
