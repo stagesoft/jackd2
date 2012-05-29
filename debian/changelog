@@ -1,9 +1,10 @@
-jackd2 (1.9.8~dfsg.3+20120529git007cdc37-1) unstable; urgency=low
+jackd2 (1.9.8~dfsg.4+20120529git007cdc37-1) unstable; urgency=low
 
-  * Imported Upstream version 1.9.8~dfsg.3+20120529git007cdc37
+  * Update helper script to replace waf by waf-light
+  * Imported Upstream version 1.9.8~dfsg.4+20120529git007cdc37
   * Drop CELT support (Closes: #674652)
 
- -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Tue, 29 May 2012 21:31:17 +0200
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Tue, 29 May 2012 22:00:18 +0200
 
 jackd2 (1.9.8~dfsg.3+20120418gitf82ec715-6) unstable; urgency=low
 
