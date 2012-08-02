@@ -1,3 +1,9 @@
+jackd2 (1.9.8~dfsg.4+20120529git007cdc37-2) unstable; urgency=low
+
+  * Fix syntax error in jack_control (Closes: #675719)
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Thu, 02 Aug 2012 22:17:30 +0200
+
 jackd2 (1.9.8~dfsg.4+20120529git007cdc37-1) unstable; urgency=low
 
   * Update helper script to replace waf by waf-light
