@@ -51,7 +51,7 @@ DEB_MAKE_INSTALL_TARGET = install
 # upstream stop shipping waf dir
 DEB_MAKE_CLEAN_TARGET = clean
 clean::
-	rm -f .lock-wscript
+	rm -f .lock-wscript .lock-waf_linux2_build
 	find waflib -name "*.pyc" -delete
 	rm -f man/*.1
 	rm -rf build
