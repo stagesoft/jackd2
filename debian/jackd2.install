@@ -1,5 +1,5 @@
 debian/tmp/usr/bin/jack*
-debian/tmp/usr/share/*
+debian/tmp/usr/share/dbus-1/*
 debian/tmp/usr/lib/*/libjackserver.so.*
 debian/tmp/usr/lib/*/jack/netmanager.so
 debian/tmp/usr/lib/*/jack/profiler.so
