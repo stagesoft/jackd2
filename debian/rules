@@ -86,6 +86,7 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	dh_install -pjackd2 debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/jack/jack_alsa.so
 	dh_install -pjackd2 debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/jack/jack_alsarawmidi.so
 	dh_install -pjackd2 debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/jack/audioadapter.so
+	dh_install -pjackd2 debian/tmp/usr/share/dbus-1/*
 endif	
 
 binary-install/jackd2::
