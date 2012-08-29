@@ -1,3 +1,9 @@
+jackd2 (1.9.8~dfsg.4+20120529git007cdc37-4) unstable; urgency=low
+
+  * Only include DBUS files on Linux (Closes: #685776)
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Wed, 29 Aug 2012 21:26:01 +0200
+
 jackd2 (1.9.8~dfsg.4+20120529git007cdc37-3) unstable; urgency=low
 
   * Fix manpage corruption (Closes: #680159, #672881)
