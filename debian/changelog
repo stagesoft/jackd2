@@ -1,3 +1,11 @@
+jackd2 (1.9.8~dfsg.4+20120529git007cdc37-4.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * No longer ship /etc/security/limits.d/audio.conf as a conffile
+    (Closes: #688204)
+
+ -- Sébastien Villemot <sebastien@debian.org>  Fri, 28 Sep 2012 20:25:20 +0200
+
 jackd2 (1.9.8~dfsg.4+20120529git007cdc37-4) unstable; urgency=low
 
   * Only include DBUS files on Linux (Closes: #685776)
