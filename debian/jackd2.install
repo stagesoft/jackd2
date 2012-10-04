@@ -9,5 +9,4 @@ debian/tmp/usr/lib/*/jack/jack_netone.so
 debian/tmp/usr/lib/*/jack/netadapter.so
 debian/tmp/usr/lib/*/jack/jack_dummy.so
 debian/bash_completion.d etc
-debian/audio.conf etc/security/limits.d
 debian/audio.conf usr/share/jackd
