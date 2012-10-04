@@ -5,8 +5,8 @@
 
 CONFIG_FILE=/etc/security/limits.d/audio.conf
 
-# if neither $CONFIG_FILE nor ${CONFIG_FILE}.disabled exists, the file
-# somehow got lost. Let's copy it over from /usr/share/
+# if neither $CONFIG_FILE nor ${CONFIG_FILE}.disabled exists,
+# let's copy it over from /usr/share/
 if [ ! -s ${CONFIG_FILE} -a ! -s ${CONFIG_FILE}.disabled ]; then
     cp /usr/share/jackd/audio.conf ${CONFIG_FILE}.disabled
 fi
