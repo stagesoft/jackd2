@@ -1,7 +1,7 @@
 From: Adrian Knoth <adi@drcomp.erfurt.thur.de>
 Forwarded: not-needed
 Origin: http://repo.or.cz/w/jack2.git/shortlog/refs/heads/no-self-connect
-Last-Update: 2012-04-18
+Last-Update: 2012-11-10
 Description: Add no-self-connect option to jackd2
  This patch avoids automatic port connections of programs like ardour
  in ladish environments. Depending on the runtime mode, a program cannot
@@ -45,7 +45,7 @@ Description: Add no-self-connect option to jackd2
  };
  
  struct jackctl_driver
-@@ -802,6 +815,40 @@
+@@ -869,6 +882,40 @@
          goto fail_free_parameters;
      }
  
@@ -86,16 +86,15 @@ Description: Add no-self-connect option to jackd2
      JackServerGlobals::on_device_acquire = on_device_acquire;
      JackServerGlobals::on_device_release = on_device_release;
  
-@@ -886,6 +933,8 @@
-     jackctl_server *server_ptr,
+@@ -954,6 +1001,7 @@
      jackctl_driver *driver_ptr)
  {
+     JSList * paramlist = NULL;
 +    JackSelfConnectMode self_connect_mode;
-+
+ 
      try {
  
-         if (!server_ptr || !driver_ptr) {
-@@ -917,6 +966,27 @@
+@@ -986,6 +1034,27 @@
              server_ptr->client_timeout.i = 500; /* 0.5 sec; usable when non realtime. */
          }
  
@@ -123,7 +122,7 @@ Description: Add no-self-connect option to jackd2
          /* check port max value before allocating server */
          if (server_ptr->port_max.ui > PORT_NUM_MAX) {
              jack_error("Jack server started with too much ports %d (when port max can be %d)", server_ptr->port_max.ui, PORT_NUM_MAX);
-@@ -933,6 +1003,7 @@
+@@ -1002,6 +1071,7 @@
              server_ptr->port_max.ui,
              server_ptr->verbose.b,
              (jack_timer_type_t)server_ptr->clock_source.ui,
@@ -150,7 +149,7 @@ Description: Add no-self-connect option to jackd2
      for (int i = 0; i < CLIENT_NUM; i++) {
          fClientTable[i] = NULL;
      }
-@@ -800,10 +802,10 @@
+@@ -816,10 +818,10 @@
  
      // First disconnect all ports
      for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (input_ports[i] != EMPTY); i++) {
@@ -163,7 +162,7 @@ Description: Add no-self-connect option to jackd2
      }
  
      // Then issue port registration notification
-@@ -859,7 +861,7 @@
+@@ -875,7 +877,7 @@
      JackClientInterface* client = fClientTable[refnum];
  
      // Disconnect port ==> notification is sent
@@ -172,7 +171,7 @@ Description: Add no-self-connect option to jackd2
  
      if (fGraphManager->ReleasePort(refnum, port_index) == 0) {
          if (client->GetClientControl()->fActive) {
-@@ -871,6 +873,72 @@
+@@ -887,6 +889,72 @@
      }
  }
  
@@ -245,7 +244,7 @@ Description: Add no-self-connect option to jackd2
  int JackEngine::PortConnect(int refnum, const char* src, const char* dst)
  {
      jack_log("JackEngine::PortConnect src = %s dst = %s", src, dst);
-@@ -911,7 +979,12 @@
+@@ -927,7 +995,12 @@
          return -1;
      }
  
@@ -259,7 +258,7 @@ Description: Add no-self-connect option to jackd2
      if (res == 0) {
          NotifyPortConnect(src, dst, true);
      }
-@@ -954,15 +1027,21 @@
+@@ -970,15 +1043,21 @@
          }
  
          return ret;
@@ -371,7 +370,7 @@ Description: Add no-self-connect option to jackd2
      int res = fInstance->Open(driver_desc, driver_params);
      return (res < 0) ? res : fInstance->Start();
  }
-@@ -345,7 +346,7 @@
+@@ -335,7 +336,7 @@
              free(argv[i]);
          }
  
@@ -429,7 +428,7 @@ Description: Add no-self-connect option to jackd2
                                         { 0, 0, 0, 0 }
                                     };
  
-@@ -279,6 +280,26 @@
+@@ -277,6 +278,26 @@
                  break;
          #endif
  
