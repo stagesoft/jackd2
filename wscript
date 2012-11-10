@@ -116,7 +116,7 @@ def configure(conf):
     #   conf.check_tool('compiler_cc')
  
     conf.env.append_unique('CXXFLAGS', '-Wall')
-    conf.env.append_unique('CCFLAGS', '-Wall')
+    conf.env.append_unique('CFLAGS', '-Wall')
 
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
@@ -173,9 +173,18 @@ def configure(conf):
         conf.define('HAVE_CELT_API_0_7', 0)
         conf.define('HAVE_CELT_API_0_5', 0)
 
+    conf.env['WITH_OPUS'] = False
+    if conf.check_cfg(package='opus', atleast_version='0.9.0' , args='--cflags --libs', mandatory=False):
+        if conf.check_cc(header_name='opus/opus_custom.h', mandatory=False):
+            conf.define('HAVE_OPUS', 1)
+            conf.env['WITH_OPUS'] = True
+
+
     conf.env['LIB_PTHREAD'] = ['pthread']
     conf.env['LIB_DL'] = ['dl']
     conf.env['LIB_RT'] = ['rt']
+    conf.env['LIB_M'] = ['m']
+    conf.env['LIB_STDC++'] = ['stdc++']
     conf.env['JACK_API_VERSION'] = JACK_API_VERSION
     conf.env['JACK_VERSION'] = VERSION
 
@@ -202,7 +211,7 @@ def configure(conf):
 
     if conf.env['BUILD_DEBUG']:
         conf.env.append_unique('CXXFLAGS', '-g')
-        conf.env.append_unique('CCFLAGS', '-g')
+        conf.env.append_unique('CFLAGS', '-g')
         conf.env.append_unique('LINKFLAGS', '-g')
 
     conf.define('CLIENT_NUM', Options.options.clients)
@@ -219,7 +228,7 @@ def configure(conf):
             conf.define('USE_LIBDBUS_AUTOLAUNCH', 1)
     if conf.env['BUILD_WITH_PROFILE'] == True:
         conf.define('JACK_MONITOR', 1)
-    conf.write_config_header('config.h')
+    conf.write_config_header('config.h', remove=False)
 
     svnrev = None
     if os.access('svnversion.h', os.R_OK):
@@ -228,15 +237,13 @@ def configure(conf):
         if m != None:
             svnrev = m.group(1)
 
-    conf.env.append_unique('LINKFLAGS', ['-lm', '-lstdc++'])
-
     if Options.options.mixed == True:
         env_variant2 = conf.env.copy()
         conf.set_env_name('lib32', env_variant2)
         env_variant2.set_variant('lib32')
         conf.setenv('lib32')
         conf.env.append_unique('CXXFLAGS', '-m32')
-        conf.env.append_unique('CCFLAGS', '-m32')
+        conf.env.append_unique('CFLAGS', '-m32')
         conf.env.append_unique('LINKFLAGS', '-m32')
         if Options.options.libdir32:
             conf.env['LIBDIR'] = Options.options.libdir32
@@ -260,10 +267,11 @@ def configure(conf):
     display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
     display_feature('Build debuggable binaries', conf.env['BUILD_DEBUG'])
-    display_msg('C compiler flags', repr(conf.env['CCFLAGS']))
+    display_msg('C compiler flags', repr(conf.env['CFLAGS']))
     display_msg('C++ compiler flags', repr(conf.env['CXXFLAGS']))
     display_msg('Linker flags', repr(conf.env['LINKFLAGS']))
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
+    display_feature('Build Opus netjack2', conf.env['WITH_OPUS'])
     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
     display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
 
