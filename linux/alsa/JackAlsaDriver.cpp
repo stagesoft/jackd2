@@ -579,6 +579,7 @@ enum_alsa_devices()
         if (snd_ctl_open(&handle, card_id, 0) >= 0 &&
             snd_ctl_card_info(handle, info) >= 0)
         {
+            snprintf(card_id, sizeof(card_id), "hw:%s", snd_ctl_card_info_get_id(info));
             fill_device(&constraint_ptr, &array_size, card_id, snd_ctl_card_info_get_name(info));
 
             device_no = -1;
@@ -731,12 +732,12 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
 
     desc = jack_driver_descriptor_construct("alsa", JackDriverMaster, "Linux ALSA API based audio backend", &filler);
 
+    strcpy(value.str, "hw:0");
+    jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, enum_alsa_devices(), "ALSA device name", NULL);
+
     strcpy(value.str, "none");
     jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Provide capture ports.  Optionally set device", NULL);
     jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamString, &value, NULL, "Provide playback ports.  Optionally set device", NULL);
-
-    strcpy(value.str, "hw:0");
-    jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, enum_alsa_devices(), "ALSA device name", NULL);
 
     value.ui = 48000U;
     jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
@@ -778,9 +779,9 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
         "  s - shaped\n"
         "  t - triangular");
 
-    value.i = 0;
-    jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamInt, &value, NULL, "Number of capture channels (defaults to hardware max)", NULL);
-    jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamInt, &value, NULL, "Number of playback channels (defaults to hardware max)", NULL);
+    value.ui = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamUInt, &value, NULL, "Number of capture channels (defaults to hardware max)", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamUInt, &value, NULL, "Number of playback channels (defaults to hardware max)", NULL);
 
     value.i = FALSE;
     jack_driver_descriptor_add_parameter(desc, &filler, "shorts", 'S', JackDriverParamBool, &value, NULL, "Try 16-bit samples before 32-bit", NULL);
@@ -859,10 +860,12 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
                 break;
 
             case 'd':
-                playback_pcm_name = strdup (param->value.str);
-                capture_pcm_name = strdup (param->value.str);
-                jack_log("playback device %s", playback_pcm_name);
-                jack_log("capture device %s", capture_pcm_name);
+                if (strcmp (param->value.str, "none") != 0) {
+                    playback_pcm_name = strdup (param->value.str);
+                    capture_pcm_name = strdup (param->value.str);
+                    jack_log("playback device %s", playback_pcm_name);
+                    jack_log("capture device %s", capture_pcm_name);
+                }
                 break;
 
             case 'H':
@@ -889,8 +892,9 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
 
             case 'n':
                 user_nperiods = param->value.ui;
-                if (user_nperiods < 2)	/* enforce minimum value */
+                if (user_nperiods < 2) {    /* enforce minimum value */
                     user_nperiods = 2;
+                }
                 break;
 
             case 's':
@@ -974,8 +978,9 @@ void SetTime(jack_time_t time)
 int Restart()
 {
     int res;
-    if ((res = g_alsa_driver->Stop()) == 0)
+    if ((res = g_alsa_driver->Stop()) == 0) {
         res = g_alsa_driver->Start();
+    }
     return res;
 }
 
