@@ -1,3 +1,13 @@
+jackd2 (1.9.8~dfsg.4+20121110git67ac4440-1) experimental; urgency=low
+
+  * Imported Upstream version 1.9.8~dfsg.4+20121110git67ac4440
+    (Closes: #682792)
+  * Fix FTBFS on ppc64 (Closes: #684470)
+  * Switch to dh_python2 (Closes: #676922)
+  * Refresh no-selfconnect.patch
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Sat, 10 Nov 2012 11:01:03 +0100
+
 jackd2 (1.9.8~dfsg.4+20120529git007cdc37-4.1) unstable; urgency=low
 
   * Non-maintainer upload.
