@@ -1,0 +1,101 @@
+From: Kaj Ailomaa <kaj.ailomaa@mousike.me>
+Bugs-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=682792
+Bugs-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/jackd2/+bug/956438
+Origin: upstream, https://github.com/jackaudio/jack2/commit/aa02feeacfa533a07f04e916334637b57eaac5a2 https://github.com/jackaudio/jack2/commit/700489b429b0edb7046b169278e3e6751e3e59fc
+Applied-Upstream: 1.9.9
+Forwarded: not-needed
+Description: Fix hanging qjackctl when stopping jackdbus
+--- a/common/JackLibAPI.cpp
++++ b/common/JackLibAPI.cpp
+@@ -177,7 +177,7 @@
+         va_end(ap);
+         JackGlobals::fOpenMutex->Unlock();
+         return res;
+-    } catch(std::bad_alloc& e) {
++    } catch (std::bad_alloc& e) {
+         jack_error("Memory allocation error...");
+         return NULL;
+     } catch (...) {
+--- a/common/JackLockedEngine.h
++++ b/common/JackLockedEngine.h
+@@ -41,7 +41,7 @@
+ */
+ 
+ #define CATCH_EXCEPTION_RETURN                      \
+-    } catch(std::bad_alloc& e) {                    \
++    } catch (std::bad_alloc& e) {                    \
+         jack_error("Memory allocation error...");   \
+         return -1;                                  \
+     } catch (...) {                                 \
+@@ -50,10 +50,10 @@
+     }                                               \
+ 
+ #define CATCH_CLOSE_EXCEPTION_RETURN                      \
+-    } catch(std::bad_alloc& e) {                    \
++    } catch (std::bad_alloc& e) {                    \
+         jack_error("Memory allocation error...");   \
+         return -1;                                  \
+-    } catch(JackTemporaryException& e) {                       \
++    } catch (JackTemporaryException& e) {                       \
+         jack_error("JackTemporaryException : now quits...");   \
+         JackTools::KillServer();                     \
+         return 0;                                   \
+@@ -63,7 +63,7 @@
+     }
+ 
+ #define CATCH_EXCEPTION                      \
+-    } catch(std::bad_alloc& e) {                    \
++    } catch (std::bad_alloc& e) {                    \
+         jack_error("Memory allocation error...");   \
+     } catch (...) {                                 \
+         jack_error("Unknown error...");             \
+@@ -327,8 +327,8 @@
+ 
+         void NotifyQuit()
+         {
++            // No lock needed
+             TRY_CALL
+-            JackLock lock(&fEngine);
+             return fEngine.NotifyQuit();
+             CATCH_EXCEPTION
+         }
+--- a/common/JackServerAPI.cpp
++++ b/common/JackServerAPI.cpp
+@@ -162,7 +162,7 @@
+         va_end(ap);
+         JackGlobals::fOpenMutex->Unlock();
+         return res;
+-    } catch(std::bad_alloc& e) {
++    } catch (std::bad_alloc& e) {
+         jack_error("Memory allocation error...");
+         return NULL;
+     } catch (...) {
+--- a/common/JackServer.cpp
++++ b/common/JackServer.cpp
+@@ -134,7 +134,6 @@
+ int JackServer::Close()
+ {
+     jack_log("JackServer::Close");
+-    fEngine->NotifyQuit();
+     fChannel.Close();
+     fAudioDriver->Detach();
+     fAudioDriver->Close();
+@@ -190,6 +189,7 @@
+ int JackServer::Stop()
+ {
+     jack_log("JackServer::Stop");
++    fEngine->NotifyQuit();
+     fChannel.Stop();
+     
+     fEngine->ShutDown();
+--- a/posix/JackSocketServerChannel.cpp
++++ b/posix/JackSocketServerChannel.cpp
+@@ -97,7 +97,7 @@
+ 
+ void JackSocketServerChannel::Stop()
+ {
+-    fThread.Kill();
++    fThread.Stop();
+ }
+ 
+ void JackSocketServerChannel::ClientCreate()
