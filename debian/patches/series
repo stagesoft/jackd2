@@ -1,2 +1,3 @@
 no-selfconnect.patch
 jack_control.patch
+jackdbus-hang.patch
