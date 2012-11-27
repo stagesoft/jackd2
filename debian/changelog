@@ -1,3 +1,9 @@
+jackd2 (1.9.8~dfsg.4+20120529git007cdc37-5) unstable; urgency=low
+
+  * Add patch to fix hanging jackdbus (Closes: #682792)
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Tue, 27 Nov 2012 21:40:49 +0100
+
 jackd2 (1.9.8~dfsg.4+20120529git007cdc37-4.1) unstable; urgency=low
 
   * Non-maintainer upload.
