@@ -15,9 +15,9 @@ CDBS_BUILD_DEPENDS += , cdbs (>= 0.4.93~),\
 CDBS_BUILD_DEPENDS_rules_debhelper_buildinfo =
 
 
-DEB_UPSTREAM_PACKAGE = jack
-DEB_UPSTREAM_URL = http://www.grame.fr/~letz/
-DEB_UPSTREAM_TARBALL_EXTENSION = tgz
+DEB_UPSTREAM_URL = https://github.com/jackaudio/jack2/archive
+DEB_UPSTREAM_TARBALL_BASENAME = $(DEB_UPSTREAM_TARBALL_VERSION)
+DEB_UPSTREAM_TARBALL_SRCDIR = jack2-$(DEB_UPSTREAM_TARBALL_VERSION)
 
 # unneeded and possibly sourceless binaries
 DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.Lib ./windows/**.lib ./windows/**.dll

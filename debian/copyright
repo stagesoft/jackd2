@@ -1,7 +1,7 @@
 Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?rev=135
 Name: jackdmp
 Maintainer: JACK developers <jack-devel@jackaudio.org>
-Source: http://jackaudio.org/download
+Source: https://github.com/jackaudio/jack2
 
 Excluded-Files: ./macosx/libcelt.a,
 	./macosx/libportaudio.a,
