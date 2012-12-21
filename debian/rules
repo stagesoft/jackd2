@@ -28,8 +28,8 @@ DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.rc
 # pure garbage in upstream tarball
 DEB_UPSTREAM_REPACKAGE_EXCLUDES += .DS_Store
 
-# ignore oddly packaged bzip2 archive to not upset dpkg
-DEB_COPYRIGHT_CHECK_IGNORE_REGEX = ^\./waf|\./debian/(changelog|copyright(|_hints|_newhints))$
+# sources not in prefered form of modification
+DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./waf
 
 # Minimum assured version referenced upstream as library API/ABI
 ABI = 0.118.0

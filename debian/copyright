@@ -9,6 +9,9 @@ Reason: unneeded and possibly sourceless binaries
 Excluded-Files: ./windows/**.rc
 Reason: unneeded sources, copyright-protected without licence
 
+Excluded-Files: ./waf
+Reason: sources not in prefered form of modification
+
 Copyright: 2004-2009, Grame <grame@grame.fr>
 License: LGPL-2.1+
 
