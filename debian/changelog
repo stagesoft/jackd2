@@ -1,3 +1,24 @@
+jackd2 (1.9.9.5~dfsg-1) UNRELEASED; urgency=low
+
+  [ upstream ]
+  * New upstream release.
+
+  [ Jonas Smedegaard ]
+  * Update and improve get-orig-source target:
+    + Update to use github.com URLs in watch file and CDBS hints.
+    + Simplify to strip all *.a, .dll and *.Lib files (i.e. catch *.a
+      files also below windows dir, and skip lower-case *.lib files).
+    + Extend to strip waf file.
+    + Update copyright file Source and Excluded-Files fields.
+    + Add comment in rules file on how to do git snapshots.
+    + Drop obsolete make_tarball.sh script.
+  * Add patch to reapply stripped-from-source waflib as unpacked source
+    and add waf-light.
+  * Build-depend on libopus-dev.
+  * Use anonscm.debian.org for Vcs-Browser field.
+
+ -- Jonas Smedegaard <dr@jones.dk>  Fri, 21 Dec 2012 04:42:40 +0100
+
 jackd2 (1.9.8~dfsg.4+20121110git67ac4440-1) experimental; urgency=low
 
   * Imported Upstream version 1.9.8~dfsg.4+20121110git67ac4440
