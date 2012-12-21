@@ -20,7 +20,7 @@ DEB_UPSTREAM_TARBALL_BASENAME = $(DEB_UPSTREAM_TARBALL_VERSION)
 DEB_UPSTREAM_TARBALL_SRCDIR = jack2-$(DEB_UPSTREAM_TARBALL_VERSION)
 
 # unneeded and possibly sourceless binaries
-DEB_UPSTREAM_REPACKAGE_EXCLUDES += *.a
+DEB_UPSTREAM_REPACKAGE_EXCLUDES += *.a *.dll *.Lib
 
 # unneeded sources copyright-protected without licence
 DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.rc

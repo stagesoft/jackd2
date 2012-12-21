@@ -3,7 +3,7 @@ Name: jackdmp
 Maintainer: JACK developers <jack-devel@jackaudio.org>
 Source: https://github.com/jackaudio/jack2
 
-Excluded-Files: *.a
+Excluded-Files: *.a, *.dll, *.Lib
 Reason: unneeded and possibly sourceless binaries
 
 Excluded-Files: ./windows/**.rc
