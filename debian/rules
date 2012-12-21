@@ -14,10 +14,11 @@ CDBS_BUILD_DEPENDS += , cdbs (>= 0.4.93~),\
 						debhelper (>= 8.1.3)
 CDBS_BUILD_DEPENDS_rules_debhelper_buildinfo =
 
-
+# Set tag to full 40 char git tag for git snapshot release
+tag = $(DEB_UPSTREAM_TARBALL_VERSION)
 DEB_UPSTREAM_URL = https://github.com/jackaudio/jack2/archive
-DEB_UPSTREAM_TARBALL_BASENAME = $(DEB_UPSTREAM_TARBALL_VERSION)
-DEB_UPSTREAM_TARBALL_SRCDIR = jack2-$(DEB_UPSTREAM_TARBALL_VERSION)
+DEB_UPSTREAM_TARBALL_BASENAME = $(tag)
+DEB_UPSTREAM_TARBALL_SRCDIR = jack2-$(tag)
 
 # unneeded and possibly sourceless binaries
 DEB_UPSTREAM_REPACKAGE_EXCLUDES += *.a *.dll *.Lib
