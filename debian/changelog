@@ -16,6 +16,12 @@ jackd2 (1.9.9.5~dfsg-1) UNRELEASED; urgency=low
     and add waf-light.
   * Build-depend on libopus-dev.
   * Use anonscm.debian.org for Vcs-Browser field.
+  * Drop pre-squeeze conffile cleanup in preinst.
+  * Tidy bash-completion file:
+    + Use tab indentation.
+    + Strip excess space.
+  * Remove debian/source/local-options: abort-on-upstream-changes and
+    unapply-patches are default in dpkg-source since 1.16.1.
 
  -- Jonas Smedegaard <dr@jones.dk>  Fri, 21 Dec 2012 04:42:40 +0100
 
