@@ -1,3 +1,3 @@
-debian/tmp/usr/include/jack/*.h
-debian/tmp/usr/lib/*/pkgconfig
-debian/tmp/usr/lib/*/lib*.so
+usr/include/jack/*.h
+usr/lib/*/pkgconfig
+usr/lib/*/lib*.so
