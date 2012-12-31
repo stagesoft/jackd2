@@ -640,6 +640,8 @@ Files: common/JackWeakAPI.c
 Copyright: 2002-2007, Werner Schweer and others
   2009, Grame <grame@grame.fr>
 License: LGPL-2.1+
+Comment:
+ FIXME: List explicitly who those others are.
 
 Files: common/jack/midiport.h
 Copyright: 2004, Ian Esten
