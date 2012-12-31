@@ -818,6 +818,8 @@ License: other-SA-jackd2
 License: other-SA-jack
  This file is distributed under the same license as the
  jack-audio-connection-kit package.
+Comment:
+ TODO: Request relicensing to be tied to this package.
 
 License: Expat
  Permission is hereby granted, free of charge, to any person obtaining a
