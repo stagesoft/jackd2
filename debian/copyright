@@ -728,6 +728,8 @@ License: LGPL-2.1+
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  Lesser General Public License for more details.
  .
+ Comment:
+ .
  On Debian GNU systems, the complete text of the GNU Lesser General
  Public License (LGPL) version 2.1 or newer can be found in
  '/usr/share/common-licenses/LGPL'.
@@ -747,6 +749,8 @@ License: GPL-2+
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
  .
+ Comment:
+ .
  On Debian GNU systems, the complete text of the GNU General Public
  License (GPL) version 2 or newer can be found in
  '/usr/share/common-licenses/GPL'.
@@ -764,6 +768,8 @@ License: GPL-2
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
  .
+ Comment:
+ .
  On Debian GNU systems, the complete text of the GNU General Public
  License (GPL) version 2 can be found in
  '/usr/share/common-licenses/GPL-2'.
@@ -780,6 +786,8 @@ License: GPL-2~either
  WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
+ .
+ Comment:
  .
  On Debian GNU systems, the complete text of the GNU General Public
  License (GPL) version 2 can be found in
@@ -799,6 +807,8 @@ License: GPL-2~or
  .
  GNU General Public License for more details.
  .
+ Comment:
+ .
  On Debian GNU systems, the complete text of the GNU General Public
  License (GPL) version 2 can be found in
  '/usr/share/common-licenses/GPL-2'.
@@ -816,6 +826,8 @@ License: GPL-3+
  WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
+ .
+ Comment:
  .
  On Debian GNU systems, the complete text of the GNU General Public
  License (GPL) version 3 or newer can be found in
