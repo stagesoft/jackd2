@@ -73,39 +73,6 @@ Files: common/JackAudioAdapter.cpp
 Copyright: 2004-2012, Grame <grame@grame.fr>
 License: GPL-2+
 
-Files: common/JackAPI.cpp
- common/JackAudioPort.cpp
- common/JackClient.cpp
- common/JackClient.h
- common/JackClientControl.h
- common/JackClientInterface.h
- common/JackEngineControl.cpp
- common/JackEngineControl.h
- common/JackFrameTimer.cpp
- common/JackFrameTimer.h
- common/JackGraphManager.cpp
- common/JackGraphManager.h
- common/JackLibAPI.cpp
- common/JackPort.cpp
- common/JackPort.h
- common/JackRequest.h
- common/JackServerLaunch.h
- common/JackThread.h
- common/JackTime.h
- common/JackTransportEngine.cpp
- common/JackTransportEngine.h
- common/shm.c
- common/shm.h
- macosx/JackMachThread.cpp
- macosx/JackMachTime.c
- posix/JackPosixServerLaunch.cpp
- posix/JackPosixThread.cpp
- posix/JackPosixThread.h
- solaris/JackSolarisTime.c
-Copyright: 2001-2003, Paul Davis
-  2004-2012, Grame <grame@grame.fr>
-License: LGPL-2.1+
-
 Files: linux/alsarawmidi/JackALSARawMidiDriver.cpp
  linux/alsarawmidi/JackALSARawMidiDriver.h
  linux/alsarawmidi/JackALSARawMidiInputPort.cpp
@@ -144,87 +111,6 @@ Files: linux/alsarawmidi/JackALSARawMidiDriver.cpp
 Copyright: 2011, Devin Anderson
 License: GPL-2+
 
-Files: common/JackAudioDriver.h
- common/JackDriver.cpp
- common/JackDriver.h
- common/JackDriverInfo.h
- common/JackDriverLoader.cpp
- common/JackDriverLoader.h
- common/JackDummyDriver.cpp
- common/JackDummyDriver.h
- common/JackExternalClient.cpp
- common/JackExternalClient.h
- common/JackFreewheelDriver.cpp
- common/JackFreewheelDriver.h
- common/JackInternalClient.cpp
- common/JackInternalClient.h
- common/JackLoopbackDriver.cpp
- common/JackLoopbackDriver.h
- common/JackRestartThreadedDriver.cpp
- common/JackRestartThreadedDriver.h
- common/JackServer.cpp
- common/JackServer.h
- common/JackServerAPI.cpp
- common/JackThreadedDriver.cpp
- common/JackThreadedDriver.h
- common/JackTimedDriver.cpp
- common/JackTimedDriver.h
- common/JackWaitThreadedDriver.cpp
- common/JackWaitThreadedDriver.h
- linux/alsa/JackAlsaDriver.cpp
- linux/alsa/JackAlsaDriver.h
- posix/JackShmMem_os.h
-Copyright: 2001-2005, Paul Davis
-  2004-2008, Grame <grame@grame.fr>
-License: GPL-2+
-
-Files: common/memops.c
- common/memops.h
- example-clients/evmon.c
- example-clients/freewheel.c
- linux/alsa/alsa_driver.c
- linux/alsa/alsa_driver.h
- linux/alsa/generic.h
- linux/alsa/generic_hw.c
- linux/alsa/hammerfall.c
- linux/alsa/hammerfall.h
- linux/alsa/hardware.h
- linux/alsa/hdsp.h
- linux/cycles.h
- linux/driver.h
-Copyright: 1999-2001, 2003, 2007, Paul Davis
-License: GPL-2+
-
-Files: common/JackNetAdapter.cpp
- common/JackNetAdapter.h
- common/JackNetDriver.cpp
- common/JackNetDriver.h
- common/JackNetInterface.cpp
- common/JackNetInterface.h
- common/JackNetManager.cpp
- common/JackNetManager.h
- common/JackNetSocket.h
- common/JackNetTool.cpp
- common/JackNetTool.h
- posix/JackNetUnixSocket.cpp
- posix/JackNetUnixSocket.h
- windows/portaudio/JackPortAudioDevices.cpp
- windows/portaudio/JackPortAudioDevices.h
-Copyright: 2008-2011, Romain Moret at Grame
-License: GPL-2+
-
-Files: common/JackTypes.h
- common/jack/thread.h
- common/jack/weakjack.h
- common/jack/weakmacros.h
- common/timestamps.c
- common/timestamps.h
- example-clients/internal_metro.h
- posix/JackTypes_os.h
- tests/external_metro.h
-Copyright: 2001-2004, 2010, Paul Davis
-License: LGPL-2.1+
-
 Files: common/JackMidiAsyncQueue.cpp
  common/JackMidiAsyncQueue.h
  common/JackMidiAsyncWaitQueue.cpp
@@ -259,16 +145,89 @@ Files: common/JackMidiAsyncQueue.cpp
 Copyright: 2010, Devin Anderson
 License: LGPL-2.1+
 
-Files: dbus/controller.c
- dbus/controller_iface_configure.c
- dbus/controller_iface_control.c
- dbus/controller_iface_introspectable.c
- dbus/controller_iface_patchbay.c
- dbus/controller_iface_transport.c
- dbus/controller_internal.h
-Copyright: 2007-2008, Juuso Alasuutari
-  2007-2008, 2011, Nedko Arnaudov
-License: other-GPL-2-either
+Files: common/JackAudioDriver.h
+ common/JackDriver.cpp
+ common/JackDriver.h
+ common/JackDriverInfo.h
+ common/JackDriverLoader.cpp
+ common/JackDriverLoader.h
+ common/JackDummyDriver.cpp
+ common/JackDummyDriver.h
+ common/JackExternalClient.cpp
+ common/JackExternalClient.h
+ common/JackFreewheelDriver.cpp
+ common/JackFreewheelDriver.h
+ common/JackInternalClient.cpp
+ common/JackInternalClient.h
+ common/JackLoopbackDriver.cpp
+ common/JackLoopbackDriver.h
+ common/JackRestartThreadedDriver.cpp
+ common/JackRestartThreadedDriver.h
+ common/JackServer.cpp
+ common/JackServer.h
+ common/JackServerAPI.cpp
+ common/JackThreadedDriver.cpp
+ common/JackThreadedDriver.h
+ common/JackTimedDriver.cpp
+ common/JackTimedDriver.h
+ common/JackWaitThreadedDriver.cpp
+ common/JackWaitThreadedDriver.h
+ linux/alsa/JackAlsaDriver.cpp
+ linux/alsa/JackAlsaDriver.h
+ posix/JackShmMem_os.h
+Copyright: 2001-2005, Paul Davis
+  2004-2008, Grame <grame@grame.fr>
+License: GPL-2+
+
+Files: common/JackAPI.cpp
+ common/JackAudioPort.cpp
+ common/JackClient.cpp
+ common/JackClient.h
+ common/JackClientControl.h
+ common/JackClientInterface.h
+ common/JackEngineControl.cpp
+ common/JackEngineControl.h
+ common/JackFrameTimer.cpp
+ common/JackFrameTimer.h
+ common/JackGraphManager.cpp
+ common/JackGraphManager.h
+ common/JackLibAPI.cpp
+ common/JackPort.cpp
+ common/JackPort.h
+ common/JackRequest.h
+ common/JackServerLaunch.h
+ common/JackThread.h
+ common/JackTime.h
+ common/JackTransportEngine.cpp
+ common/JackTransportEngine.h
+ common/shm.c
+ common/shm.h
+ macosx/JackMachThread.cpp
+ macosx/JackMachTime.c
+ posix/JackPosixServerLaunch.cpp
+ posix/JackPosixThread.cpp
+ posix/JackPosixThread.h
+ solaris/JackSolarisTime.c
+Copyright: 2001-2003, Paul Davis
+  2004-2012, Grame <grame@grame.fr>
+License: LGPL-2.1+
+
+Files: common/memops.c
+ common/memops.h
+ example-clients/evmon.c
+ example-clients/freewheel.c
+ linux/alsa/alsa_driver.c
+ linux/alsa/alsa_driver.h
+ linux/alsa/generic.h
+ linux/alsa/generic_hw.c
+ linux/alsa/hammerfall.c
+ linux/alsa/hammerfall.h
+ linux/alsa/hardware.h
+ linux/alsa/hdsp.h
+ linux/cycles.h
+ linux/driver.h
+Copyright: 1999-2001, 2003, 2007, Paul Davis
+License: GPL-2+
 
 Files: dbus/controller.h
  dbus/controller_iface_session_manager.c
@@ -282,10 +241,46 @@ Files: dbus/controller.h
 Copyright: 2007-2008,,2011 Nedko Arnaudov
 License: other-GPL-2-either
 
-Files: common/JackNetOneDriver.cpp
- common/JackNetOneDriver.h
-Copyright: 2008-2011, Torben Horn
+Files: common/JackNetAdapter.cpp
+ common/JackNetAdapter.h
+ common/JackNetDriver.cpp
+ common/JackNetDriver.h
+ common/JackNetInterface.cpp
+ common/JackNetInterface.h
+ common/JackNetManager.cpp
+ common/JackNetManager.h
+ common/JackNetSocket.h
+ common/JackNetTool.cpp
+ common/JackNetTool.h
+ posix/JackNetUnixSocket.cpp
+ posix/JackNetUnixSocket.h
+ windows/portaudio/JackPortAudioDevices.cpp
+ windows/portaudio/JackPortAudioDevices.h
+Copyright: 2008-2011, Romain Moret at Grame
 License: GPL-2+
+
+Files: common/JackTypes.h
+ common/jack/thread.h
+ common/jack/weakjack.h
+ common/jack/weakmacros.h
+ common/timestamps.c
+ common/timestamps.h
+ example-clients/internal_metro.h
+ posix/JackTypes_os.h
+ tests/external_metro.h
+Copyright: 2001-2004, 2010, Paul Davis
+License: LGPL-2.1+
+
+Files: dbus/controller.c
+ dbus/controller_iface_configure.c
+ dbus/controller_iface_control.c
+ dbus/controller_iface_introspectable.c
+ dbus/controller_iface_patchbay.c
+ dbus/controller_iface_transport.c
+ dbus/controller_internal.h
+Copyright: 2007-2008, Juuso Alasuutari
+  2007-2008, 2011, Nedko Arnaudov
+License: other-GPL-2-either
 
 Files: linux/alsa/alsa_midi.h
  linux/alsa/alsa_midi_impl.h
@@ -329,13 +324,6 @@ Files: dbus/audio_reserve.c
 Copyright: 2009, Grame <grame@grame.fr>
 License: other-GPL-2-either
 
-Files: linux/firewire/JackFFADODriver.h
-Copyright: 2001, Paul Davis
-  2004, Grame <grame@grame.fr>
-  2007, Pieter Palmers
-  2012, Adrian Knoth
-License: GPL-2+
-
 Files: linux/freebob/JackFreebobDriver.cpp
  linux/freebob/JackFreebobDriver.h
 Copyright: 2001, Paul Davis
@@ -366,6 +354,15 @@ Files: windows/JackRouter/JackRouter.cpp
  windows/JackRouter/JackRouter.h
 Copyright: 2006-2011, Grame <grame@grame.fr>
 License: Expat
+
+Files: dbus/reserve.*
+Copyright: 2009, Lennart Poettering
+License: Expat
+
+Files: windows/portaudio/pa_asio.h
+ windows/portaudio/portaudio.h
+Copyright: 1999-2002, Ross Bencina and Phil Burk
+License: other-Expat-modrequest
 
 Files: dbus/jackdbus.c
  dbus/jackdbus.h
@@ -439,6 +436,11 @@ Copyright: 2006, Torben Hohn <torbenh@gmx.de>
   2008, Pieter Palmers <pieterpalmers@users.sourceforge.net>
 License: GPL-2+
 
+Files: common/JackNetOneDriver.cpp
+ common/JackNetOneDriver.h
+Copyright: 2008-2011, Torben Horn
+License: GPL-2+
+
 Files: common/JackPortType.cpp
  common/JackPortType.h
 Copyright: 2007, Dmitry Baikov
@@ -488,15 +490,6 @@ Copyright: 2000, Paul Davis
   2003, Rohan Drape
 License: LGPL-2.1+
 
-Files: dbus/reserve.*
-Copyright: 2009, Lennart Poettering
-License: Expat
-
-Files: windows/portaudio/pa_asio.h
- windows/portaudio/portaudio.h
-Copyright: 1999-2002, Ross Bencina and Phil Burk
-License: other-Expat-modrequest
-
 Files: debian/po/fi.po
  debian/po/sv.po
 Copyright: 2009
@@ -522,6 +515,13 @@ License: GPL-2
 Files: dbus/list.h
 Copyright: unknown
 License: GPL-2
+
+Files: linux/firewire/JackFFADODriver.h
+Copyright: 2001, Paul Davis
+  2004, Grame <grame@grame.fr>
+  2007, Pieter Palmers
+  2012, Adrian Knoth
+License: GPL-2+
 
 Files: example-clients/internal_metro.cpp
 Copyright: 2002, Anthony Van Groningen
