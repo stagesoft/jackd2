@@ -730,12 +730,11 @@ License: LGPL-2.1+
  .
  Comment:
  .
- On Debian GNU systems, the complete text of the GNU Lesser General
- Public License (LGPL) version 2.1 or newer can be found in
- '/usr/share/common-licenses/LGPL'.
+ On Debian systems the 'GNU Lesser General Public License' version 2.1
+ is located in '/usr/share/common-licenses/LGPL-2.1'.
  .
- You should have received a copy of the GNU Lesser General Public
- License along with this program.  If not, see
+ You should have received a copy of the 'GNU Lesser General Public
+ License' along with this program.  If not, see
  <http://www.gnu.org/licenses/>.
 
 License: GPL-2+
@@ -751,11 +750,10 @@ License: GPL-2+
  .
  Comment:
  .
- On Debian GNU systems, the complete text of the GNU General Public
- License (GPL) version 2 or newer can be found in
- '/usr/share/common-licenses/GPL'.
+ On Debian systems the 'GNU General Public License' version 2 is located
+ in '/usr/share/common-licenses/GPL-2'.
  .
- You should have received a copy of the GNU General Public License
+ You should have received a copy of the 'GNU General Public License'
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 License: GPL-2
@@ -767,15 +765,6 @@ License: GPL-2
  WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
- .
- Comment:
- .
- On Debian GNU systems, the complete text of the GNU General Public
- License (GPL) version 2 can be found in
- '/usr/share/common-licenses/GPL-2'.
- .
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 License: GPL-2~either
  This program is free software; you can redistribute it and/or modify it
@@ -786,15 +775,6 @@ License: GPL-2~either
  WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  General Public License for more details.
- .
- Comment:
- .
- On Debian GNU systems, the complete text of the GNU General Public
- License (GPL) version 2 can be found in
- '/usr/share/common-licenses/GPL-2'.
- .
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 License: GPL-2~or
  This program is free software; you can redistribute it and/or modify it
@@ -806,15 +786,6 @@ License: GPL-2~or
  (at your option) any later version.
  .
  GNU General Public License for more details.
- .
- Comment:
- .
- On Debian GNU systems, the complete text of the GNU General Public
- License (GPL) version 2 can be found in
- '/usr/share/common-licenses/GPL-2'.
- .
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 License: GPL-3+
  This program is free software: you can redistribute it and/or modify it
@@ -829,12 +800,8 @@ License: GPL-3+
  .
  Comment:
  .
- On Debian GNU systems, the complete text of the GNU General Public
- License (GPL) version 3 or newer can be found in
- '/usr/share/common-licenses/GPL'.
- .
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ On Debian systems the 'GNU General Public License version 3 is located
+ in '/usr/share/common-licenses/GPL-3'.
 
 License: GPL-2~jackd2
  This file is distributed under the same license as the jackd2 package.
