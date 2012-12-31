@@ -652,7 +652,7 @@ License: LGPL-2.1+
 
 Files: dbus/sigsegv.c
 Copyright: 2005-2008, Jaco Kroon
-License: PD~Kroon
+License: public-domain~Kroon
  This code is in the public domain.  Use it as you see fit, some credit
  would be appreciated, but is not a prerequisite for usage.  Feedback on
  it's use would encourage further development and maintenance.
