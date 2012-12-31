@@ -651,11 +651,14 @@ Copyright: 2004, Lee Revell
 License: LGPL-2.1+
 
 Files: dbus/sigsegv.c
-Copyright: none (public domain)
-License: PD
+Copyright: 2005-2008, Jaco Kroon
+License: PD~Kroon
  This code is in the public domain.  Use it as you see fit, some credit
  would be appreciated, but is not a prerequisite for usage.  Feedback on
  it's use would encourage further development and maintenance.
+Comment:
+ FIXME: Public domain statement and copyright claim are arguably
+ incompatible.
 
 Files: debian/po/gl.po
 Copyright: 2009, Debian
