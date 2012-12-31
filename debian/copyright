@@ -515,6 +515,15 @@ License: GPL-2
 Files: dbus/list.h
 Copyright: unknown
 License: GPL-2
+Comment:
+ Licensing header contains the following explanation for copyright
+ holder being unknown:
+ .
+ Linux kernel header adapted for user-mode
+ The 2.6.17-rt1 version was used.
+ .
+ Original copyright holders of this code are unknown, they were not
+ mentioned in the original file.
 
 Files: linux/firewire/JackFFADODriver.h
 Copyright: 2001, Paul Davis
