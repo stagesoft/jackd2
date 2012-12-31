@@ -14,6 +14,10 @@ Files: *
 Copyright: 2004-2012, Grame <grame@grame.fr>
 License: LGPL-2.1+
 
+Files: dbus/reserve.*
+Copyright: 2009, Lennart Poettering
+License: Expat
+
 Files: windows/getopt*
 Copyright: 1987-1999, Free Software Foundation, Inc
 License: LGPL-2+
@@ -353,10 +357,6 @@ License: BSD-3-clause
 Files: windows/JackRouter/JackRouter.cpp
  windows/JackRouter/JackRouter.h
 Copyright: 2006-2011, Grame <grame@grame.fr>
-License: Expat
-
-Files: dbus/reserve.*
-Copyright: 2009, Lennart Poettering
 License: Expat
 
 Files: windows/portaudio/pa_asio.h
