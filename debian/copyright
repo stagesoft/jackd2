@@ -591,7 +591,8 @@ Copyright: 2001, Paul Davis
 License: GPL-2+
 
 Files: linux/freebob/freebob_driver.h
-Copyright: 2005-2007, Pieter Palmers <pieterpalmers@users.sourceforge.net>
+Copyright: 2005-2007, Pieter Palmers
+ <pieterpalmers@users.sourceforge.net>
 License: GPL-2+
 
 Files: common/netjack.h
@@ -663,11 +664,13 @@ Comment:
  FIXME: Debian cannot legally be copyright holder.
 
 Files: debian/po/fr.po
-Copyright: 2009, Debian French l10n team <debian-l10n-french@lists.debian.org>
+Copyright: 2009, Debian French l10n team
+ <debian-l10n-french@lists.debian.org>
 License: GPL-2~jack-audio-connection-kit
 
 Files: debian/po/ja.po
-Copyright: 2009, Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
+Copyright: 2009, Debian Multimedia Maintainers
+ <pkg-multimedia-maintainers@lists.alioth.debian.org>
 License: GPL-2~jack-audio-connection-kit
 
 Files: debian/po/vi.po
