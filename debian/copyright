@@ -805,11 +805,17 @@ License: GPL-3+
 
 License: GPL-2~jackd2
  This file is distributed under the same license as the jackd2 package.
+Comment:
+ jackd2 has multiple differently licensed parts, only the most
+ restrictive being listed here.
 
 License: GPL-2~jack-audio-connection-kit
  This file is distributed under the same license as the
  jack-audio-connection-kit package.
 Comment:
+ jack-audio-connection-kit has multiple differently licensed parts, only
+ the most restrictive being listed here.
+ .
  TODO: Request relicensing to be tied to this package.
 
 License: Expat
