@@ -239,7 +239,7 @@ Files: dbus/controller.h
  dbus/xml_nop.c
  dbus/xml_write_raw.c
 Copyright: 2007-2008,,2011 Nedko Arnaudov
-License: other-GPL-2-either
+License: GPL-2~either
 
 Files: common/JackNetAdapter.cpp
  common/JackNetAdapter.h
@@ -280,7 +280,7 @@ Files: dbus/controller.c
  dbus/controller_internal.h
 Copyright: 2007-2008, Juuso Alasuutari
   2007-2008, 2011, Nedko Arnaudov
-License: other-GPL-2-either
+License: GPL-2~either
 
 Files: linux/alsa/alsa_midi.h
  linux/alsa/alsa_midi_impl.h
@@ -317,12 +317,12 @@ License: None
 
 Files: common/JackMidiDriver.cpp
 Copyright: 2009, Grame <grame@grame.fr>
-License: other-GPL-2-or
+License: GPL-2~or
 
 Files: dbus/audio_reserve.c
  dbus/audio_reserve.h
 Copyright: 2009, Grame <grame@grame.fr>
-License: other-GPL-2-either
+License: GPL-2~either
 
 Files: linux/freebob/JackFreebobDriver.cpp
  linux/freebob/JackFreebobDriver.h
@@ -362,14 +362,14 @@ License: Expat
 Files: windows/portaudio/pa_asio.h
  windows/portaudio/portaudio.h
 Copyright: 1999-2002, Ross Bencina and Phil Burk
-License: other-Expat-modrequest
+License: Expat~modrequest
 
 Files: dbus/jackdbus.c
  dbus/jackdbus.h
 Copyright: 2007-2008, Juuso Alasuutari
   2007-2008, 2010, Nedko Arnaudov
   2008, Marc-Olivier Barre
-License: other-GPL-2-either
+License: GPL-2~either
 
 Files: common/JackControlAPI.cpp
  common/JackControlAPI.h
@@ -493,14 +493,14 @@ License: LGPL-2.1+
 Files: debian/po/fi.po
  debian/po/sv.po
 Copyright: 2009
-License: other-SA-jack
+License: GPL-2~jack-audio-connection-kit
 Comment:
  FIXME: No copyright holder.
 
 Files: common/JackAudioDriver.cpp
 Copyright: 2001, Paul Davis
   2004-2008, Grame <grame@grame.fr>
-License: other-GPL-2-or
+License: GPL-2~or
 
 Files: windows/Setup/src/gpl_installer.rtf
 Copyright: 2001, Paul Davis
@@ -649,17 +649,17 @@ License: PD
 
 Files: debian/po/gl.po
 Copyright: 2009, Debian
-License: other-SA-jack
+License: GPL-2~jack-audio-connection-kit
 Comment:
  FIXME: Debian cannot legally be copyright holder.
 
 Files: debian/po/fr.po
 Copyright: 2009, Debian French l10n team <debian-l10n-french@lists.debian.org>
-License: other-SA-jack
+License: GPL-2~jack-audio-connection-kit
 
 Files: debian/po/ja.po
 Copyright: 2009, Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
-License: other-SA-jack
+License: GPL-2~jack-audio-connection-kit
 
 Files: debian/po/vi.po
 Copyright: 2009, Free Software Foundation, Inc
@@ -668,40 +668,40 @@ License: None
 
 Files: debian/po/de.po
 Copyright: 2009, Helge Kreutzmann <debian@helgefjell.de>
-License: other-SA-jack
+License: GPL-2~jack-audio-connection-kit
 
 Files: debian/po/es.po
 Copyright: 2009, Software in the Public Interest
-License: other-SA-jack
+License: GPL-2~jack-audio-connection-kit
 
 Files: debian/po/it.po
 Copyright: 2009, THE JACK-AUDIO-CONNECTION-KIT'S HOLDER
-License: other-SA-jack
+License: GPL-2~jack-audio-connection-kit
 Comment:
  FIXME: Bogus copyright holder.
 
 Files: debian/po/nl.po
 Copyright: 2011, THE PACKAGE'S HOLDER
-License: other-SA-jackd2
+License: GPL-2~jackd2
 Comment:
  FIXME: Bogus copyright holder.
 
 Files: debian/po/pt_BR.po
 Copyright: 2010, THE jackd2'S HOLDER
-License: other-SA-jackd2
+License: GPL-2~jackd2
 Comment:
  FIXME: Bogus copyright holder.
 
 Files: debian/po/pt.po
 Copyright: 2009, the jack-audio-connection-kit's holder
-License: other-SA-jack
+License: GPL-2~jack-audio-connection-kit
 Comment:
  FIXME: Bogus copyright holder.
 
 Files: debian/po/da.po
 Copyright: 2011, jackd2
  2011, Joe Hansen <joedalton2@yahoo.dk>
-License: other-SA-jackd2
+License: GPL-2~jackd2
 Comment:
  FIXME: jackd2 cannot legally be copyright holder.
 
@@ -759,7 +759,7 @@ License: GPL-2
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-License: other-GPL-2-either
+License: GPL-2~either
  This program is free software; you can redistribute it and/or modify it
  under the terms of the GNU General Public License as published by the
  Free Software Foundation; either version 2 of the License.
@@ -776,7 +776,7 @@ License: other-GPL-2-either
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-License: other-GPL-2-or
+License: GPL-2~or
  This program is free software; you can redistribute it and/or modify it
  under the terms of the GNU General Public License as published by the
  Free Software Foundation; either version 2 of the License, or
@@ -812,10 +812,10 @@ License: GPL-3+
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-License: other-SA-jackd2
+License: GPL-2~jackd2
  This file is distributed under the same license as the jackd2 package.
 
-License: other-SA-jack
+License: GPL-2~jack-audio-connection-kit
  This file is distributed under the same license as the
  jack-audio-connection-kit package.
 Comment:
@@ -841,7 +841,7 @@ License: Expat
  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-License: other-Expat-modrequest
+License: Expat~modrequest
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files
  (the "Software"), to deal in the Software without restriction,
