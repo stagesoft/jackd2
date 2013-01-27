@@ -84,7 +84,7 @@ class JackDebugClient : public JackClient
         int SetBufferSize(jack_nframes_t buffer_size);
         int SetFreeWheel(int onoff);
         int ComputeTotalLatencies();
-        void ShutDown();
+        void ShutDown(const char* message);
         jack_native_thread_t GetThreadID();
 
         // Port management
@@ -106,7 +106,7 @@ class JackDebugClient : public JackClient
         void TransportLocate(jack_nframes_t frame);
         jack_transport_state_t TransportQuery(jack_position_t* pos);
         jack_nframes_t GetCurrentTransportFrame();
-        int TransportReposition(jack_position_t* pos);
+        int TransportReposition(const jack_position_t* pos);
         void TransportStart();
         void TransportStop();
 

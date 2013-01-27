@@ -68,6 +68,14 @@ int JackInternalClient::Open(const char* server_name, const char* name, int uuid
     int result;
     char name_res[JACK_CLIENT_NAME_SIZE + 1];
     jack_log("JackInternalClient::Open name = %s", name);
+    
+    if (strlen(name) >= JACK_CLIENT_NAME_SIZE) {
+        jack_error("\"%s\" is too long to be used as a JACK client name.\n"
+                   "Please use %lu characters or less",
+                   name,
+                   JACK_CLIENT_NAME_SIZE - 1);
+        return -1; 
+    }
 
     strncpy(fServerName, server_name, sizeof(fServerName));
 
@@ -102,10 +110,10 @@ error:
     return -1;
 }
 
-void JackInternalClient::ShutDown()
+void JackInternalClient::ShutDown(const char* message)
 {
     jack_log("JackInternalClient::ShutDown");
-    JackClient::ShutDown();
+    JackClient::ShutDown(message);
 }
 
 JackGraphManager* JackInternalClient::GetGraphManager() const

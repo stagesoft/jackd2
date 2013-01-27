@@ -79,8 +79,9 @@ namespace Jack {
     const char* JackTools::DefaultServerName()
     {
         const char* server_name;
-        if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL)
+        if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL) {
             server_name = JACK_DEFAULT_SERVER_NAME;
+        }
         return server_name;
     }
 
@@ -226,10 +227,11 @@ namespace Jack {
     {
         size_t i;
         for (i = 0; i < strlen(name); i++) {
-            if ((name[i] == '/') || (name[i] == '\\'))
+            if ((name[i] == '/') || (name[i] == '\\')) {
                 new_name[i] = '_';
-            else
+            } else {
                 new_name[i] = name[i];
+            }
         }
         new_name[i] = '\0';
     }

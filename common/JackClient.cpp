@@ -88,13 +88,15 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
 JackClient::~JackClient()
 {}
 
-void JackClient::ShutDown()
+void JackClient::ShutDown(const char* message)
 {
     jack_log("JackClient::ShutDown");
  
+    // If "fInfoShutdown" callback, then call it
     if (fInfoShutdown) {
-        fInfoShutdown(JackFailure, "JACK server has been closed", fInfoShutdownArg);
+        fInfoShutdown(JackFailure, message, fInfoShutdownArg);
         fInfoShutdown = NULL;
+    // Otherwise possibly call the normal "fShutdown"
     } else if (fShutdown) {
         fShutdown(fShutdownArg);
         fShutdown = NULL;
@@ -117,7 +119,10 @@ int JackClient::Close()
     }
 
     fChannel->Close();
+    assert(JackGlobals::fSynchroMutex);
+    JackGlobals::fSynchroMutex->Lock();
     fSynchroTable[GetClientControl()->fRefNum].Disconnect();
+    JackGlobals::fSynchroMutex->Unlock();
     JackGlobals::fClientTable[GetClientControl()->fRefNum] = NULL;
     return result;
 }
@@ -146,8 +151,9 @@ void JackClient::SetupDriverSync(bool freewheel)
         }
     } else {
         jack_log("JackClient::SetupDriverSync driver sem in normal mode");
-        for (int i = 0; i < GetEngineControl()->fDriverNum; i++)
+        for (int i = 0; i < GetEngineControl()->fDriverNum; i++) {
             fSynchroTable[i].SetFlush(false);
+        }
     }
 }
 
@@ -292,10 +298,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 
             case kShutDownCallback:
                 jack_log("JackClient::kShutDownCallback");
-                if (fInfoShutdown) {
-                    fInfoShutdown((jack_status_t)value1, message, fInfoShutdownArg);
-                    fInfoShutdown = NULL;
-                }
+                ShutDown(message);
                 break;
 
             case kSessionCallback:
@@ -336,7 +339,7 @@ int JackClient::HandleLatencyCallback(int status)
     list<jack_port_id_t>::iterator it;
 
 	for (it = fPortList.begin(); it != fPortList.end(); it++) {
-	   JackPort* port = GetGraphManager()->GetPort(*it);
+        JackPort* port = GetGraphManager()->GetPort(*it);
         if ((port->GetFlags() & JackPortIsOutput) && (mode == JackPlaybackLatency)) {
             GetGraphManager()->RecalculateLatency(*it, mode);
 		}
@@ -656,7 +659,7 @@ inline void JackClient::Error()
     fThread.DropSelfRealTime();
     GetClientControl()->fActive = false;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
-    ShutDown();
+    ShutDown(JACK_SERVER_FAILURE);
     fThread.Terminate();
 }
 
@@ -667,15 +670,15 @@ inline void JackClient::Error()
 int JackClient::PortRegister(const char* port_name, const char* port_type, unsigned long flags, unsigned long buffer_size)
 {
     // Check if port name is empty
-    string port_name_str = string(port_name);
-    if (port_name_str.size() == 0) {
+    string port_short_name_str = string(port_name);
+    if (port_short_name_str.size() == 0) {
         jack_error("port_name is empty");
         return 0; // Means failure here...
     }
 
     // Check port name length
-    string name = string(GetClientControl()->fName) + string(":") + port_name_str;
-    if (name.size() >= REAL_JACK_PORT_NAME_SIZE) {
+    string port_full_name_str = string(GetClientControl()->fName) + string(":") + port_short_name_str;
+    if (port_full_name_str.size() >= REAL_JACK_PORT_NAME_SIZE) {
         jack_error("\"%s:%s\" is too long to be used as a JACK port name.\n"
                    "Please use %lu characters or less",
                    GetClientControl()->fName,
@@ -686,10 +689,10 @@ int JackClient::PortRegister(const char* port_name, const char* port_type, unsig
 
     int result = -1;
     jack_port_id_t port_index = NO_PORT;
-    fChannel->PortRegister(GetClientControl()->fRefNum, name.c_str(), port_type, flags, buffer_size, &port_index, &result);
+    fChannel->PortRegister(GetClientControl()->fRefNum, port_full_name_str.c_str(), port_type, flags, buffer_size, &port_index, &result);
 
     if (result == 0) {
-        jack_log("JackClient::PortRegister ref = %ld name = %s type = %s port_index = %ld", GetClientControl()->fRefNum, name.c_str(), port_type, port_index);
+        jack_log("JackClient::PortRegister ref = %ld name = %s type = %s port_index = %ld", GetClientControl()->fRefNum, port_full_name_str.c_str(), port_type, port_index);
         fPortList.push_back(port_index);
         return port_index;
     } else {
@@ -716,6 +719,14 @@ int JackClient::PortUnRegister(jack_port_id_t port_index)
 int JackClient::PortConnect(const char* src, const char* dst)
 {
     jack_log("JackClient::Connect src = %s dst = %s", src, dst);
+    if (strlen(src) >= REAL_JACK_PORT_NAME_SIZE) {
+        jack_error("\"%s\" is too long to be used as a JACK port name.\n", src);
+        return -1; 
+    }
+    if (strlen(dst) >= REAL_JACK_PORT_NAME_SIZE) {
+        jack_error("\"%s\" is too long to be used as a JACK port name.\n", src);
+        return -1; 
+    }
     int result = -1;
     fChannel->PortConnect(GetClientControl()->fRefNum, src, dst, &result);
     return result;
@@ -724,6 +735,14 @@ int JackClient::PortConnect(const char* src, const char* dst)
 int JackClient::PortDisconnect(const char* src, const char* dst)
 {
     jack_log("JackClient::Disconnect src = %s dst = %s", src, dst);
+    if (strlen(src) >= REAL_JACK_PORT_NAME_SIZE) {
+        jack_error("\"%s\" is too long to be used as a JACK port name.\n", src);
+        return -1; 
+    }
+    if (strlen(dst) >= REAL_JACK_PORT_NAME_SIZE) {
+        jack_error("\"%s\" is too long to be used as a JACK port name.\n", src);
+        return -1; 
+    }
     int result = -1;
     fChannel->PortDisconnect(GetClientControl()->fRefNum, src, dst, &result);
     return result;
@@ -956,6 +975,8 @@ void JackClient::OnShutdown(JackShutdownCallback callback, void *arg)
     if (IsActive()) {
         jack_error("You cannot set callbacks on an active client");
     } else {
+        // Shutdown callback will either be an old API version or the new version (with info) 
+        GetClientControl()->fCallback[kShutDownCallback] = (callback != NULL);
         fShutdownArg = arg;
         fShutdown = callback;
     }
@@ -966,6 +987,7 @@ void JackClient::OnInfoShutdown(JackInfoShutdownCallback callback, void *arg)
     if (IsActive()) {
         jack_error("You cannot set callbacks on an active client");
     } else {
+        // Shutdown callback will either be an old API version or the new version (with info)
         GetClientControl()->fCallback[kShutDownCallback] = (callback != NULL);
         fInfoShutdownArg = arg;
         fInfoShutdown = callback;

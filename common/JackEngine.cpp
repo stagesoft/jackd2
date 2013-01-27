@@ -94,20 +94,6 @@ int JackEngine::Close()
     return 0;
 }
 
-void JackEngine::ShutDown()
-{
-    jack_log("JackEngine::ShutDown");
-  
-    // Shutdown remaining clients (RT is stopped)
-    for (int i = fEngineControl->fDriverNum; i < CLIENT_NUM; i++) {
-        if (JackLoadableInternalClient* loadable_client = dynamic_cast<JackLoadableInternalClient*>(fClientTable[i])) {
-            jack_log("JackEngine::ShutDown loadable client = %s", loadable_client->GetClientControl()->fName);
-            loadable_client->ShutDown();
-        } 
-    }
-}
-
-
 void JackEngine::NotifyQuit()
 {
     fChannel.NotifyQuit();
@@ -128,9 +114,9 @@ int JackEngine::AllocateRefnum()
     return -1;
 }
 
-void JackEngine::ReleaseRefnum(int ref)
+void JackEngine::ReleaseRefnum(int refnum)
 {
-    fClientTable[ref] = NULL;
+    fClientTable[refnum] = NULL;
 
     if (fEngineControl->fTemporary) {
         int i;
@@ -140,7 +126,7 @@ void JackEngine::ReleaseRefnum(int ref)
             }
         }
         if (i == CLIENT_NUM) {
-            // last client and temporay case: quit the server
+            // Last client and temporay case: quit the server
             jack_log("JackEngine::ReleaseRefnum server quit");
             fEngineControl->fTemporary = false;
             throw JackTemporaryException();
@@ -155,10 +141,10 @@ void JackEngine::ReleaseRefnum(int ref)
 void JackEngine::ProcessNext(jack_time_t cur_cycle_begin)
 {
     fLastSwitchUsecs = cur_cycle_begin;
-    if (fGraphManager->RunNextGraph())  { // True if the graph actually switched to a new state
+    if (fGraphManager->RunNextGraph())  {   // True if the graph actually switched to a new state
         fChannel.Notify(ALL_CLIENTS, kGraphOrderCallback, 0);
     }
-    fSignal.Signal();                   // Signal for threads waiting for next cycle
+    fSignal.Signal();                       // Signal for threads waiting for next cycle
 }
 
 void JackEngine::ProcessCurrent(jack_time_t cur_cycle_begin)
@@ -272,33 +258,30 @@ int JackEngine::ComputeTotalLatencies()
 
 int JackEngine::ClientNotify(JackClientInterface* client, int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
 {   
-    if (!client) {
-        return 0;
-    }
-    
+    // Check if notification is needed
     if (!client->GetClientControl()->fCallback[notify]) {
         jack_log("JackEngine::ClientNotify: no callback for notification = %ld", notify);
         return 0;
     }
     
-    int ret;
+    int res1;
    
     // External client
     if (dynamic_cast<JackExternalClient*>(client)) {
-       ret = client->ClientNotify(refnum, name, notify, sync, message, value1, value2);
+       res1 = client->ClientNotify(refnum, name, notify, sync, message, value1, value2);
     // Important for internal client : unlock before calling the notification callbacks
     } else {
-        bool res = Unlock();
-        ret = client->ClientNotify(refnum, name, notify, sync, message, value1, value2);
-        if (res) {
+        bool res2 = Unlock();
+        res1 = client->ClientNotify(refnum, name, notify, sync, message, value1, value2);
+        if (res2) {
             Lock();
         }
     }
     
-    if (ret < 0) {
-        jack_error("NotifyClient fails name = %s notification = %ld val1 = %ld val2 = %ld", name, notify, value1, value2);
+    if (res1 < 0) {
+        jack_error("ClientNotify fails name = %s notification = %ld val1 = %ld val2 = %ld", name, notify, value1, value2);
     }
-    return ret;
+    return res1;
 }
 
 void JackEngine::NotifyClient(int refnum, int event, int sync, const char* message, int value1, int value2)
@@ -343,19 +326,21 @@ void JackEngine::NotifyRemoveClient(const char* name, int refnum)
 {
     // Notify existing clients (including the one beeing suppressed) of the removed client
     for (int i = 0; i < CLIENT_NUM; i++) {
-        ClientNotify(fClientTable[i], refnum, name, kRemoveClient, false, "", 0, 0);
+        JackClientInterface* client = fClientTable[i];
+        if (client) {
+            ClientNotify(client, refnum, name, kRemoveClient, false, "", 0, 0);
+        }
     }
 }
 
 // Coming from the driver
-void JackEngine::NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
+void JackEngine::NotifyDriverXRun()
 {
     // Use the audio thread => request thread communication channel
-    fEngineControl->NotifyXRun(callback_usecs, delayed_usecs);
     fChannel.Notify(ALL_CLIENTS, kXRunCallback, 0);
 }
 
-void JackEngine::NotifyXRun(int refnum)
+void JackEngine::NotifyClientXRun(int refnum)
 {
     if (refnum == ALL_CLIENTS) {
         NotifyClients(kXRunCallback, false, "", 0, 0);
@@ -426,6 +411,7 @@ void JackEngine::NotifyActivate(int refnum)
 int JackEngine::GetInternalClientName(int refnum, char* name_res)
 {
     JackClientInterface* client = fClientTable[refnum];
+    assert(client);
     strncpy(name_res, client->GetClientControl()->fName, JACK_CLIENT_NAME_SIZE);
     return 0;
 }
@@ -713,6 +699,7 @@ int JackEngine::ClientExternalClose(int refnum)
 {
     jack_log("JackEngine::ClientExternalClose ref = %ld", refnum);
     JackClientInterface* client = fClientTable[refnum];
+    assert(client);
     int res = ClientCloseAux(refnum, true);
     client->Close();
     delete client;
@@ -761,7 +748,7 @@ int JackEngine::ClientCloseAux(int refnum, bool wait)
     }
 
     // Notify running clients
-    NotifyRemoveClient(client->GetClientControl()->fName, client->GetClientControl()->fRefNum);
+    NotifyRemoveClient(client->GetClientControl()->fName, refnum);
 
     // Cleanup...
     fSynchroTable[refnum].Destroy();
@@ -842,6 +829,21 @@ int JackEngine::ClientDeactivate(int refnum)
     }
 }
 
+void JackEngine::ClientKill(int refnum)
+{
+    if (fClientTable[refnum]) {
+        jack_log("JackEngine::ClientKill ref = %ld", refnum);
+        if (ClientDeactivate(refnum) < 0) {
+            jack_error("JackEngine::ClientKill ref = %ld cannot be removed from the graph !!", refnum);
+        }
+        if (ClientExternalClose(refnum) < 0) {
+            jack_error("JackEngine::ClientKill ref = %ld cannot be closed", refnum);
+        }
+    } else {
+        jack_log("JackEngine::ClientKill ref = %ld probably already killed...", refnum);
+    }
+}
+
 //-----------------
 // Port management
 //-----------------
@@ -873,6 +875,7 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
 {
     jack_log("JackEngine::PortUnRegister ref = %ld port_index = %ld", refnum, port_index);
     JackClientInterface* client = fClientTable[refnum];
+    assert(client);
 
     // Disconnect port ==> notification is sent
     PortDisconnect(refnum, port_index, ALL_PORTS);
@@ -954,22 +957,22 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
         fGraphManager->GetConnections(src, connections);
 
         JackPort* port = fGraphManager->GetPort(src);
-        int ret = 0;
+        int res = 0;
         if (port->GetFlags() & JackPortIsOutput) {
             for (int i = 0; (i < CONNECTION_NUM_FOR_PORT) && (connections[i] != EMPTY); i++) {
                 if (PortDisconnect(refnum, src, connections[i]) != 0) {
-                    ret = -1;
+                    res = -1;
                 }
             }
         } else {
             for (int i = 0; (i < CONNECTION_NUM_FOR_PORT) && (connections[i] != EMPTY); i++) {
                 if (PortDisconnect(refnum, connections[i], src) != 0) {
-                    ret = -1;
+                    res = -1;
                 }
             }
         }
 
-        return ret;
+        return res;
     } else if (fGraphManager->CheckPorts(src, dst) < 0) {
         return -1;
     } else if (fGraphManager->Disconnect(src, dst) == 0) {
@@ -1066,6 +1069,7 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
 int JackEngine::SessionReply(int refnum)
 {
     JackClientInterface* client = fClientTable[refnum];
+    assert(client);
     char uuid_buf[JACK_UUID_SIZE];
     snprintf(uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID);
     fSessionResult->fCommandList.push_back(JackSessionCommand(uuid_buf,
