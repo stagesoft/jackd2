@@ -15,12 +15,13 @@ Build-Depends: @cdbs@,
  libreadline-dev,
  libraw1394-dev [linux-any],
  libffado-dev (>= 2.0.0) [amd64 i386 powerpc],
+ libopus-dev,
  po-debconf
 Standards-Version: 3.9.3
 DM-Upload-Allowed: yes
 Homepage: http://jackaudio.org/
 Vcs-Git: git://git.debian.org/git/pkg-multimedia/jackd2.git
-Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/jackd2.git;a=summary
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-multimedia/jackd2.git
 
 Package: jackd2
 Architecture: any

@@ -14,14 +14,14 @@ CDBS_BUILD_DEPENDS += , cdbs (>= 0.4.93~),\
 						debhelper (>= 8.1.3)
 CDBS_BUILD_DEPENDS_rules_debhelper_buildinfo =
 
-
-DEB_UPSTREAM_PACKAGE = jack
-DEB_UPSTREAM_URL = http://www.grame.fr/~letz/
-DEB_UPSTREAM_TARBALL_EXTENSION = tgz
+# Set tag to full 40 char git tag for git snapshot release
+tag = $(DEB_UPSTREAM_TARBALL_VERSION)
+DEB_UPSTREAM_URL = https://github.com/jackaudio/jack2/archive
+DEB_UPSTREAM_TARBALL_BASENAME = $(tag)
+DEB_UPSTREAM_TARBALL_SRCDIR = jack2-$(tag)
 
 # unneeded and possibly sourceless binaries
-DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.Lib ./windows/**.lib ./windows/**.dll
-DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./macosx/libcelt.a ./macosx/libportaudio.a
+DEB_UPSTREAM_REPACKAGE_EXCLUDES += *.a *.dll *.Lib
 
 # unneeded sources copyright-protected without licence
 DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.rc
@@ -29,8 +29,8 @@ DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.rc
 # pure garbage in upstream tarball
 DEB_UPSTREAM_REPACKAGE_EXCLUDES += .DS_Store
 
-# ignore oddly packaged bzip2 archive to not upset dpkg
-DEB_COPYRIGHT_CHECK_IGNORE_REGEX = ^\./waf|\./debian/(changelog|copyright(|_hints|_newhints))$
+# sources not in prefered form of modification
+DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./waf
 
 # Minimum assured version referenced upstream as library API/ABI
 ABI = 0.118.0

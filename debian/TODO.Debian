@@ -1,2 +1,2 @@
-* maybe start jackd it as an init.d service
-* verify that optionally marked symbols are not part of library ABI
+  * Maybe start jackd as an init.d service.
+  * Verify that optionally marked symbols are not part of library ABI.
