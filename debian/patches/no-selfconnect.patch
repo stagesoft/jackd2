@@ -1,7 +1,7 @@
 From: Adrian Knoth <adi@drcomp.erfurt.thur.de>
 Forwarded: not-needed
 Origin: http://repo.or.cz/w/jack2.git/shortlog/refs/heads/no-self-connect
-Last-Update: 2012-11-10
+Last-Update: 2013-01-27
 Description: Add no-self-connect option to jackd2
  This patch avoids automatic port connections of programs like ardour
  in ladish environments. Depending on the runtime mode, a program cannot
@@ -9,7 +9,7 @@ Description: Add no-self-connect option to jackd2
  are handled by ladish instead, so they can be restored and altered later.
 --- a/common/JackConstants.h
 +++ b/common/JackConstants.h
-@@ -82,4 +82,6 @@
+@@ -83,4 +83,6 @@
  #define EMPTY   0xFFFD
  #define FREE	0xFFFC
  
@@ -86,14 +86,14 @@ Description: Add no-self-connect option to jackd2
      JackServerGlobals::on_device_acquire = on_device_acquire;
      JackServerGlobals::on_device_release = on_device_release;
  
-@@ -954,6 +1001,7 @@
+@@ -953,6 +1000,7 @@
+     jackctl_server *server_ptr,
      jackctl_driver *driver_ptr)
  {
-     JSList * paramlist = NULL;
 +    JackSelfConnectMode self_connect_mode;
+     JSList * paramlist = NULL;
  
      try {
- 
 @@ -986,6 +1034,27 @@
              server_ptr->client_timeout.i = 500; /* 0.5 sec; usable when non realtime. */
          }
@@ -149,7 +149,7 @@ Description: Add no-self-connect option to jackd2
      for (int i = 0; i < CLIENT_NUM; i++) {
          fClientTable[i] = NULL;
      }
-@@ -816,10 +818,10 @@
+@@ -803,10 +805,10 @@
  
      // First disconnect all ports
      for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (input_ports[i] != EMPTY); i++) {
@@ -162,8 +162,8 @@ Description: Add no-self-connect option to jackd2
      }
  
      // Then issue port registration notification
-@@ -875,7 +877,7 @@
-     JackClientInterface* client = fClientTable[refnum];
+@@ -878,7 +880,7 @@
+     assert(client);
  
      // Disconnect port ==> notification is sent
 -    PortDisconnect(refnum, port_index, ALL_PORTS);
@@ -171,7 +171,7 @@ Description: Add no-self-connect option to jackd2
  
      if (fGraphManager->ReleasePort(refnum, port_index) == 0) {
          if (client->GetClientControl()->fActive) {
-@@ -887,6 +889,72 @@
+@@ -890,6 +892,72 @@
      }
  }
  
@@ -244,7 +244,7 @@ Description: Add no-self-connect option to jackd2
  int JackEngine::PortConnect(int refnum, const char* src, const char* dst)
  {
      jack_log("JackEngine::PortConnect src = %s dst = %s", src, dst);
-@@ -927,7 +995,12 @@
+@@ -930,7 +998,12 @@
          return -1;
      }
  
@@ -258,10 +258,10 @@ Description: Add no-self-connect option to jackd2
      if (res == 0) {
          NotifyPortConnect(src, dst, true);
      }
-@@ -970,15 +1043,21 @@
+@@ -973,15 +1046,21 @@
          }
  
-         return ret;
+         return res;
 -    } else if (fGraphManager->CheckPorts(src, dst) < 0) {
 -        return -1;
 -    } else if (fGraphManager->Disconnect(src, dst) == 0) {
@@ -325,16 +325,16 @@ Description: Add no-self-connect option to jackd2
          {}
 --- a/common/JackServer.cpp
 +++ b/common/JackServer.cpp
-@@ -37,7 +37,7 @@
- namespace Jack
- {
+@@ -41,7 +41,7 @@
+ // Server control 
+ //----------------
  
 -JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, const char* server_name)
 +JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, JackSelfConnectMode self_connect_mode, const char* server_name)
  {
      if (rt) {
          jack_info("JACK server starting in realtime mode with priority %ld", priority);
-@@ -47,7 +47,7 @@
+@@ -51,7 +51,7 @@
  
      fGraphManager = JackGraphManager::Allocate(port_max);
      fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, clock, server_name);
@@ -353,10 +353,10 @@ Description: Add no-self-connect option to jackd2
 +        JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, JackSelfConnectMode self_connect_mode, const char* server_name);
          ~JackServer();
  
-         int Open(jack_driver_desc_t* driver_desc, JSList* driver_params);
+         // Server control
 --- a/common/JackServerGlobals.cpp
 +++ b/common/JackServerGlobals.cpp
-@@ -48,10 +48,11 @@
+@@ -47,10 +47,11 @@
                               int priority,
                               int port_max,
                               int verbose,
@@ -370,7 +370,7 @@ Description: Add no-self-connect option to jackd2
      int res = fInstance->Open(driver_desc, driver_params);
      return (res < 0) ? res : fInstance->Start();
  }
-@@ -335,7 +336,7 @@
+@@ -336,7 +337,7 @@
              free(argv[i]);
          }
  
@@ -381,7 +381,7 @@ Description: Add no-self-connect option to jackd2
              Delete();
 --- a/common/JackServerGlobals.h
 +++ b/common/JackServerGlobals.h
-@@ -61,7 +61,8 @@
+@@ -60,7 +60,8 @@
                       int priority,
                       int port_max,
                       int verbose,
@@ -393,7 +393,7 @@ Description: Add no-self-connect option to jackd2
  };
 --- a/common/JackTypes.h
 +++ b/common/JackTypes.h
-@@ -55,4 +55,14 @@
+@@ -50,4 +50,14 @@
      Finished,
  } jack_client_state_t;
  
@@ -410,7 +410,7 @@ Description: Add no-self-connect option to jackd2
  #endif
 --- a/common/Jackdmp.cpp
 +++ b/common/Jackdmp.cpp
-@@ -184,8 +184,8 @@
+@@ -203,8 +203,8 @@
      jackctl_driver_t * master_driver_ctl;
      jackctl_driver_t * loopback_driver_ctl = NULL;
      int replace_registry = 0;
@@ -420,7 +420,7 @@ Description: Add no-self-connect option to jackd2
  #ifdef __linux__
          "c:"
  #endif
-@@ -215,6 +215,7 @@
+@@ -234,6 +234,7 @@
                                         { "version", 0, 0, 'V' },
                                         { "silent", 0, 0, 's' },
                                         { "sync", 0, 0, 'S' },
@@ -428,7 +428,7 @@ Description: Add no-self-connect option to jackd2
                                         { 0, 0, 0, 0 }
                                     };
  
-@@ -277,6 +278,26 @@
+@@ -296,6 +297,26 @@
                  break;
          #endif
  
@@ -446,7 +446,7 @@ Description: Add no-self-connect option to jackd2
 +                        value.c = optarg[0];
 +                        jackctl_parameter_set_value(param, &value);
 +                    } else {
-+                        usage(stdout);
++                        usage(stdout, NULL);
 +                        goto destroy_server;
 +                    }
 +                }
