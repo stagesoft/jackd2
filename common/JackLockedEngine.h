@@ -103,15 +103,7 @@ class SERVER_EXPORT JackLockedEngine
             return fEngine.Close();
             CATCH_EXCEPTION_RETURN
         }
-        
-        void ShutDown()
-        {
-            // No lock needed
-            TRY_CALL
-            fEngine.ShutDown();
-            CATCH_EXCEPTION
-        }
-
+ 
         // Client management
         int ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status)
         {
@@ -163,6 +155,13 @@ class SERVER_EXPORT JackLockedEngine
             JackLock lock(&fEngine);
             return (fEngine.CheckClient(refnum)) ? fEngine.ClientDeactivate(refnum) : -1;
             CATCH_EXCEPTION_RETURN
+        }
+        void ClientKill(int refnum)
+        {
+            TRY_CALL
+            JackLock lock(&fEngine);
+            fEngine.ClientKill(refnum);
+            CATCH_EXCEPTION
         }
 
         // Internal client management
@@ -259,16 +258,18 @@ class SERVER_EXPORT JackLockedEngine
         }
 
         // Notifications
-        void NotifyXRun(jack_time_t cur_cycle_begin, float delayed_usecs)
+        void NotifyDriverXRun()
         {
-            // RT : no lock
-            fEngine.NotifyXRun(cur_cycle_begin, delayed_usecs);
+            // Coming from the driver in RT : no lock
+            fEngine.NotifyDriverXRun();
         }
 
-        void NotifyXRun(int refnum)
+        void NotifyClientXRun(int refnum)
         {
-            // RT : no lock
-            fEngine.NotifyXRun(refnum);
+            TRY_CALL
+            JackLock lock(&fEngine);
+            fEngine.NotifyClientXRun(refnum);
+            CATCH_EXCEPTION
         }
 
         void NotifyGraphReorder()

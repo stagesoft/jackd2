@@ -37,6 +37,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+//----------------
+// Server control 
+//----------------
+
 JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, const char* server_name)
 {
     if (rt) {
@@ -53,8 +57,7 @@ JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int prio
     // regular freewheel driver because the freewheel driver needs to run in
     // threaded mode when freewheel mode is active and needs to run as a slave
     // when freewheel mode isn't active.
-    JackFreewheelDriver *freewheelDriver =
-        new JackFreewheelDriver(fEngine, GetSynchroTable());
+    JackFreewheelDriver* freewheelDriver = new JackFreewheelDriver(fEngine, GetSynchroTable());
     fThreadedFreewheelDriver = new JackThreadedDriver(freewheelDriver);
 
     fFreewheelDriver = freewheelDriver;
@@ -87,7 +90,7 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         goto fail_close1;
     }
 
-    if (fChannel.Open(fEngineControl->fServerName, this) < 0) {
+    if (fRequestChannel.Open(fEngineControl->fServerName, this) < 0) {
         jack_error("Server channel open error");
         goto fail_close2;
     }
@@ -121,7 +124,7 @@ fail_close4:
     fEngine->Close();
 
 fail_close3:
-    fChannel.Close();
+    fRequestChannel.Close();
 
 fail_close2:
     fAudioDriver->Close();
@@ -134,7 +137,7 @@ fail_close1:
 int JackServer::Close()
 {
     jack_log("JackServer::Close");
-    fChannel.Close();
+    fRequestChannel.Close();
     fAudioDriver->Detach();
     fAudioDriver->Close();
     fFreewheelDriver->Close();
@@ -144,6 +147,38 @@ int JackServer::Close()
     EndTime();
     return 0;
 }
+
+int JackServer::Start()
+{
+    jack_log("JackServer::Start");
+    if (fAudioDriver->Start() < 0) {
+        return -1;
+    }
+    return fRequestChannel.Start();
+}
+
+int JackServer::Stop()
+{
+    jack_log("JackServer::Stop");
+    int res = (fFreewheel) ? fThreadedFreewheelDriver->Stop() : fAudioDriver->Stop();
+    
+    fEngine->NotifyQuit();
+    fRequestChannel.Stop();
+    fEngine->NotifyFailure(JackFailure, JACK_SERVER_FAILURE);
+    
+    return res;
+}
+
+bool JackServer::IsRunning()
+{
+    jack_log("JackServer::IsRunning");
+    assert(fAudioDriver);
+    return fAudioDriver->IsRunning();
+}
+
+//------------------
+// Internal clients 
+//------------------
 
 int JackServer::InternalClientLoad1(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int uuid, int* status)
 {
@@ -165,7 +200,7 @@ int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const 
     *status = 0;
 
     // Client object is internally kept in JackEngine
-    if ((client->Init(so_name) < 0) || (client->Open(JACK_DEFAULT_SERVER_NAME, client_name,  uuid, (jack_options_t)options, (jack_status_t*)status) < 0)) {
+    if ((client->Init(so_name) < 0) || (client->Open(JackTools::DefaultServerName(), client_name,  uuid, (jack_options_t)options, (jack_status_t*)status) < 0)) {
         delete client;
         int my_status1 = *status | JackFailure;
         *status = (jack_status_t)my_status1;
@@ -177,36 +212,9 @@ int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const 
     }
  }
 
-int JackServer::Start()
-{
-    jack_log("JackServer::Start");
-    if (fAudioDriver->Start() < 0) {
-        return -1;
-    }
-    return fChannel.Start();
-}
-
-int JackServer::Stop()
-{
-    jack_log("JackServer::Stop");
-    fEngine->NotifyQuit();
-    fChannel.Stop();
-    
-    fEngine->ShutDown();
-
-    if (fFreewheel) {
-        return fThreadedFreewheelDriver->Stop();
-    } else {
-        return fAudioDriver->Stop();
-    }
-}
-
-bool JackServer::IsRunning()
-{
-    jack_log("JackServer::IsRunning");
-    assert(fAudioDriver);
-    return fAudioDriver->IsRunning();
-}
+//---------------------------
+// From request thread : API 
+//---------------------------
 
 int JackServer::SetBufferSize(jack_nframes_t buffer_size)
 {
@@ -284,7 +292,10 @@ int JackServer::SetFreewheel(bool onoff)
     }
 }
 
+//---------------------------
 // Coming from the RT thread
+//---------------------------
+
 void JackServer::Notify(int refnum, int notify, int value)
 {
     switch (notify) {
@@ -294,25 +305,14 @@ void JackServer::Notify(int refnum, int notify, int value)
             break;
 
         case kXRunCallback:
-            fEngine->NotifyXRun(refnum);
+            fEngine->NotifyClientXRun(refnum);
             break;
     }
 }
 
-void JackServer::ClientKill(int refnum)
-{
-    jack_log("JackServer::ClientKill ref = %ld", refnum);
-    if (fEngine->ClientDeactivate(refnum) < 0) {
-        jack_error("JackServer::ClientKill ref = %ld cannot be removed from the graph !!", refnum);
-    }
-    if (fEngine->ClientExternalClose(refnum) < 0) {
-        jack_error("JackServer::ClientKill ref = %ld cannot be closed", refnum);
-    }
-}
-
-//----------------------
+//--------------------
 // Backend management
-//----------------------
+//--------------------
 
 JackDriverInfo* JackServer::AddSlave(jack_driver_desc_t* driver_desc, JSList* driver_params)
 {

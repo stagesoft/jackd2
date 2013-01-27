@@ -24,7 +24,7 @@
 #include "config.h"
 #endif
 
-#define VERSION "1.9.9.4"
+#define VERSION "1.9.10"
 
 #define BUFFER_SIZE_MAX 8192
 
@@ -37,7 +37,9 @@
 #define JACK_UUID_SIZE 32
 #define JACK_SESSION_COMMAND_SIZE 256
 
-#define REAL_JACK_PORT_NAME_SIZE JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE
+#define SYNC_MAX_NAME_SIZE 256
+
+#define REAL_JACK_PORT_NAME_SIZE JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE   // full name like "client_name:short_port_name"
 
 #ifndef PORT_NUM
 #define PORT_NUM 2048
@@ -64,9 +66,6 @@
 
 #define JACK_DEFAULT_SERVER_NAME "default"
 
-#define jack_server_entry "jackdmp_entry"
-#define jack_client_entry "jack_client"
-
 #define ALL_CLIENTS -1 // for notification
 
 #define JACK_PROTOCOL_VERSION 8
@@ -75,6 +74,8 @@
 #define DRIVER_OPEN_TIMEOUT 5           // in sec
 #define FREEWHEEL_DRIVER_TIMEOUT 10     // in sec
 #define DRIVER_TIMEOUT_FACTOR    10
+
+#define JACK_SERVER_FAILURE "JACK server has been closed"
 
 
 #define NO_PORT   0xFFFE

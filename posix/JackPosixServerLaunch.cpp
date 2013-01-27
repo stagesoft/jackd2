@@ -17,6 +17,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
+#if !defined(WIN32) || defined(__CYGWIN__)
+
+#ifdef PTHREAD_WIN32        // Added by JE - 13-02-2010
+#include <ptw32/pthread.h>  // Makes sure we #include the ptw32 version for
+#endif                      // consistency - even though we won't need it !
 
 #include "JackConstants.h"
 #include "JackChannel.h"
@@ -73,7 +78,7 @@ static int start_server_dbus(const char* server_name)
     return 0;
 }
 
-#else
+#elif defined(USE_CLASSIC_AUTOLAUNCH)
 
 /* Exec the JACK server in this process.  Does not return. */
 static void start_server_classic_aux(const char* server_name)
@@ -88,7 +93,7 @@ static void start_server_classic_aux(const char* server_name)
     char** argv = 0;
     int i = 0;
     int good = 0;
-    int ret;
+    int res;
 
     snprintf(filename, 255, "%s/.jackdrc", getenv("HOME"));
     fp = fopen(filename, "r");
@@ -103,11 +108,11 @@ static void start_server_classic_aux(const char* server_name)
 
     if (fp) {
         arguments[0] = '\0';
-        ret = fscanf(fp, "%s", buffer);
+        res = fscanf(fp, "%s", buffer);
         while (ret != 0 && ret != EOF) {
             strcat(arguments, buffer);
             strcat(arguments, " ");
-            ret = fscanf(fp, "%s", buffer);
+            res = fscanf(fp, "%s", buffer);
         }
         if (strlen(arguments) > 0) {
             good = 1;
@@ -199,8 +204,11 @@ static int start_server(const char* server_name, jack_options_t options)
 
 #if defined(USE_LIBDBUS_AUTOLAUNCH)
     return start_server_dbus(server_name);
-#else
+#elif defined(USE_CLASSIC_AUTOLAUNCH)
     return start_server_classic(server_name);
+#else
+    fprintf(stderr, "Automatic start of JACK server is disabled at configure time\n");
+    return 1;
 #endif
 }
 
@@ -239,3 +247,4 @@ int try_start_server(jack_varargs_t* va, jack_options_t options, jack_status_t* 
     return 0;
 }
 
+#endif  // !defined(WIN32) || defined(__CYGWIN__)

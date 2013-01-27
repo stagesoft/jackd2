@@ -30,7 +30,7 @@ namespace Jack
 
 void JackPosixSemaphore::BuildName(const char* client_name, const char* server_name, char* res, int size)
 {
-    char ext_client_name[JACK_CLIENT_NAME_SIZE + 1];
+    char ext_client_name[SYNC_MAX_NAME_SIZE + 1];
     JackTools::RewriteName(client_name, ext_client_name);
     snprintf(res, size, "jack_sem.%d_%s_%s", JackTools::GetUID(), server_name, ext_client_name);
 }
@@ -94,8 +94,9 @@ bool JackPosixSemaphore::Wait()
 
     while ((res = sem_wait(fSemaphore) < 0)) {
         jack_error("JackPosixSemaphore::Wait name = %s err = %s", fName, strerror(errno));
-        if (errno != EINTR)
+        if (errno != EINTR) {
             break;
+        }
     }
     return (res == 0);
 }
@@ -122,8 +123,9 @@ bool JackPosixSemaphore::TimedWait(long usec)
         jack_error("JackPosixSemaphore::TimedWait err = %s", strerror(errno));
         jack_log("JackPosixSemaphore::TimedWait now : %ld %ld ", now.tv_sec, now.tv_usec);
         jack_log("JackPosixSemaphore::TimedWait next : %ld %ld ", time.tv_sec, time.tv_nsec/1000);
-        if (errno != EINTR)
+        if (errno != EINTR) {
             break;
+        }
     }
     return (res == 0);
 }

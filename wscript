@@ -13,7 +13,7 @@ import re
 import Logs
 import sys
 
-VERSION='1.9.9'
+VERSION='1.9.10'
 APPNAME='jack'
 JACK_API_VERSION = '0.1.0'
 
@@ -76,6 +76,7 @@ def options(opt):
     opt.add_option('--firewire', action='store_true', default=False, help='Enable FireWire driver (FFADO)')
     opt.add_option('--freebob', action='store_true', default=False, help='Enable FreeBob driver')
     opt.add_option('--alsa', action='store_true', default=False, help='Enable ALSA driver')
+    opt.add_option('--autostart', type='string', default="default", help='Autostart method. Possible values: "default", "classic", "dbus", "none"')
     opt.sub_options('dbus')
 
 def configure(conf):
@@ -178,6 +179,8 @@ def configure(conf):
         if conf.check_cc(header_name='opus/opus_custom.h', mandatory=False):
             conf.define('HAVE_OPUS', 1)
             conf.env['WITH_OPUS'] = True
+        else:
+            conf.define('HAVE_OPUS', 0)
 
 
     conf.env['LIB_PTHREAD'] = ['pthread']
@@ -214,6 +217,27 @@ def configure(conf):
         conf.env.append_unique('CFLAGS', '-g')
         conf.env.append_unique('LINKFLAGS', '-g')
 
+    if not Options.options.autostart in ["default", "classic", "dbus", "none"]:
+        conf.fatal("Invalid autostart value \"" + Options.options.autostart + "\"")
+
+    if Options.options.autostart == "default":
+        if conf.env['BUILD_JACKDBUS'] == True and conf.env['BUILD_JACKD'] == False:
+            conf.env['AUTOSTART_METHOD'] = "dbus"
+        else:
+            conf.env['AUTOSTART_METHOD'] = "classic"
+    else:
+        conf.env['AUTOSTART_METHOD'] = Options.options.autostart
+
+    if conf.env['AUTOSTART_METHOD'] == "dbus" and not conf.env['BUILD_JACKDBUS']:
+        conf.fatal("D-Bus autostart mode was specified but jackdbus will not be built")
+    if conf.env['AUTOSTART_METHOD'] == "classic" and not conf.env['BUILD_JACKD']:
+        conf.fatal("Classic autostart mode was specified but jackd will not be built")
+
+    if conf.env['AUTOSTART_METHOD'] == "dbus":
+        conf.define('USE_LIBDBUS_AUTOLAUNCH', 1)
+    elif conf.env['AUTOSTART_METHOD'] == "classic":
+        conf.define('USE_CLASSIC_AUTOLAUNCH', 1)
+
     conf.define('CLIENT_NUM', Options.options.clients)
     conf.define('PORT_NUM_FOR_CLIENT', Options.options.application_ports)
 
@@ -224,8 +248,6 @@ def configure(conf):
     conf.define('JACKMP', 1)
     if conf.env['BUILD_JACKDBUS'] == True:
         conf.define('JACK_DBUS', 1)
-        if conf.env['BUILD_JACKD'] == False:
-            conf.define('USE_LIBDBUS_AUTOLAUNCH', 1)
     if conf.env['BUILD_WITH_PROFILE'] == True:
         conf.define('JACK_MONITOR', 1)
     conf.write_config_header('config.h', remove=False)
@@ -277,6 +299,7 @@ def configure(conf):
 
     display_feature('Build standard JACK (jackd)', conf.env['BUILD_JACKD'])
     display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'])
+    display_msg('Autostart method', conf.env['AUTOSTART_METHOD'])
 
     if conf.env['BUILD_JACKDBUS'] and conf.env['BUILD_JACKD']:
         print(Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues:' + Logs.colors.NORMAL)
@@ -335,10 +358,10 @@ def build(bld):
             bld.add_subdirs('dbus')
 
     if bld.env['BUILD_DOXYGEN_DOCS'] == True:
-        share_dir = bld.env.get_destdir() + bld.env['PREFIX'] + '/share/jack-audio-connection-kit'
         html_docs_source_dir = "build/default/html"
-        html_docs_install_dir = share_dir + '/reference/html/'
-        if Options.commands['install']:
+        if bld.cmd == 'install':
+            share_dir = bld.options.destdir + bld.env['PREFIX'] + '/share/jack-audio-connection-kit'
+            html_docs_install_dir = share_dir + '/reference/html/'
             if os.path.isdir(html_docs_install_dir):
                 Logs.pprint('CYAN', "Removing old doxygen documentation installation...")
                 shutil.rmtree(html_docs_install_dir)
@@ -346,17 +369,17 @@ def build(bld):
             Logs.pprint('CYAN', "Installing doxygen documentation...")
             shutil.copytree(html_docs_source_dir, html_docs_install_dir)
             Logs.pprint('CYAN', "Installing doxygen documentation done.")
-        elif Options.commands['uninstall']:
+        elif bld.cmd =='uninstall':
             Logs.pprint('CYAN', "Uninstalling doxygen documentation...")
             if os.path.isdir(share_dir):
                 shutil.rmtree(share_dir)
             Logs.pprint('CYAN', "Uninstalling doxygen documentation done.")
-        elif Options.commands['clean']:
+        elif bld.cmd =='clean':
             if os.access(html_docs_source_dir, os.R_OK):
                 Logs.pprint('CYAN', "Removing doxygen generated documentation...")
                 shutil.rmtree(html_docs_source_dir)
                 Logs.pprint('CYAN', "Removing doxygen generated documentation done.")
-        elif Options.commands['build']:
+        elif bld.cmd =='build':
             if not os.access(html_docs_source_dir, os.R_OK):
                 os.popen("doxygen").read()
             else:

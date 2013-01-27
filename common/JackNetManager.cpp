@@ -513,7 +513,7 @@ namespace Jack
             return res;
         } else if (res == NET_PACKET_ERROR) {
             // Well not a real XRun...
-            JackServerGlobals::fInstance->GetEngine()->NotifyXRun(GetMicroSeconds(), 0);
+            JackServerGlobals::fInstance->GetEngine()->NotifyClientXRun(ALL_CLIENTS);
         }
 
 #ifdef JACK_MONITOR
@@ -640,15 +640,15 @@ namespace Jack
     int JackNetMasterManager::SyncCallback(jack_transport_state_t state, jack_position_t* pos)
     {
         //check if each slave is ready to roll
-        int ret = 1;
+        int res = 1;
         master_list_it_t it;
         for (it = fMasterList.begin(); it != fMasterList.end(); it++) {
             if (!(*it)->IsSlaveReadyToRoll()) {
-                ret = 0;
+                res = 0;
             }
         }
-        jack_log("JackNetMasterManager::SyncCallback returns '%s'", (ret) ? "true" : "false");
-        return ret;
+        jack_log("JackNetMasterManager::SyncCallback returns '%s'", (res) ? "true" : "false");
+        return res;
     }
 
     void* JackNetMasterManager::NetManagerThread(void* arg)
