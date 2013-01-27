@@ -31,7 +31,6 @@ namespace Jack
 
 JackServer* JackServerGlobals::fInstance;
 unsigned int JackServerGlobals::fUserCount;
-int JackServerGlobals::fRTNotificationSocket;
 std::map<std::string, JackDriverInfo*> JackServerGlobals::fSlavesList;
 std::map<std::string, int> JackServerGlobals::fInternalsList;
 
@@ -115,7 +114,7 @@ bool JackServerGlobals::Init()
     int loopback = 0;
     int sync = 0;
     int rc, i;
-    int ret;
+    int res;
     int replace_registry = 0;
 
     FILE* fp = 0;
@@ -175,11 +174,11 @@ bool JackServerGlobals::Init()
 
         argc = 0;
         if (fp) {
-            ret = fscanf(fp, "%s", buffer);
-            while (ret != 0 && ret != EOF) {
+            res = fscanf(fp, "%s", buffer);
+            while (res != 0 && res != EOF) {
                 argv[argc] = (char*)malloc(64);
                 strcpy(argv[argc], buffer);
-                ret = fscanf(fp, "%s", buffer);
+                res = fscanf(fp, "%s", buffer);
                 argc++;
             }
             fclose(fp);
@@ -305,8 +304,9 @@ bool JackServerGlobals::Init()
         }
 
 #ifndef WIN32
-        if (server_name == NULL)
+        if (server_name == NULL) {
             server_name = (char*)JackTools::DefaultServerName();
+        }
 #endif
 
         rc = jack_register_server(server_name, false);
@@ -328,8 +328,9 @@ bool JackServerGlobals::Init()
         jack_cleanup_shm();
         JackTools::CleanupFiles(server_name);
 
-        if (!realtime && client_timeout == 0)
+        if (!realtime && client_timeout == 0) {
             client_timeout = 500; /* 0.5 sec; usable when non realtime. */
+        }
 
         for (i = 0; i < argc; i++) {
             free(argv[i]);
@@ -377,14 +378,16 @@ bool JackServerGlobals::Init()
         }
     }
 
-    if (master_driver_params)
+    if (master_driver_params) {
         jack_free_driver_params(master_driver_params);
+    }
     return true;
 
 error:
     jack_log("JackServerGlobals Init error");
-    if (master_driver_params)
+    if (master_driver_params) {
         jack_free_driver_params(master_driver_params);
+    }
     Destroy();
     return false;
 }

@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001 Paul Davis
-Copyright (C) 2004-2008 Grame
+Copyright (C) 2004-2013 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "types.h"
 #include "jack.h"
 #include "control.h"
-
 #include "JackConstants.h"
 #include "JackPlatformPlug.h"
 
@@ -41,7 +40,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 /*
-This is a simple port of the old jackdmp.cpp file to use the new Jack 2.0 control API. Available options for the server
+This is a simple port of the old jackdmp.cpp file to use the new jack2 control API. Available options for the server
 are "hard-coded" in the source. A much better approach would be to use the control API to:
 - dynamically retrieve available server parameters and then prepare to parse them
 - get available drivers and their possible parameters, then prepare to parse them.
@@ -88,51 +87,12 @@ static void copyright(FILE* file)
 {
     fprintf(file, "jackdmp " VERSION "\n"
             "Copyright 2001-2005 Paul Davis and others.\n"
-            "Copyright 2004-2012 Grame.\n"
+            "Copyright 2004-2013 Grame.\n"
             "jackdmp comes with ABSOLUTELY NO WARRANTY\n"
             "This is free software, and you are welcome to redistribute it\n"
             "under certain conditions; see the file COPYING for details\n");
 }
 
-static void usage(FILE* file)
-{
-    fprintf(file, "\n"
-            "usage: jackdmp [ --no-realtime OR -r ]\n"
-            "               [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
-            "      (the two previous arguments are mutually exclusive. The default is --realtime)\n"
-            "               [ --name OR -n server-name ]\n"
-            "               [ --timeout OR -t client-timeout-in-msecs ]\n"
-            "               [ --loopback OR -L loopback-port-number ]\n"
-            "               [ --port-max OR -p maximum-number-of-ports]\n"
-            "               [ --slave-backend OR -X slave-backend-name ]\n"
-            "               [ --internal-client OR -I internal-client-name ]\n"
-            "               [ --verbose OR -v ]\n"
-#ifdef __linux__
-            "               [ --clocksource OR -c [ c(ycle) | h(pet) | s(ystem) ]\n"
-#endif
-            "               [ --replace-registry ]\n"
-            "               [ --silent OR -s ]\n"
-            "               [ --sync OR -S ]\n"
-            "               [ --temporary OR -T ]\n"
-            "               [ --version OR -V ]\n"
-            "         -d master-backend-name [ ... master-backend args ... ]\n"
-#ifdef __APPLE__
-            "               Available master backends may include: coreaudio, dummy, net or netone.\n\n"
-#endif
-#ifdef WIN32
-            "               Available master backends may include: portaudio, dummy, net or netone.\n\n"
-#endif
-#ifdef __linux__
-            "               Available master backends may include: alsa, dummy, freebob, firewire, net or netone.\n\n"
-#endif
-#if defined(__sun__) || defined(sun)
-            "               Available master backends may include: boomer, oss, dummy or net.\n\n"
-#endif
-            "       jackdmp -d master-backend-name --help\n"
-            "             to display options for each master backend\n\n");
-}
-
-// To put in the control.h interface ??
 static jackctl_driver_t * jackctl_server_get_driver(jackctl_server_t *server, const char *driver_name)
 {
     const JSList * node_ptr = jackctl_server_get_drivers_list(server);
@@ -171,6 +131,65 @@ static jackctl_parameter_t * jackctl_get_parameter(const JSList * parameters_lis
     }
 
     return NULL;
+}
+
+static void print_server_drivers(jackctl_server_t *server, FILE* file)
+{
+    const JSList * node_ptr = jackctl_server_get_drivers_list(server);
+
+    fprintf(file, "Available backends:\n");
+    
+    while (node_ptr) {
+        jackctl_driver_t* driver = (jackctl_driver_t *)node_ptr->data;
+        fprintf(file, "      %s (%s)\n", jackctl_driver_get_name(driver), (jackctl_driver_get_type(driver) == JackMaster) ? "master" : "slave");
+        node_ptr = jack_slist_next(node_ptr);
+    }
+    fprintf(file, "\n");
+}
+
+static void print_server_internals(jackctl_server_t *server, FILE* file)
+{
+    const JSList * node_ptr = jackctl_server_get_internals_list(server);
+
+    fprintf(file, "Available internals:\n");
+    
+    while (node_ptr) {
+        jackctl_internal_t* internal = (jackctl_internal_t *)node_ptr->data;
+        fprintf(file, "      %s\n", jackctl_internal_get_name(internal));
+        node_ptr = jack_slist_next(node_ptr);
+    }
+    fprintf(file, "\n");
+}
+
+static void usage(FILE* file, jackctl_server_t *server)
+{
+    fprintf(file, "\n"
+            "Usage: jackdmp [ --no-realtime OR -r ]\n"
+            "               [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
+            "      (the two previous arguments are mutually exclusive. The default is --realtime)\n"
+            "               [ --name OR -n server-name ]\n"
+            "               [ --timeout OR -t client-timeout-in-msecs ]\n"
+            "               [ --loopback OR -L loopback-port-number ]\n"
+            "               [ --port-max OR -p maximum-number-of-ports]\n"
+            "               [ --slave-backend OR -X slave-backend-name ]\n"
+            "               [ --internal-client OR -I internal-client-name ]\n"
+            "               [ --verbose OR -v ]\n"
+#ifdef __linux__
+            "               [ --clocksource OR -c [ c(ycle) | h(pet) | s(ystem) ]\n"
+#endif
+            "               [ --replace-registry ]\n"
+            "               [ --silent OR -s ]\n"
+            "               [ --sync OR -S ]\n"
+            "               [ --temporary OR -T ]\n"
+            "               [ --version OR -V ]\n"
+            "         -d master-backend-name [ ... master-backend args ... ]\n"
+            "       jackdmp -d master-backend-name --help\n"
+            "             to display options for each master backend\n\n");
+    
+    if (server) {
+        print_server_drivers(server, file);
+        print_server_internals(server, file);
+    }
 }
 
 // Prototype to be found in libjackserver
@@ -270,7 +289,7 @@ int main(int argc, char** argv)
                         value.ui = JACK_TIMER_SYSTEM_CLOCK;
                         jackctl_parameter_set_value(param, &value);
                     } else {
-                        usage(stdout);
+                        usage(stdout, NULL);
                         goto destroy_server;
                     }
                 }
@@ -379,7 +398,7 @@ int main(int argc, char** argv)
                 /*fallthru*/
 
             case 'h':
-                usage(stdout);
+                usage(stdout, server_ctl);
                 goto destroy_server;
         }
     }
@@ -400,7 +419,7 @@ int main(int argc, char** argv)
     }
 
     if (!master_driver_name) {
-        usage(stderr);
+        usage(stderr, NULL);
         goto destroy_server;
     }
 
@@ -524,15 +543,17 @@ int main(int argc, char** argv)
     // Slave drivers
     for (it = slaves_list.begin(); it != slaves_list.end(); it++) {
         jackctl_driver_t * slave_driver_ctl = jackctl_server_get_driver(server_ctl, *it);
-        if (slave_driver_ctl)
+        if (slave_driver_ctl) {
             jackctl_server_remove_slave(server_ctl, slave_driver_ctl);
+        }
     }
 
     // Internal clients
     for (it = internals_list.begin(); it != internals_list.end(); it++) {
         jackctl_internal_t * internal_driver_ctl = jackctl_server_get_internal(server_ctl, *it);
-        if (internal_driver_ctl)
+        if (internal_driver_ctl) {
             jackctl_server_unload_internal(server_ctl, internal_driver_ctl);
+        }
     }
     jackctl_server_close(server_ctl);
 
