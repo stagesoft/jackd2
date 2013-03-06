@@ -13,7 +13,7 @@ import re
 import Logs
 import sys
 
-VERSION='1.9.9.5'
+VERSION='1.9.10'
 APPNAME='jack'
 JACK_API_VERSION = '0.1.0'
 
@@ -179,6 +179,8 @@ def configure(conf):
         if conf.check_cc(header_name='opus/opus_custom.h', mandatory=False):
             conf.define('HAVE_OPUS', 1)
             conf.env['WITH_OPUS'] = True
+        else:
+            conf.define('HAVE_OPUS', 0)
 
 
     conf.env['LIB_PTHREAD'] = ['pthread']
@@ -356,10 +358,10 @@ def build(bld):
             bld.add_subdirs('dbus')
 
     if bld.env['BUILD_DOXYGEN_DOCS'] == True:
-        share_dir = bld.env.get_destdir() + bld.env['PREFIX'] + '/share/jack-audio-connection-kit'
         html_docs_source_dir = "build/default/html"
-        html_docs_install_dir = share_dir + '/reference/html/'
-        if Options.commands['install']:
+        if bld.cmd == 'install':
+            share_dir = bld.options.destdir + bld.env['PREFIX'] + '/share/jack-audio-connection-kit'
+            html_docs_install_dir = share_dir + '/reference/html/'
             if os.path.isdir(html_docs_install_dir):
                 Logs.pprint('CYAN', "Removing old doxygen documentation installation...")
                 shutil.rmtree(html_docs_install_dir)
@@ -367,17 +369,17 @@ def build(bld):
             Logs.pprint('CYAN', "Installing doxygen documentation...")
             shutil.copytree(html_docs_source_dir, html_docs_install_dir)
             Logs.pprint('CYAN', "Installing doxygen documentation done.")
-        elif Options.commands['uninstall']:
+        elif bld.cmd =='uninstall':
             Logs.pprint('CYAN', "Uninstalling doxygen documentation...")
             if os.path.isdir(share_dir):
                 shutil.rmtree(share_dir)
             Logs.pprint('CYAN', "Uninstalling doxygen documentation done.")
-        elif Options.commands['clean']:
+        elif bld.cmd =='clean':
             if os.access(html_docs_source_dir, os.R_OK):
                 Logs.pprint('CYAN', "Removing doxygen generated documentation...")
                 shutil.rmtree(html_docs_source_dir)
                 Logs.pprint('CYAN', "Removing doxygen generated documentation done.")
-        elif Options.commands['build']:
+        elif bld.cmd =='build':
             if not os.access(html_docs_source_dir, os.R_OK):
                 os.popen("doxygen").read()
             else:

@@ -63,7 +63,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     int fServerPriority;
     int fClientPriority;
     int fMaxClientPriority;
-    char fServerName[JACK_SERVER_CONTROL_NAME_SIZE];
+    char fServerName[JACK_SERVER_NAME_SIZE];
     JackTransportEngine fTransport;
     jack_timer_type_t fClockSource;
     int fDriverNum;
@@ -113,6 +113,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
         fMaxUsecs = 0;
         ResetRollingUsecs();
         strncpy(fServerName, server_name, sizeof(fServerName));
+        fCPULoad = 0.f;
         fPeriod = 0;
         fComputation = 0;
         fConstraint = 0;
@@ -120,7 +121,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
         fXrunDelayedUsecs = 0.f;
         fClockSource = clock;
         fDriverNum = 0;
-   }
+    }
 
     ~JackEngineControl()
     {}

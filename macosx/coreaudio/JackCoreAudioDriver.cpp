@@ -283,32 +283,36 @@ OSStatus JackCoreAudioDriver::Render(void* inRefCon,
                                      UInt32 inNumberFrames,
                                      AudioBufferList* ioData)
 {
-    JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inRefCon;
-    driver->fActionFags = ioActionFlags;
-    driver->fCurrentTime = inTimeStamp;
-    driver->fDriverOutputData = ioData;
+    return static_cast<JackCoreAudioDriver*>(inRefCon)->Render(ioActionFlags, inTimeStamp, ioData);
+}
+
+OSStatus JackCoreAudioDriver::Render(AudioUnitRenderActionFlags* ioActionFlags, const AudioTimeStamp* inTimeStamp,  AudioBufferList* ioData)
+{
+    fActionFags = ioActionFlags;
+    fCurrentTime = inTimeStamp;
+    fDriverOutputData = ioData;
 
     // Setup threaded based log function et get RT thread parameters once...
     if (set_threaded_log_function()) {
 
         jack_log("JackCoreAudioDriver::Render : set_threaded_log_function");
-        JackMachThread::GetParams(pthread_self(), &driver->fEngineControl->fPeriod, &driver->fEngineControl->fComputation, &driver->fEngineControl->fConstraint);
+        JackMachThread::GetParams(pthread_self(), &fEngineControl->fPeriod, &fEngineControl->fComputation, &fEngineControl->fConstraint);
 
-        if (driver->fComputationGrain > 0) {
-            jack_log("JackCoreAudioDriver::Render : RT thread computation setup to %d percent of period", int(driver->fComputationGrain * 100));
-            driver->fEngineControl->fComputation = driver->fEngineControl->fPeriod * driver->fComputationGrain;
+        if (fComputationGrain > 0) {
+            jack_log("JackCoreAudioDriver::Render : RT thread computation setup to %d percent of period", int(fComputationGrain * 100));
+            fEngineControl->fComputation = fEngineControl->fPeriod * fComputationGrain;
         }
     }
 
     // Signal waiting start function...
-    driver->fState = true;
+    fState = true;
 
-    driver->CycleTakeBeginTime();
+    CycleTakeBeginTime();
 
-    if (driver->Process() < 0) {
+    if (Process() < 0) {
         jack_error("Process error, stopping driver");
-        driver->NotifyFailure(JackBackendError, "Process error, stopping driver");    // Message length limited to JACK_MESSAGE_SIZE
-        driver->Stop();
+        NotifyFailure(JackBackendError, "Process error, stopping driver");    // Message length limited to JACK_MESSAGE_SIZE
+        Stop();
         kill(JackTools::GetPID(), SIGINT);
         return kAudioHardwareUnsupportedOperationError;
     } else {
@@ -327,6 +331,8 @@ int JackCoreAudioDriver::Read()
 
 int JackCoreAudioDriver::Write()
 {
+    int size = sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize;
+    
     if (fAC3Encoder) {
     
         // AC3 encoding and SPDIF write
@@ -336,7 +342,7 @@ int JackCoreAudioDriver::Write()
             AC3_inputs[i] = GetOutputBuffer(i);
             // If not connected, clear the buffer
             if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) == 0) {
-                memset(AC3_inputs[i], 0, sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
+                memset(AC3_inputs[i], 0, size);
             }
         }
         AC3_outputs[0] = (jack_default_audio_sample_t*)fDriverOutputData->mBuffers[0].mData;
@@ -349,14 +355,13 @@ int JackCoreAudioDriver::Write()
         for (int i = 0; i < fPlaybackChannels; i++) {
             if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) > 0) {
                 jack_default_audio_sample_t* buffer = GetOutputBuffer(i);
-                int size = sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize;
                 memcpy((jack_default_audio_sample_t*)fDriverOutputData->mBuffers[i].mData, buffer, size);
                 // Monitor ports
                 if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[i]) > 0) {
                     memcpy(GetMonitorBuffer(i), buffer, size);
                 }
             } else {
-                memset((jack_default_audio_sample_t*)fDriverOutputData->mBuffers[i].mData, 0, sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
+                memset((jack_default_audio_sample_t*)fDriverOutputData->mBuffers[i].mData, 0, size);
             }
         }
     }
@@ -1724,7 +1729,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         if (chan_in_list.size() > 0) {
             for (uint i = 0; i < chan_in_list.size(); i++) {
                 int chan = chan_in_list[i];
-                if (chan < out_maxChannels) {
+                if (chan < in_maxChannels) {
                     // The wanted JACK input index for the 'chan' channel value
                     chanArr[chan] = i;
                     jack_info("Input channel = %d ==> JACK input port = %d", chan, i);
@@ -2333,8 +2338,7 @@ int JackCoreAudioDriver::Start()
         fState = false;
         int count = 0;
 
-        OSStatus err = AudioOutputUnitStart(fAUHAL);
-        if (err == noErr) {
+        if (AudioOutputUnitStart(fAUHAL) == noErr) {
 
             while (!fState && count++ < WAIT_COUNTER) {
                 usleep(100000);
@@ -2387,10 +2391,9 @@ int JackCoreAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
 bool JackCoreAudioDriver::TakeHogAux(AudioDeviceID deviceID, bool isInput)
 {
     pid_t hog_pid;
-    OSStatus err;
-
     UInt32 propSize = sizeof(hog_pid);
-    err = AudioDeviceGetProperty(deviceID, 0, isInput, kAudioDevicePropertyHogMode, &propSize, &hog_pid);
+    
+    OSStatus err = AudioDeviceGetProperty(deviceID, 0, isInput, kAudioDevicePropertyHogMode, &propSize, &hog_pid);
     if (err) {
         jack_error("Cannot read hog state...");
         printError(err);
