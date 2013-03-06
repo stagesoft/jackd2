@@ -44,7 +44,7 @@ waf-configure-options += --libdir=/usr/lib/$(DEB_HOST_MULTIARCH)
 waf-configure-options += $(if $(filter linux,$(DEB_HOST_ARCH_OS)),--alsa --dbus)
 waf-configure-options += $(if $(filter amd64 i386 powerpc,$(DEB_HOST_ARCH)),--firewire)
 
-DEB_MAKE_INVOKE = ./waf -v --destdir=$(CURDIR)/debian/tmp
+DEB_MAKE_INVOKE = ./waf-light -v --destdir=$(CURDIR)/debian/tmp
 DEB_MAKE_INSTALL_TARGET = install
 
 # TODO: use distclean and drop related clean target, when (or if)
@@ -74,7 +74,7 @@ clean::
 common-configure-arch common-configure-indep:: common-configure-impl
 common-configure-impl:: debian/stamp-waf-configure
 debian/stamp-waf-configure:
-	./waf configure $(waf-configure-options)
+	./waf-light configure $(waf-configure-options)
 	touch $@
 clean::
 	rm -f debian/stamp-waf-configure
