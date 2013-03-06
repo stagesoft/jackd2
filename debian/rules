@@ -74,6 +74,7 @@ clean::
 common-configure-arch common-configure-indep:: common-configure-impl
 common-configure-impl:: debian/stamp-waf-configure
 debian/stamp-waf-configure:
+	chmod +x ./waf-light
 	./waf-light configure $(waf-configure-options)
 	touch $@
 clean::
