@@ -1,4 +1,4 @@
-jackd2 (1.9.9.5~dfsg-1) UNRELEASED; urgency=low
+jackd2 (1.9.9.5+20130306git47f3a68c-1) experimental; urgency=low
 
   [ upstream ]
   * New upstream release.
@@ -25,7 +25,11 @@ jackd2 (1.9.9.5~dfsg-1) UNRELEASED; urgency=low
   * Rewrite copyright file using file format 1.0.
     + Cover new/changed files, and extend some copyrights.
 
- -- Jonas Smedegaard <dr@jones.dk>  Fri, 21 Dec 2012 04:42:40 +0100
+  [ Adrian Knoth ]
+  * Imported Upstream version 1.9.9.5+20130306git47f3a68c
+  * Invoke ./waf-light instead of ./waf
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Wed, 06 Mar 2013 14:44:55 +0100
 
 jackd2 (1.9.9.5+20130127git15950eb1-1) experimental; urgency=low
 
