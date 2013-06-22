@@ -14,7 +14,7 @@ if [ ! -s ${CONFIG_FILE} ] && [ ! -s ${CONFIG_FILE}.disabled ]; then
 fi
 
 db_get jackd/tweak_rt_limits
-if [ $RET = "true" ]; then
+if [ "x$RET" = "xtrue" ]; then
 	if [ -e ${CONFIG_FILE}.disabled ]; then
 		mv ${CONFIG_FILE}.disabled ${CONFIG_FILE} || true
 	fi
