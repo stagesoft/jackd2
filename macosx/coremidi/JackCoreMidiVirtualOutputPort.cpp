@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <sstream>
 #include <stdexcept>
 
+#include "JackError.h"
 #include "JackCoreMidiUtil.h"
 #include "JackCoreMidiVirtualOutputPort.h"
 
@@ -27,7 +28,7 @@ using Jack::JackCoreMidiVirtualOutputPort;
 
 JackCoreMidiVirtualOutputPort::
 JackCoreMidiVirtualOutputPort(const char *alias_name, const char *client_name,
-                              const char *driver_name, int index,
+                              const char *driver_name, int base_index, int index,
                               MIDIClientRef client, double time_ratio,
                               size_t max_bytes,
                               size_t max_messages):
@@ -35,7 +36,7 @@ JackCoreMidiVirtualOutputPort(const char *alias_name, const char *client_name,
                            max_messages)
 {
     std::stringstream stream;
-    stream << "virtual" << (index + 1);
+    stream << "virtual" << (base_index + 1);
     CFStringRef name = CFStringCreateWithCString(0, stream.str().c_str(),
                                                  CFStringGetSystemEncoding());
     if (! name) {
@@ -43,11 +44,23 @@ JackCoreMidiVirtualOutputPort(const char *alias_name, const char *client_name,
     }
     MIDIEndpointRef source;
     OSStatus status = MIDISourceCreate(client, name, &source);
+    
+    /*
+    SInt32 value;                                        
+    status = MIDIObjectGetIntegerProperty(source, kMIDIPropertyUniqueID, &value);
+    if (status == noErr) {
+        jack_info("kMIDIPropertyUniqueID %d", value);
+    }
+    */   
+    
     CFRelease(name);
     if (status != noErr) {
         throw std::runtime_error(GetMacOSErrorString(status));
     }
     Initialize(alias_name, client_name, driver_name, index, source, 0);
+    
+    // Keep in global list (that keeps growing during the whole session...)
+    endpoint_list.insert(GetEndpoint());
 }
 
 JackCoreMidiVirtualOutputPort::~JackCoreMidiVirtualOutputPort()

@@ -38,13 +38,15 @@ namespace Jack
 
 JackEngine::JackEngine(JackGraphManager* manager,
                        JackSynchro* table,
-                       JackEngineControl* control) 
+                       JackEngineControl* control,
+                       JackSelfConnectMode self_connect_mode)
                     : JackLockAble(control->fServerName), 
                     fSignal(control->fServerName)
 {
     fGraphManager = manager;
     fSynchroTable = table;
     fEngineControl = control;
+    fSelfConnectMode = self_connect_mode;
     for (int i = 0; i < CLIENT_NUM; i++) {
         fClientTable[i] = NULL;
     }
@@ -602,7 +604,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref
         EnsureUUID(uuid);
     }
 
-    jack_log("JackEngine::ClientExternalOpen: uuid = %d, name = %s ", uuid, real_name);
+    jack_log("JackEngine::ClientExternalOpen: uuid = %d, name = %s", uuid, real_name);
 
     int refnum = AllocateRefnum();
     if (refnum < 0) {
@@ -803,10 +805,10 @@ int JackEngine::ClientDeactivate(int refnum)
 
     // First disconnect all ports
     for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (input_ports[i] != EMPTY); i++) {
-        PortDisconnect(refnum, input_ports[i], ALL_PORTS);
+        PortDisconnect(-1, input_ports[i], ALL_PORTS);
     }
     for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (output_ports[i] != EMPTY); i++) {
-        PortDisconnect(refnum, output_ports[i], ALL_PORTS);
+        PortDisconnect(-1, output_ports[i], ALL_PORTS);
     }
 
     // Then issue port registration notification
@@ -874,7 +876,7 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
     assert(client);
 
     // Disconnect port ==> notification is sent
-    PortDisconnect(refnum, port_index, ALL_PORTS);
+    PortDisconnect(-1, port_index, ALL_PORTS);
 
     if (fGraphManager->ReleasePort(refnum, port_index) == 0) {
         if (client->GetClientControl()->fActive) {
@@ -886,9 +888,75 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
     }
 }
 
+// this check is to prevent apps to self connect to other apps
+// TODO: make this work with multiple clients per app
+int JackEngine::CheckPortsConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
+{
+    JackPort* src_port = fGraphManager->GetPort(src);
+    JackPort* dst_port = fGraphManager->GetPort(dst);
+
+    jack_log("JackEngine::CheckPortsConnect(ref = %d, src = %d, dst = %d)", refnum, src_port->GetRefNum(), dst_port->GetRefNum());
+
+    int src_self = src_port->GetRefNum() == refnum ? 1 : 0;
+    int dst_self = dst_port->GetRefNum() == refnum ? 1 : 0;
+
+    jack_log("src_self is %s", src_self ? "true" : "false");
+    jack_log("dst_self is %s", dst_self ? "true" : "false");
+
+    // 0 means client is connecting other client ports (i.e. control app patchbay functionality)
+    // 1 means client is connecting its own port to port of other client (i.e. self hooking into system app)
+    // 2 means client is connecting its own ports (i.e. for app internal functionality)
+    // TODO: Make this check an engine option and more tweakable (return error or success)
+    // MAYBE: make the engine option changable on the fly and expose it through client or control API
+
+    switch (fSelfConnectMode)
+    {
+    case JackSelfConnectFailExternalOnly:
+        if (src_self + dst_self == 1)
+        {
+            jack_info("rejecting port self connect request to external port (%s -> %s)", src_port->GetName(), dst_port->GetName());
+            return -1;
+        }
+
+        return 1;
+
+    case JackSelfConnectIgnoreExternalOnly:
+        if (src_self + dst_self == 1)
+        {
+            jack_info("ignoring port self connect request to external port (%s -> %s)", src_port->GetName(), dst_port->GetName());
+            return 0;
+        }
+
+        return 1;
+
+    case JackSelfConnectFailAll:
+        if (src_self + dst_self != 0)
+        {
+            jack_info("rejecting port self connect request (%s -> %s)", src_port->GetName(), dst_port->GetName());
+            return -1;
+        }
+
+        return 1;
+
+    case JackSelfConnectIgnoreAll:
+        if (src_self + dst_self != 0)
+        {
+            jack_info("ignoring port self connect request (%s -> %s)", src_port->GetName(), dst_port->GetName());
+            return 0;
+        }
+
+        return 1;
+
+    case JackSelfConnectAllow:  // fix warning
+        return 1;
+    }
+
+    return 1;
+}
+
 int JackEngine::PortConnect(int refnum, const char* src, const char* dst)
 {
-    jack_log("JackEngine::PortConnect src = %s dst = %s", src, dst);
+    jack_log("JackEngine::PortConnect ref = %d src = %s dst = %s", refnum, src, dst);
     jack_port_id_t port_src, port_dst;
 
     return (fGraphManager->GetTwoPorts(src, dst, &port_src, &port_dst) < 0)
@@ -898,7 +966,7 @@ int JackEngine::PortConnect(int refnum, const char* src, const char* dst)
 
 int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
 {
-    jack_log("JackEngine::PortConnect src = %d dst = %d", src, dst);
+    jack_log("JackEngine::PortConnect ref = %d src = %d dst = %d", refnum, src, dst);
     JackClientInterface* client;
     int ref;
 
@@ -926,7 +994,12 @@ int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
         return -1;
     }
 
-    int res = fGraphManager->Connect(src, dst);
+    int res = CheckPortsConnect(refnum, src, dst);
+    if (res != 1) {
+        return res;
+    }
+
+    res = fGraphManager->Connect(src, dst);
     if (res == 0) {
         NotifyPortConnect(src, dst, true);
     }
@@ -935,7 +1008,7 @@ int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
 
 int JackEngine::PortDisconnect(int refnum, const char* src, const char* dst)
 {
-    jack_log("JackEngine::PortDisconnect src = %s dst = %s", src, dst);
+    jack_log("JackEngine::PortDisconnect ref = %d src = %s dst = %s", refnum, src, dst);
     jack_port_id_t port_src, port_dst;
 
     return (fGraphManager->GetTwoPorts(src, dst, &port_src, &port_dst) < 0)
@@ -945,7 +1018,7 @@ int JackEngine::PortDisconnect(int refnum, const char* src, const char* dst)
 
 int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
 {
-    jack_log("JackEngine::PortDisconnect src = %d dst = %d", src, dst);
+    jack_log("JackEngine::PortDisconnect ref = %d src = %d dst = %d", refnum, src, dst);
 
     if (dst == ALL_PORTS) {
 
@@ -969,15 +1042,21 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
         }
 
         return res;
-    } else if (fGraphManager->CheckPorts(src, dst) < 0) {
-        return -1;
-    } else if (fGraphManager->Disconnect(src, dst) == 0) {
-        // Notifications
-        NotifyPortConnect(src, dst, false);
-        return 0;
-    } else {
+    }
+
+    if (fGraphManager->CheckPorts(src, dst) < 0) {
         return -1;
     }
+
+    int res = CheckPortsConnect(refnum, src, dst);
+    if (res != 1) {
+        return res;
+    }
+
+    res = fGraphManager->Disconnect(src, dst);
+    if (res == 0)
+        NotifyPortConnect(src, dst, false);
+    return res;
 }
 
 int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)

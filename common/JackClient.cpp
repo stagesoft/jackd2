@@ -88,13 +88,13 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
 JackClient::~JackClient()
 {}
 
-void JackClient::ShutDown(const char* message)
+void JackClient::ShutDown(jack_status_t code, const char* message)
 {
     jack_log("JackClient::ShutDown");
  
     // If "fInfoShutdown" callback, then call it
     if (fInfoShutdown) {
-        fInfoShutdown(JackFailure, message, fInfoShutdownArg);
+        fInfoShutdown(code, message, fInfoShutdownArg);
         fInfoShutdown = NULL;
     // Otherwise possibly call the normal "fShutdown"
     } else if (fShutdown) {
@@ -232,7 +232,10 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
             case kStartFreewheelCallback:
                 jack_log("JackClient::kStartFreewheel");
                 SetupDriverSync(true);
-                fThread.DropRealTime();     // Always done (JACK server in RT mode or not...)
+                // Drop RT only when the RT thread is actually running
+                if (fThread.GetStatus() == JackThread::kRunning) {
+                    fThread.DropRealTime();     
+                }
                 if (fFreewheel) {
                     fFreewheel(1, fFreewheelArg);
                 }
@@ -244,8 +247,9 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 if (fFreewheel) {
                     fFreewheel(0, fFreewheelArg);
                 }
-                if (GetEngineControl()->fRealTime) {
-                    if (fThread.AcquireRealTime() < 0) {
+                // Acquire RT only when the RT thread is actually running
+                if (GetEngineControl()->fRealTime && fThread.GetStatus() == JackThread::kRunning) {
+                    if (fThread.AcquireRealTime(GetEngineControl()->fClientPriority) < 0) {
                         jack_error("JackClient::AcquireRealTime error");
                     }
                 }
@@ -295,7 +299,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 
             case kShutDownCallback:
                 jack_log("JackClient::kShutDownCallback");
-                ShutDown(message);
+                ShutDown(jack_status_t(value1), message);
                 break;
 
             case kSessionCallback:
@@ -520,23 +524,18 @@ bool JackClient::Init()
         jack_error("Failed to set thread realtime key");
     }
 
-    if (GetEngineControl()->fRealTime) {
-        set_threaded_log_function();
-    }
-
     // Setup RT
     if (GetEngineControl()->fRealTime) {
-        if (fThread.AcquireSelfRealTime(GetEngineControl()->fClientPriority) < 0) {
-            jack_error("JackClient::AcquireSelfRealTime error");
-        }
+        set_threaded_log_function();
+        SetupRealTime();
     }
 
     return true;
 }
 
-int JackClient::StartThread()
+void JackClient::SetupRealTime()
 {
-    jack_log("JackClient::StartThread : period = %ld computation = %ld constraint = %ld",
+    jack_log("JackClient::Init : period = %ld computation = %ld constraint = %ld",
              long(int64_t(GetEngineControl()->fPeriod) / 1000.0f),
              long(int64_t(GetEngineControl()->fComputation) / 1000.0f),
              long(int64_t(GetEngineControl()->fConstraint) / 1000.0f));
@@ -544,6 +543,13 @@ int JackClient::StartThread()
     // Will do "something" on OSX only...
     fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
 
+    if (fThread.AcquireSelfRealTime(GetEngineControl()->fClientPriority) < 0) {
+        jack_error("JackClient::AcquireSelfRealTime error");
+    }
+}
+
+int JackClient::StartThread()
+{
     if (fThread.StartSync() < 0) {
         jack_error("Start thread error");
         return -1;
@@ -656,7 +662,7 @@ inline void JackClient::Error()
     fThread.DropSelfRealTime();
     GetClientControl()->fActive = false;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
-    ShutDown(JACK_SERVER_FAILURE);
+    ShutDown(jack_status_t(JackFailure | JackServerError), JACK_SERVER_FAILURE);
     fThread.Terminate();
 }
 

@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <sstream>
 #include <stdexcept>
 
+#include "JackError.h"
 #include "JackCoreMidiUtil.h"
 #include "JackCoreMidiVirtualInputPort.h"
 
@@ -43,26 +44,38 @@ HandleInputEvent(const MIDIPacketList *packet_list, void *port,
 
 JackCoreMidiVirtualInputPort::
 JackCoreMidiVirtualInputPort(const char *alias_name, const char *client_name,
-                             const char *driver_name, int index,
+                             const char *driver_name, int base_index, int index,
                              MIDIClientRef client, double time_ratio,
                              size_t max_bytes, size_t max_messages):
     JackCoreMidiInputPort(time_ratio, max_bytes, max_messages)
 {
     std::stringstream stream;
-    stream << "virtual" << (index + 1);
+    stream << "virtual" << (base_index + 1);
     CFStringRef name = CFStringCreateWithCString(0, stream.str().c_str(),
-                                                CFStringGetSystemEncoding());
+                                               CFStringGetSystemEncoding());
     if (! name) {
         throw std::bad_alloc();
     }
     MIDIEndpointRef destination;
     OSStatus status = MIDIDestinationCreate(client, name, HandleInputEvent,
                                             this, &destination);
+     
+    /*                                                                            
+    SInt32 value;                                        
+    status = MIDIObjectGetIntegerProperty(destination, kMIDIPropertyUniqueID, &value);
+    if (status == noErr) {
+        jack_info("kMIDIPropertyUniqueID %d", value);
+    }
+    */                                  
+                                            
     CFRelease(name);
     if (status != noErr) {
         throw std::runtime_error(GetMacOSErrorString(status));
     }
     Initialize(alias_name, client_name, driver_name, index, destination);
+    
+    // Keep in global list (that keeps growing during the whole session...)
+    endpoint_list.insert(endpoint);
 }
 
 JackCoreMidiVirtualInputPort::~JackCoreMidiVirtualInputPort()

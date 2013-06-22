@@ -112,7 +112,6 @@ bool JackCoreMidiDriver::OpenAux()
 
     OSStatus status = MIDIClientCreate(name, HandleNotificationEvent, this,
                                        &client);
-
     CFRelease(name);
 
     if (status != noErr) {
@@ -211,7 +210,7 @@ bool JackCoreMidiDriver::OpenAux()
                 virtual_input_ports[vi_count] =
                     new JackCoreMidiVirtualInputPort(fAliasName, client_name,
                                                      capture_driver_name,
-                                                     vi_count + pi_count, client,
+                                                     vi_count, vi_count + pi_count, client,
                                                      time_ratio);
             } catch (std::exception e) {
                 jack_error("JackCoreMidiDriver::Open - while creating virtual "
@@ -236,7 +235,7 @@ bool JackCoreMidiDriver::OpenAux()
                 virtual_output_ports[vo_count] =
                     new JackCoreMidiVirtualOutputPort(fAliasName, client_name,
                                                       playback_driver_name,
-                                                      vo_count + po_count, client,
+                                                      vo_count, vo_count + po_count, client,
                                                       time_ratio);
             } catch (std::exception e) {
                 jack_error("JackCoreMidiDriver::Open - while creating virtual "
@@ -245,7 +244,6 @@ bool JackCoreMidiDriver::OpenAux()
             }
         }
     }
-
 
     if (! (pi_count || po_count || in_channels || out_channels)) {
         jack_error("JackCoreMidiDriver::Open - no CoreMIDI inputs or outputs "
@@ -357,7 +355,7 @@ JackCoreMidiDriver::Attach()
     JackCoreMidiPort *port_obj;
     latency_range.max = latency;
     latency_range.min = latency;
-
+    
     // Physical inputs
     for (int i = 0; i < num_physical_inputs; i++) {
         port_obj = physical_input_ports[i];
@@ -521,16 +519,25 @@ JackCoreMidiDriver::CloseAux()
 void
 JackCoreMidiDriver::Restart()
 {
+    // Lock between this thread and RT thread
     JackLock lock(this);
-
-    SaveConnections();
-    Stop();
-    Detach();
-    CloseAux();
-    OpenAux();
-    Attach();
-    Start();
-    RestoreConnections();
+    
+    // Lock between this thread and request thread
+    if (fEngine->Lock()) {
+        // Use first alias
+        SaveConnections(1);
+        Stop();
+        Detach();
+        CloseAux();
+        OpenAux();
+        Attach();
+        Start();
+        // Use first alias and partial port naming
+        LoadConnections(1, false);
+        fEngine->Unlock();
+    } else {
+        jack_error("Cannot acquire engine lock...");
+    }
 }
 
 void
@@ -538,16 +545,27 @@ JackCoreMidiDriver::HandleNotification(const MIDINotification *message)
 {
     switch (message->messageID) {
 
-        case kMIDIMsgSetupChanged:
-            Restart();
+        case kMIDIMsgObjectAdded: {
+            /*
+                We don't want to restart when our internal virtual in/out are created.
+            */
+            const MIDIObjectAddRemoveNotification* add_message = reinterpret_cast<const MIDIObjectAddRemoveNotification*>(message);
+            if (!JackCoreMidiPort::IsInternalPort(add_message->child)) {
+                Restart();
+            }
             break;
-
-        case kMIDIMsgObjectAdded:
+        }
+        
+        case kMIDIMsgObjectRemoved: {
+            /*
+                We don't want to restart when our internal virtual in/out are created.
+            */
+            const MIDIObjectAddRemoveNotification* remove_message = reinterpret_cast<const MIDIObjectAddRemoveNotification*>(message);
+            if (!JackCoreMidiPort::IsInternalPort(remove_message->child)) {
+                Restart();
+            }
             break;
-
-        case kMIDIMsgObjectRemoved:
-            break;
-
+        }
     }
 }
 
@@ -585,7 +603,7 @@ JackCoreMidiDriver::Open(bool capturing_aux, bool playing_aux, int in_channels_a
         return -1;
     } else {
         JackSleep(10000);
-        jack_info("CoreMIDI driver is running...");
+        jack_info("CoreMIDI driver is opened...");
     }
 
     return 0;
@@ -809,8 +827,8 @@ extern "C" {
     {
         const JSList * node;
         const jack_driver_param_t * param;
-        int virtual_in = 0;
-        int virtual_out = 0;
+        int virtual_in = 2;
+        int virtual_out = 2;
 
         for (node = params; node; node = jack_slist_next (node)) {
             param = (const jack_driver_param_t *) node->data;

@@ -32,12 +32,12 @@ namespace Jack
 
 #define SLAVE_SETUP_RETRY   5
 
-#define MANAGER_INIT_TIMEOUT    2000000         // in usec
-#define MASTER_INIT_TIMEOUT     1000000 * 10    // in usec
-#define SLAVE_INIT_TIMEOUT      1000000 * 10    // in usec
-#define PACKET_TIMEOUT          500000          // in usec
+#define MANAGER_INIT_TIMEOUT    1000000 * 2   // in usec
+#define MASTER_INIT_TIMEOUT     1000000 * 10  // in usec
+#define SLAVE_INIT_TIMEOUT      1000000 * 10  // in usec
+#define PACKET_TIMEOUT          500000        // in usec
 
-#define NETWORK_MAX_LATENCY     20
+#define NETWORK_MAX_LATENCY     30  // maximum possible latency in network master/slave loop
 
     /**
     \Brief This class describes the basic Net Interface, used by both master and slave.
@@ -137,6 +137,7 @@ namespace Jack
             bool fRunning;
             int fCurrentCycleOffset;
             int fMaxCycleOffset;
+            bool fSynched;
        
             bool Init();
             bool SetParams();
@@ -156,17 +157,24 @@ namespace Jack
             int Send(size_t size, int flags);
             int Recv(size_t size, int flags);
 
-            bool IsSynched();
-
             void FatalRecvError();
             void FatalSendError();
 
         public:
 
-            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCurrentCycleOffset(0), fMaxCycleOffset(0)
+            JackNetMasterInterface() 
+                : JackNetInterface(), 
+                fRunning(false), 
+                fCurrentCycleOffset(0), 
+                fMaxCycleOffset(0), 
+                fSynched(false)
             {}
             JackNetMasterInterface(session_params_t& params, JackNetSocket& socket, const char* multicast_ip)
-                    : JackNetInterface(params, socket, multicast_ip), fRunning(false), fCurrentCycleOffset(0), fMaxCycleOffset(0)
+                    : JackNetInterface(params, socket, multicast_ip), 
+                    fRunning(false), 
+                    fCurrentCycleOffset(0), 
+                    fMaxCycleOffset(0), 
+                    fSynched(false)
             {}
 
             virtual~JackNetMasterInterface()
@@ -188,7 +196,7 @@ namespace Jack
             bool InitConnection(int time_out_sec);
             bool InitRendering();
 
-            net_status_t SendAvailableToMaster(long count = LONG_MAX);  // long here (and not int...)
+            net_status_t SendAvailableToMaster(int count = INT_MAX); 
             net_status_t SendStartToMaster();
 
             bool SetParams();
