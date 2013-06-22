@@ -1,3 +1,18 @@
+jackd2 (1.9.9.5+20130622git7de15e7a-1) unstable; urgency=low
+
+  [ Jonas Smedegaard ]
+  * Add README.source emphasizing control.in file as *not* a show-stopper for contributions, referring to wiki page for details.
+
+  [ Adrian Knoth ]
+  * Don't fail in postinst after skipping debconf dialog (Closes: #688202)
+  * Imported Upstream version 1.9.9.5+20130622git7de15e7a
+  * Recompiling fixes netone backend (Closes: #709550)
+  * Drop no-selfconnect.patch
+  * Drop obsolte DMUA flag
+  * Bump standards version to 3.9.4
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Sat, 22 Jun 2013 12:38:35 +0200
+
 jackd2 (1.9.9.5+20130306git47f3a68c-1) experimental; urgency=low
 
   [ upstream ]
