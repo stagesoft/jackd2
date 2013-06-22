@@ -29,7 +29,8 @@ namespace Jack
 {
     JackNetDriver::JackNetDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                 const char* ip, int udp_port, int mtu, int midi_input_ports, int midi_output_ports,
-                                char* net_name, uint transport_sync, int network_latency, int celt_encoding, int opus_encoding)
+                                char* net_name, uint transport_sync, int network_latency, 
+                                int celt_encoding, int opus_encoding, bool auto_save)
             : JackWaiterDriver(name, alias, engine, table), JackNetSlaveInterface(ip, udp_port)
     {
         jack_log("JackNetDriver::JackNetDriver ip %s, port %d", ip, udp_port);
@@ -40,8 +41,10 @@ namespace Jack
         }
 
         fParams.fMtu = mtu;
-        fParams.fSendMidiChannels = midi_input_ports;
-        fParams.fReturnMidiChannels = midi_output_ports;
+        
+        fWantedMIDICaptureChannels = midi_input_ports;
+        fWantedMIDIPlaybackChannels = midi_output_ports;
+        
         if (celt_encoding > 0) {
             fParams.fSampleEncoder = JackCeltEncoder;
             fParams.fKBps = celt_encoding;
@@ -62,6 +65,9 @@ namespace Jack
         fLastTimebaseMaster = -1;
         fMidiCapturePortList = NULL;
         fMidiPlaybackPortList = NULL;
+        fWantedAudioCaptureChannels = -1;
+        fWantedAudioPlaybackChannels = -1;
+        fAutoSave = auto_save;
 #ifdef JACK_MONITOR
         fNetTimeMon = NULL;
         fRcvSyncUst = 0;
@@ -79,6 +85,29 @@ namespace Jack
 
 //open, close, attach and detach------------------------------------------------------
 
+    int JackNetDriver::Open(jack_nframes_t buffer_size,
+                         jack_nframes_t samplerate,
+                         bool capturing,
+                         bool playing,
+                         int inchannels,
+                         int outchannels,
+                         bool monitor,
+                         const char* capture_driver_name,
+                         const char* playback_driver_name,
+                         jack_nframes_t capture_latency,
+                         jack_nframes_t playback_latency)
+    {
+        // Keep initial wanted values
+        fWantedAudioCaptureChannels = inchannels;
+        fWantedAudioPlaybackChannels = outchannels;
+        return JackWaiterDriver::Open(buffer_size, samplerate, 
+                                    capturing, playing, 
+                                    inchannels, outchannels, 
+                                    monitor, 
+                                    capture_driver_name, playback_driver_name, 
+                                    capture_latency, playback_latency);
+    }
+                         
     int JackNetDriver::Close()
     {
 #ifdef JACK_MONITOR
@@ -110,7 +139,9 @@ namespace Jack
     bool JackNetDriver::Initialize()
     {
         jack_log("JackNetDriver::Initialize");
-        SaveConnections();
+        if (fAutoSave) {
+            SaveConnections(0);
+        }
         FreePorts();
 
         // New loading, but existing socket, restart the driver
@@ -120,8 +151,12 @@ namespace Jack
         }
 
         // Set the parameters to send
-        fParams.fSendAudioChannels = fCaptureChannels;
-        fParams.fReturnAudioChannels = fPlaybackChannels;
+        fParams.fSendAudioChannels = fWantedAudioCaptureChannels;
+        fParams.fReturnAudioChannels = fWantedAudioPlaybackChannels;
+        
+        fParams.fSendMidiChannels = fWantedMIDICaptureChannels;
+        fParams.fReturnMidiChannels = fWantedMIDIPlaybackChannels;
+        
         fParams.fSlaveSyncMode = fEngineControl->fSyncMode;
 
         // Display some additional infos
@@ -140,11 +175,16 @@ namespace Jack
             return false;
         }
 
-        // If -1 at connection time, in/out channels count is sent by the master
+        // If -1 at connection time for audio, in/out audio channels count is sent by the master
         fCaptureChannels = fParams.fSendAudioChannels;
         fPlaybackChannels = fParams.fReturnAudioChannels;
-
+        
+        // If -1 at connection time for MIDI, in/out MIDI channels count is sent by the master (in fParams struct)
+   
         // Allocate midi ports lists
+        delete[] fMidiCapturePortList;
+        delete[] fMidiPlaybackPortList;
+        
         fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
         fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
 
@@ -174,7 +214,7 @@ namespace Jack
         plot_name = string(fParams.fName);
         plot_name += string("_slave");
         plot_name += (fEngineControl->fSyncMode) ? string("_sync") : string("_async");
-        plot_name +=  string("_latency");
+        plot_name += string("_latency");
         fNetTimeMon = new JackGnuPlotMonitor<float>(128, 5, plot_name);
         string net_time_mon_fields[] =
         {
@@ -201,7 +241,9 @@ namespace Jack
         // Transport engine parametering
         fEngineControl->fTransport.SetNetworkSync(fParams.fTransportSync);
 
-        RestoreConnections();
+        if (fAutoSave) {
+            LoadConnections(0);
+        }
         return true;
     }
 
@@ -238,14 +280,17 @@ namespace Jack
         jack_latency_range_t input_range;
         jack_latency_range_t output_range;
         jack_latency_range_t monitor_range;
-
+     
         for (int i = 0; i < fCaptureChannels; i++) {
-            input_range.max = input_range.min = 0;
+            input_range.max = input_range.min = float(fParams.fNetworkLatency * fEngineControl->fBufferSize) / 2.f;
             fGraphManager->GetPort(fCapturePortList[i])->SetLatencyRange(JackCaptureLatency, &input_range);
         }
 
         for (int i = 0; i < fPlaybackChannels; i++) {
-            output_range.max = output_range.min = 0;
+            output_range.max = output_range.min = float(fParams.fNetworkLatency * fEngineControl->fBufferSize) / 2.f;
+            if (!fEngineControl->fSyncMode) {
+                output_range.max = output_range.min += fEngineControl->fBufferSize;
+            }
             fGraphManager->GetPort(fPlaybackPortList[i])->SetLatencyRange(JackPlaybackLatency, &output_range);
             if (fWithMonitorPorts) {
                 monitor_range.min = monitor_range.max = 0;
@@ -335,6 +380,7 @@ namespace Jack
             jack_log("JackNetDriver::AllocPorts() fMidiPlaybackPortList[%d] midi_port_index = %ld fPortLatency = %ld", midi_port_index, port_index, port->GetLatency());
         }
 
+        UpdateLatencies();
         return 0;
     }
 
@@ -372,26 +418,34 @@ namespace Jack
         return 0;
     }
 
-    void JackNetDriver::SaveConnections()
+    void JackNetDriver::SaveConnections(int alias)
     {
-        JackDriver::SaveConnections();
+        JackDriver::SaveConnections(alias);
         const char** connections;
 
-        for (int i = 0; i < fParams.fSendMidiChannels; ++i) {
-            if (fCapturePortList[i] && (connections = fGraphManager->GetConnections(fMidiCapturePortList[i])) != 0) {
-                for (int j = 0; connections[j]; j++) {
-                    fConnections.push_back(make_pair(fGraphManager->GetPort(fMidiCapturePortList[i])->GetName(), connections[j]));
+        if (fMidiCapturePortList) {
+            for (int i = 0; i < fParams.fSendMidiChannels; ++i) {
+                if (fMidiCapturePortList[i] && (connections = fGraphManager->GetConnections(fMidiCapturePortList[i])) != 0) {
+                    for (int j = 0; connections[j]; j++) {
+                        JackPort* port_id = fGraphManager->GetPort(fGraphManager->GetPort(connections[j]));
+                        fConnections.push_back(make_pair(port_id->GetType(), make_pair(fGraphManager->GetPort(fMidiCapturePortList[i])->GetName(), connections[j])));
+                        jack_info("Save connection: %s %s", fGraphManager->GetPort(fMidiCapturePortList[i])->GetName(), connections[j]);
+                    }
+                    free(connections);
                 }
-                free(connections);
             }
         }
 
-        for (int i = 0; i < fParams.fReturnMidiChannels; ++i) {
-            if (fPlaybackPortList[i] && (connections = fGraphManager->GetConnections(fMidiPlaybackPortList[i])) != 0) {
-                for (int j = 0; connections[j]; j++) {
-                    fConnections.push_back(make_pair(connections[j], fGraphManager->GetPort(fMidiPlaybackPortList[i])->GetName()));
+        if (fMidiPlaybackPortList) {
+            for (int i = 0; i < fParams.fReturnMidiChannels; ++i) {
+                if (fMidiPlaybackPortList[i] && (connections = fGraphManager->GetConnections(fMidiPlaybackPortList[i])) != 0) {
+                    for (int j = 0; connections[j]; j++) {
+                        JackPort* port_id = fGraphManager->GetPort(fGraphManager->GetPort(connections[j]));
+                        fConnections.push_back(make_pair(port_id->GetType(), make_pair(connections[j], fGraphManager->GetPort(fMidiPlaybackPortList[i])->GetName())));
+                        jack_info("Save connection: %s %s", connections[j], fGraphManager->GetPort(fMidiPlaybackPortList[i])->GetName());
+                    }
+                    free(connections);
                 }
-                free(connections);
             }
         }
     }
@@ -507,32 +561,41 @@ namespace Jack
         fNetTimeMon->New();
 #endif
 
-        //receive sync (launch the cycle)
-        if (SyncRecv() == SOCKET_ERROR) {
-            return SOCKET_ERROR;
+        switch (SyncRecv()) {
+        
+            case SOCKET_ERROR:
+                return SOCKET_ERROR;
+                
+            case NET_PACKET_ERROR:
+                // since sync packet is incorrect, don't decode it and continue with data
+                break;
+                
+            default:
+                // decode sync
+                DecodeSyncPacket();
+                break;
         }
-
+  
 #ifdef JACK_MONITOR
         // For timing
         fRcvSyncUst = GetMicroSeconds();
 #endif
 
-        //decode sync
-        //if there is an error, don't return -1, it will skip Write() and the network error probably won't be identified
-        DecodeSyncPacket();
-
 #ifdef JACK_MONITOR
         fNetTimeMon->Add(float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
 #endif
         //audio, midi or sync if driver is late
-        int res = DataRecv();
-        if (res == SOCKET_ERROR) {
-            return SOCKET_ERROR;
-        } else if (res == NET_PACKET_ERROR) {
-            jack_time_t cur_time = GetMicroSeconds();
-            NotifyXRun(cur_time, float(cur_time - fBeginDateUst));  // Better this value than nothing...
+        switch (DataRecv()) {
+        
+            case SOCKET_ERROR:
+                return SOCKET_ERROR;
+                
+            case NET_PACKET_ERROR:
+                jack_time_t cur_time = GetMicroSeconds();
+                NotifyXRun(cur_time, float(cur_time - fBeginDateUst));  // Better this value than nothing...
+                break;
         }
-
+ 
         //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
 
@@ -553,12 +616,9 @@ namespace Jack
         for (int audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++) {
         #ifdef OPTIMIZED_PROTOCOL
             // Port is connected on other side...
-            if (fNetAudioPlaybackBuffer->GetConnected(audio_port_index)) {
-                if (fGraphManager->GetConnectionsNum(fPlaybackPortList[audio_port_index]) > 0) {
-                    fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer(audio_port_index));
-                } else {
-                    fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, NULL);
-                }
+            if (fNetAudioPlaybackBuffer->GetConnected(audio_port_index)
+                && (fGraphManager->GetConnectionsNum(fPlaybackPortList[audio_port_index]) > 0)) {
+                fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer(audio_port_index));
             } else {
                 fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, NULL);
             }
@@ -623,9 +683,9 @@ namespace Jack
             jack_driver_descriptor_add_parameter(desc, &filler, "input-ports", 'C', JackDriverParamInt, &value, NULL, "Number of audio input ports", "Number of audio input ports. If -1, audio physical input from the master");
             jack_driver_descriptor_add_parameter(desc, &filler, "output-ports", 'P', JackDriverParamInt, &value, NULL, "Number of audio output ports", "Number of audio output ports. If -1, audio physical output from the master");
 
-            value.i = 0;
-            jack_driver_descriptor_add_parameter(desc, &filler, "midi-in-ports", 'i', JackDriverParamInt, &value, NULL, "Number of midi input ports", NULL);
-            jack_driver_descriptor_add_parameter(desc, &filler, "midi-out-ports", 'o', JackDriverParamInt, &value, NULL, "Number of midi output ports", NULL);
+            value.i = -1;
+            jack_driver_descriptor_add_parameter(desc, &filler, "midi-in-ports", 'i', JackDriverParamInt, &value, NULL, "Number of midi input ports", "Number of MIDI input ports. If -1, MIDI physical input from the master");
+            jack_driver_descriptor_add_parameter(desc, &filler, "midi-out-ports", 'o', JackDriverParamInt, &value, NULL, "Number of midi output ports", "Number of MIDI output ports. If -1, MIDI physical output from the master");
 
 #if HAVE_CELT
             value.i = -1;
@@ -637,6 +697,10 @@ namespace Jack
 #endif
             strcpy(value.str, "'hostname'");
             jack_driver_descriptor_add_parameter(desc, &filler, "client-name", 'n', JackDriverParamString, &value, NULL, "Name of the jack client", NULL);
+            
+            value.i = false;
+            jack_driver_descriptor_add_parameter(desc, &filler, "auto-save", 's', JackDriverParamBool, &value, NULL, "Save/restore connection state when restarting", NULL);
+
 
 /*  
 Deactivated for now..
@@ -653,7 +717,7 @@ Deactivated for now..
         SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
         {
             char multicast_ip[32];
-            char net_name[JACK_CLIENT_NAME_SIZE + 1];
+            char net_name[JACK_CLIENT_NAME_SIZE + 1] = {0};
             int udp_port;
             int mtu = DEFAULT_MTU;
             // Desactivated for now...
@@ -662,28 +726,24 @@ Deactivated for now..
             jack_nframes_t sample_rate = 48000;
             int audio_capture_ports = -1;
             int audio_playback_ports = -1;
-            int midi_input_ports = 0;
-            int midi_output_ports = 0;
+            int midi_input_ports = -1;
+            int midi_output_ports = -1;
             int celt_encoding = -1;
             int opus_encoding = -1;
             bool monitor = false;
             int network_latency = 5;
             const JSList* node;
             const jack_driver_param_t* param;
+            bool auto_save = false;
 
-            net_name[0] = 0;
-
-            // Possibly use env variable
+            // Possibly use env variable for UDP port
             const char* default_udp_port = getenv("JACK_NETJACK_PORT");
             udp_port = (default_udp_port) ? atoi(default_udp_port) : DEFAULT_PORT;
 
+            // Possibly use env variable for multicast IP
             const char* default_multicast_ip = getenv("JACK_NETJACK_MULTICAST");
-            if (default_multicast_ip) {
-                strcpy(multicast_ip, default_multicast_ip);
-            } else {
-                strcpy(multicast_ip, DEFAULT_MULTICAST_IP);
-            }
-
+            strcpy(multicast_ip, (default_multicast_ip) ? default_multicast_ip : DEFAULT_MULTICAST_IP);
+         
             for (node = params; node; node = jack_slist_next(node)) {
                 param = (const jack_driver_param_t*) node->data;
                 switch (param->character)
@@ -723,6 +783,9 @@ Deactivated for now..
                     case 'n' :
                         strncpy(net_name, param->value.str, JACK_CLIENT_NAME_SIZE);
                         break;
+                    case 's':
+                        auto_save = param->value.i;
+                        break;
                     /*
                     Deactivated for now..
                     case 't' :
@@ -745,7 +808,7 @@ Deactivated for now..
                         new Jack::JackNetDriver("system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
                                                 midi_input_ports, midi_output_ports,
                                                 net_name, transport_sync,
-                                                network_latency, celt_encoding, opus_encoding));
+                                                network_latency, celt_encoding, opus_encoding, auto_save));
                 if (driver->Open(period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports, monitor, "from_master_", "to_master_", 0, 0) == 0) {
                     return driver;
                 } else {

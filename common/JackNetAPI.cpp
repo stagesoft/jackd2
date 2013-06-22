@@ -263,8 +263,8 @@ struct JackNetExtMaster : public JackNetMasterInterface {
     int InitMaster(jack_slave_t* result)
     {
         // Check MASTER <==> SLAVE network protocol coherency
-        if (fParams.fProtocolVersion != MASTER_PROTOCOL) {
-            jack_error("Error : slave is running with a different protocol %s", fParams.fName);
+        if (fParams.fProtocolVersion != NETWORK_PROTOCOL) {
+            jack_error("Error : slave '%s' is running with a different protocol %d != %d", fParams.fName, fParams.fProtocolVersion, NETWORK_PROTOCOL);
             return -1;
         }
 
@@ -369,29 +369,33 @@ struct JackNetExtMaster : public JackNetMasterInterface {
     void FreePorts()
     {
         if (fAudioPlaybackBuffer) {
-            for (int audio_port_index = 0; audio_port_index < fParams.fSendAudioChannels; audio_port_index++)
+            for (int audio_port_index = 0; audio_port_index < fParams.fSendAudioChannels; audio_port_index++) {
                 delete[] fAudioPlaybackBuffer[audio_port_index];
+            }
             delete[] fAudioPlaybackBuffer;
             fAudioPlaybackBuffer = NULL;
         }
 
         if (fMidiPlaybackBuffer) {
-            for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++)
+            for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
                 delete[] (fMidiPlaybackBuffer[midi_port_index]);
+            }
             delete[] fMidiPlaybackBuffer;
             fMidiPlaybackBuffer = NULL;
         }
 
         if (fAudioCaptureBuffer) {
-            for (int audio_port_index = 0; audio_port_index < fParams.fReturnAudioChannels; audio_port_index++)
+            for (int audio_port_index = 0; audio_port_index < fParams.fReturnAudioChannels; audio_port_index++) {
                 delete[] fAudioCaptureBuffer[audio_port_index];
+            }
             delete[] fAudioCaptureBuffer;
             fAudioCaptureBuffer = NULL;
         }
 
         if (fMidiCaptureBuffer) {
-            for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++)
+            for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
                 delete[] fMidiCaptureBuffer[midi_port_index];
+            }
             delete[] fMidiCaptureBuffer;
             fMidiCaptureBuffer = NULL;
         }
@@ -399,7 +403,6 @@ struct JackNetExtMaster : public JackNetMasterInterface {
 
     int Read(int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer)
     {
-        
         try {
            
             assert(audio_input == fParams.fReturnAudioChannels);
@@ -412,23 +415,33 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                 fNetMidiPlaybackBuffer->SetBuffer(midi_port_index, ((JackMidiBuffer**)midi_input_buffer)[midi_port_index]);
             }
          
-            //receive sync
             int res = SyncRecv();
-            if ((res == 0) || (res == SOCKET_ERROR)) {
-                return res;
+            switch (res) {
+            
+                case NET_SYNCHING:
+                case SOCKET_ERROR:
+                    return res;
+                    
+                case NET_PACKET_ERROR:
+                    // since sync packet is incorrect, don't decode it and continue with data
+                    break;
+                    
+                default:
+                    // decode sync
+                    DecodeSyncPacket();
+                    break;
             }
-       
-            DecodeSyncPacket();
+          
             return DataRecv();
 
         } catch (JackNetException& e) {
-            jack_error("Connection lost.");
+            jack_error("Lost connection");
             return -1;
         }
-     }
+    }
 
-     int Write(int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer)
-     {
+    int Write(int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer)
+    {
         try {
             
             assert(audio_output == fParams.fSendAudioChannels);
@@ -441,28 +454,22 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                 fNetMidiCaptureBuffer->SetBuffer(midi_port_index, ((JackMidiBuffer**)midi_output_buffer)[midi_port_index]);
             }
             
-            
-            if (IsSynched()) {  // only send if connection is "synched"
-            
-                EncodeSyncPacket();
+            EncodeSyncPacket();
 
-                if (SyncSend() == SOCKET_ERROR) {
-                    return SOCKET_ERROR;
-                }
+            // send sync
+            if (SyncSend() == SOCKET_ERROR) {
+                return SOCKET_ERROR;
+            }
 
-                //send data
-                if (DataSend() == SOCKET_ERROR) {
-                    return SOCKET_ERROR;
-                }
-                
-            } else {
-                jack_info("Connection is not synched, skip cycle...");
+            //send data
+            if (DataSend() == SOCKET_ERROR) {
+                return SOCKET_ERROR;
             }
             
             return 0;
 
         } catch (JackNetException& e) {
-            jack_error("Connection lost.");
+            jack_error("Lost connection");
             return -1;
         }
     }
@@ -724,7 +731,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     bool Execute()
     {
         try  {
-            // Keep running even in case of error
+            // keep running even in case of error
             while (fThread.GetStatus() == JackThread::kRunning) {
                 if (Process() == SOCKET_ERROR) {
                     return false;
@@ -732,7 +739,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
             }
             return false;
         } catch (JackNetException& e) {
-            // Otherwise just restart...
+            // otherwise just restart...
             e.PrintMessage();
             jack_info("NetSlave is restarted");
             fThread.DropRealTime();
@@ -749,12 +756,22 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     int Read()
     {
-        //receive sync (launch the cycle)
-        if (SyncRecv() == SOCKET_ERROR) {
-            return SOCKET_ERROR;
+        // receive sync (launch the cycle)
+        switch (SyncRecv()) {
+        
+            case SOCKET_ERROR:
+                return SOCKET_ERROR;
+                
+            case NET_PACKET_ERROR:
+                // since sync packet is incorrect, don't decode it and continue with data
+                break;
+                
+            default:
+                // decode sync
+                DecodeSyncPacket();
+                break;
         }
 
-        DecodeSyncPacket();
         return DataRecv();
     }
 

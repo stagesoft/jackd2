@@ -40,8 +40,7 @@ namespace Jack
 //----------------
 // Server control 
 //----------------
-
-JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, const char* server_name)
+JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, JackSelfConnectMode self_connect_mode, const char* server_name)
 {
     if (rt) {
         jack_info("JACK server starting in realtime mode with priority %ld", priority);
@@ -51,7 +50,7 @@ JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int prio
 
     fGraphManager = JackGraphManager::Allocate(port_max);
     fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, clock, server_name);
-    fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
+    fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl, self_connect_mode);
 
     // A distinction is made between the threaded freewheel driver and the
     // regular freewheel driver because the freewheel driver needs to run in
@@ -174,7 +173,7 @@ int JackServer::Stop()
     
     fEngine->NotifyQuit();
     fRequestChannel.Stop();
-    fEngine->NotifyFailure(JackFailure, JACK_SERVER_FAILURE);
+    fEngine->NotifyFailure(JackFailure | JackServerError, JACK_SERVER_FAILURE);
     
     return res;
 }
@@ -259,10 +258,10 @@ int JackServer::SetBufferSize(jack_nframes_t buffer_size)
 }
 
 /*
-Freewheel mode is implemented by switching from the (audio + freewheel) driver to the freewheel driver only:
+Freewheel mode is implemented by switching from the (audio [slaves] + freewheel) driver to the freewheel driver only:
 
     - "global" connection state is saved
-    - all audio driver ports are deconnected, thus there is no more dependancies with the audio driver
+    - all audio driver and slaves ports are deconnected, thus there is no more dependancies with the audio driver and slaves
     - the freewheel driver will be synchronized with the end of graph execution : all clients are connected to the freewheel driver
     - the freewheel driver becomes the "master"
 
@@ -280,7 +279,7 @@ int JackServer::SetFreewheel(bool onoff)
         } else {
             fFreewheel = false;
             fThreadedFreewheelDriver->Stop();
-            fGraphManager->Restore(&fConnectionState);   // Restore previous connection state
+            fGraphManager->Restore(&fConnectionState);   // Restore connection state
             fEngine->NotifyFreewheel(onoff);
             fFreewheelDriver->SetMaster(false);
             fAudioDriver->SetMaster(true);
@@ -291,6 +290,15 @@ int JackServer::SetFreewheel(bool onoff)
             fFreewheel = true;
             fAudioDriver->Stop();
             fGraphManager->Save(&fConnectionState);     // Save connection state
+            // Disconnect all slaves
+            std::list<JackDriverInterface*> slave_list = fAudioDriver->GetSlaves();
+            std::list<JackDriverInterface*>::const_iterator it;
+            for (it = slave_list.begin(); it != slave_list.end(); it++) {
+                JackDriver* slave = dynamic_cast<JackDriver*>(*it);
+                assert(slave);
+                fGraphManager->DisconnectAllPorts(slave->GetClientControl()->fRefNum);
+            }
+            // Disconnect master
             fGraphManager->DisconnectAllPorts(fAudioDriver->GetClientControl()->fRefNum);
             fEngine->NotifyFreewheel(onoff);
             fAudioDriver->SetMaster(false);
@@ -328,14 +336,24 @@ JackDriverInfo* JackServer::AddSlave(jack_driver_desc_t* driver_desc, JSList* dr
 {
     JackDriverInfo* info = new JackDriverInfo();
     JackDriverClientInterface* slave = info->Open(driver_desc, fEngine, GetSynchroTable(), driver_params);
-    if (slave == NULL) {
-        delete info;
-        return NULL;
+    
+    if (!slave) {
+        goto error1;
     }
-    slave->Attach();
+    if (slave->Attach() < 0) {
+        goto error2;
+    }
+    
     slave->SetMaster(false);
     fAudioDriver->AddSlave(slave);
     return info;
+
+error2:
+    slave->Close();
+    
+error1:
+    delete info;
+    return NULL;
 }
 
 void JackServer::RemoveSlave(JackDriverInfo* info)
@@ -348,7 +366,10 @@ void JackServer::RemoveSlave(JackDriverInfo* info)
 
 int JackServer::SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_params)
 {
-    /// Remove current master
+    std::list<JackDriverInterface*> slave_list;
+    std::list<JackDriverInterface*>::const_iterator it;
+    
+    // Remove current master
     fAudioDriver->Stop();
     fAudioDriver->Detach();
     fAudioDriver->Close();
@@ -357,15 +378,13 @@ int JackServer::SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_par
     JackDriverInfo* info = new JackDriverInfo();
     JackDriverClientInterface* master = info->Open(driver_desc, fEngine, GetSynchroTable(), driver_params);
 
-    if (master == NULL) {
-        delete info;
-        return -1;
+    if (!master) {
+       goto error;
     }
 
     // Get slaves list
-    std::list<JackDriverInterface*> slave_list = fAudioDriver->GetSlaves();
-    std::list<JackDriverInterface*>::const_iterator it;
-
+    slave_list = fAudioDriver->GetSlaves();
+ 
     // Move slaves in new master
     for (it = slave_list.begin(); it != slave_list.end(); it++) {
         JackDriverInterface* slave = *it;
@@ -378,9 +397,22 @@ int JackServer::SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_par
     // Activate master
     fAudioDriver = master;
     fDriverInfo = info;
-    fAudioDriver->Attach();
+    
+    if (fAudioDriver->Attach() < 0) {
+        goto error;
+    }
+    
+    // Notify clients of new values
+    fEngine->NotifyBufferSize(fEngineControl->fBufferSize);
+    fEngine->NotifySampleRate(fEngineControl->fSampleRate);
+    
+    // And finally start
     fAudioDriver->SetMaster(true);
     return fAudioDriver->Start();
+
+error:
+    delete info;
+    return -1;
 }
 
 //----------------------
@@ -416,7 +448,6 @@ JackGraphManager* JackServer::GetGraphManager()
 {
     return fGraphManager;
 }
-
 
 } // end of namespace
 

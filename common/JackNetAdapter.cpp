@@ -349,13 +349,21 @@ namespace Jack
 //read/write operations---------------------------------------------------------------
     int JackNetAdapter::Read()
     {
-        //don't return -1 in case of sync recv failure
-        //we need the process to continue for network error detection
-        if (SyncRecv() == SOCKET_ERROR) {
-            return 0;
+        switch (SyncRecv()) {
+        
+            case SOCKET_ERROR:
+                return 0;
+                
+            case NET_PACKET_ERROR:
+                // Since sync packet is incorrect, don't decode it and continue with data
+                break;
+                
+            default:
+                //decode sync
+                DecodeSyncPacket();
+                break;
         }
-
-        DecodeSyncPacket();
+        
         return DataRecv();
     }
 
@@ -450,7 +458,7 @@ extern "C"
         jack_driver_descriptor_add_parameter(desc, &filler, "ring-buffer", 'g', JackDriverParamInt, &value, NULL, "Fixed ringbuffer size", "Fixed ringbuffer size (if not set => automatic adaptative)");
 
         value.i = false;
-        jack_driver_descriptor_add_parameter(desc, &filler, "auto-connect", 'c', JackDriverParamBool, &value, NULL, "Auto connect netmaster to system ports", "");
+        jack_driver_descriptor_add_parameter(desc, &filler, "auto-connect", 'c', JackDriverParamBool, &value, NULL, "Auto connect netadapter to system ports", NULL);
 
         return desc;
     }

@@ -118,6 +118,7 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         inline void CallTimebaseCallbackAux();
         inline int ActivateAux();
         inline void InitAux();
+        inline void SetupRealTime();
 
         int HandleLatencyCallback(int status);
 
@@ -143,7 +144,7 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         virtual int SetBufferSize(jack_nframes_t buffer_size);
         virtual int SetFreeWheel(int onoff);
         virtual int ComputeTotalLatencies();
-        virtual void ShutDown(const char* message);
+        virtual void ShutDown(jack_status_t code, const char* message);
         virtual jack_native_thread_t GetThreadID();
 
         // Port management

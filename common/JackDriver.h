@@ -130,6 +130,8 @@ class SERVER_EXPORT JackDriverClientInterface : public JackDriverInterface, publ
 #define PlaybackDriverFlags static_cast<JackPortFlags>(JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal)
 #define MonitorDriverFlags static_cast<JackPortFlags>(JackPortIsOutput)
 
+typedef std::list<std::pair<std::string, std::pair<std::string, std::string> > > driver_connections_list_t; // [type : (src, dst)]
+
 class SERVER_EXPORT JackDriver : public JackDriverClientInterface
 {
 
@@ -169,7 +171,7 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         jack_port_id_t fPlaybackPortList[DRIVER_PORT_NUM];
         jack_port_id_t fMonitorPortList[DRIVER_PORT_NUM];
 
-        std::list<std::pair<std::string, std::string> > fConnections;		// Connections list
+        driver_connections_list_t fConnections;		// Connections list 
 
         void CycleIncTime();
         void CycleTakeBeginTime();
@@ -182,8 +184,9 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         void NotifySampleRate(jack_nframes_t sample_rate);                  // SampleRate notification sent by the driver
         void NotifyFailure(int code, const char* reason);                   // Failure notification sent by the driver
 
-        virtual void SaveConnections();
-        virtual void RestoreConnections();
+        virtual void SaveConnections(int alias);
+        virtual void LoadConnections(int alias, bool full_name = true);
+        std::string MatchPortName(const char* name, const char** ports, int alias, const std::string& type);
 
         virtual int StartSlaves();
         virtual int StopSlaves();
