@@ -72,6 +72,7 @@ volatile int output_new_delay = 0;
 volatile float output_offset = 0.0;
 volatile float output_integral = 0.0;
 volatile float output_diff = 0.0;
+volatile int running_freewheel = 0;
 
 snd_pcm_uframes_t real_buffer_size;
 snd_pcm_uframes_t real_period_size;
@@ -98,6 +99,9 @@ alsa_format_t formats[] = {
 	{ SND_PCM_FORMAT_S24_3LE, 3, sample_move_d24_sS, sample_move_dS_s24, "24bit - real" },
 	{ SND_PCM_FORMAT_S24, 4, sample_move_d24_sS, sample_move_dS_s24, "24bit" },
 	{ SND_PCM_FORMAT_S16, 2, sample_move_d16_sS, sample_move_dS_s16, "16bit" }
+#ifdef __ANDROID__
+	,{ SND_PCM_FORMAT_S16_LE, 2, sample_move_d16_sS, sample_move_dS_s16, "16bit little-endian" }
+#endif
 };
 #define NUMFORMATS (sizeof(formats)/sizeof(formats[0]))
 int format=0;
@@ -126,6 +130,11 @@ static int xrun_recovery(snd_pcm_t *handle, int err) {
 
 static int set_hwformat( snd_pcm_t *handle, snd_pcm_hw_params_t *params )
 {
+#ifdef __ANDROID__
+	format = 5;
+	snd_pcm_hw_params_set_format(handle, params, formats[format].format_id);
+	return 0;
+#else
 	int i;
 	int err;
 
@@ -139,6 +148,7 @@ static int set_hwformat( snd_pcm_t *handle, snd_pcm_hw_params_t *params )
 	}
 
 	return err;
+#endif
 }
 
 static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params, snd_pcm_access_t access, int rate, int channels, int period, int nperiods ) {
@@ -307,10 +317,33 @@ double hann( double x )
 }
 
 /**
+ * The freewheel callback.
+ */
+void freewheel (int starting, void* arg) {
+    running_freewheel = starting;
+}
+
+/**
  * The process callback for this JACK application.
  * It is called by JACK at the appropriate times.
  */
 int process (jack_nframes_t nframes, void *arg) {
+
+    if (running_freewheel) {
+	JSList *node = capture_ports;
+
+	while ( node != NULL)
+	{
+	    jack_port_t *port = (jack_port_t *) node->data;
+	    float *buf = jack_port_get_buffer (port, nframes);
+
+	    memset(buf, 0, sizeof(float)*nframes);
+
+	    node = jack_slist_next (node);
+	}
+
+	return 0;
+    }
 
     int rlen;
     int err;
@@ -680,6 +713,12 @@ int main (int argc, char *argv[]) {
        */
 
     jack_set_process_callback (client, process, 0);
+
+    /* tell the JACK server to call `freewheel()' whenever
+       freewheel mode changes.
+       */
+
+    jack_set_freewheel_callback (client, freewheel, 0);
 
     /* tell the JACK server to call `jack_shutdown()' if
        it ever shuts down, either entirely, or if it
