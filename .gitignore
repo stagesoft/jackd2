@@ -3,3 +3,6 @@ build/
 man/*.1
 .waf*
 .lock*
+android/.server/
+android/.client/
+codeBlocks

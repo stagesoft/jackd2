@@ -13,6 +13,9 @@ import re
 import Logs
 import sys
 
+import waflib.Options
+from waflib.Build import BuildContext, CleanContext, InstallContext, UninstallContext
+
 VERSION='1.9.10'
 APPNAME='jack'
 JACK_API_VERSION = '0.1.0'
@@ -20,6 +23,9 @@ JACK_API_VERSION = '0.1.0'
 # these variables are mandatory ('/' are converted automatically)
 top = '.'
 out = 'build'
+
+# lib32 variant name used when building in mixed mode
+lib32 = 'lib32'
 
 def display_msg(msg, status = None, color = None):
     sr = msg
@@ -66,6 +72,7 @@ def options(opt):
     opt.add_option('--libdir32', type='string', help="32bit Library directory [Default: <prefix>/lib32]")
     opt.add_option('--mandir', type='string', help="Manpage directory [Default: <prefix>/share/man/man1]")
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
+    opt.add_option('--dist-target', type='string', default='auto', help='Specify the target for cross-compiling [auto,mingw]')
     opt.add_option('--classic', action='store_true', default=False, help='Force enable standard JACK (jackd) even if D-Bus JACK (jackdbus) is enabled too')
     opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
     opt.add_option('--profile', action='store_true', default=False, help='Build with engine profiling')
@@ -76,19 +83,25 @@ def options(opt):
     opt.add_option('--firewire', action='store_true', default=False, help='Enable FireWire driver (FFADO)')
     opt.add_option('--freebob', action='store_true', default=False, help='Enable FreeBob driver')
     opt.add_option('--alsa', action='store_true', default=False, help='Enable ALSA driver')
+    opt.add_option('--iio', action='store_true', default=False, help='Enable IIO driver')
     opt.add_option('--autostart', type='string', default="default", help='Autostart method. Possible values: "default", "classic", "dbus", "none"')
+    opt.add_option('--portaudio', action='store_true', default=False, help='Enable Portaudio driver')
+    opt.add_option('--winmme', action='store_true', default=False, help='Enable WinMME driver')
     opt.sub_options('dbus')
 
 def configure(conf):
     conf.load('compiler_cxx')
     conf.load('compiler_cc')
-    platform = sys.platform
-    conf.env['IS_MACOSX'] = platform == 'darwin'
-    conf.env['IS_LINUX'] = platform == 'linux' or platform == 'linux2' or platform == 'linux3' or platform == 'posix'
-    conf.env['IS_SUN'] = platform == 'sunos'
-    # GNU/kFreeBSD and GNU/Hurd are treated as Linux
-    if platform.startswith('gnu0') or platform.startswith('gnukfreebsd'):
-        conf.env['IS_LINUX'] = True
+    if Options.options.dist_target == 'auto':
+        platform = sys.platform
+        conf.env['IS_MACOSX'] = platform == 'darwin'
+        conf.env['IS_LINUX'] = platform == 'linux' or platform == 'linux2' or platform == 'linux3' or platform == 'posix'
+        conf.env['IS_SUN'] = platform == 'sunos'
+        # GNU/kFreeBSD and GNU/Hurd are treated as Linux
+        if platform.startswith('gnu0') or platform.startswith('gnukfreebsd'):
+            conf.env['IS_LINUX'] = True
+    elif Options.options.dist_target == 'mingw':
+        conf.env['IS_WINDOWS'] = True
 
     if conf.env['IS_LINUX']:
         Logs.pprint('CYAN', "Linux detected")
@@ -98,6 +111,9 @@ def configure(conf):
 
     if conf.env['IS_SUN']:
         Logs.pprint('CYAN', "SunOS detected")
+
+    if conf.env['IS_WINDOWS']:
+        Logs.pprint('CYAN', "Windows detected")
 
     if conf.env['IS_LINUX']:
         conf.check_tool('compiler_cxx')
@@ -115,7 +131,13 @@ def configure(conf):
     #if conf.env['IS_SUN']:
     #   conf.check_tool('compiler_cxx')
     #   conf.check_tool('compiler_cc')
- 
+
+    if conf.env['IS_WINDOWS']:
+        conf.check_tool('compiler_cxx')
+        conf.check_tool('compiler_cc')
+        conf.env.append_unique('CCDEFINES', '_POSIX')
+        conf.env.append_unique('CXXDEFINES', '_POSIX')
+
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CFLAGS', '-Wall')
 
@@ -128,9 +150,17 @@ def configure(conf):
             conf.fatal('FreeBob driver was explicitly requested but cannot be built')
         if Options.options.firewire and not conf.env['BUILD_DRIVER_FFADO']:
             conf.fatal('FFADO driver was explicitly requested but cannot be built')
+        if Options.options.iio and not conf.env['BUILD_DRIVER_IIO']:
+            conf.fatal('IIO driver was explicitly requested but cannot be built')
         conf.env['BUILD_DRIVER_ALSA'] = Options.options.alsa
         conf.env['BUILD_DRIVER_FFADO'] = Options.options.firewire
         conf.env['BUILD_DRIVER_FREEBOB'] = Options.options.freebob
+        conf.env['BUILD_DRIVER_IIO'] = Options.options.iio
+    if conf.env['IS_WINDOWS']:
+        conf.sub_config('windows')
+        if Options.options.portaudio and not conf.env['BUILD_DRIVER_PORTAUDIO']:
+            conf.fatal('Portaudio driver was explicitly requested but cannot be built')
+        conf.env['BUILD_DRIVER_WINMME'] = Options.options.winmme
     if Options.options.dbus:
         conf.sub_config('dbus')
         if conf.env['BUILD_JACKDBUS'] != True:
@@ -202,6 +232,8 @@ def configure(conf):
     else:
         conf.env['BUILD_JACKD'] = True
 
+    conf.env['BINDIR'] = conf.env['PREFIX'] + '/bin'
+
     if Options.options.libdir:
         conf.env['LIBDIR'] = Options.options.libdir
     else:
@@ -241,10 +273,20 @@ def configure(conf):
     conf.define('CLIENT_NUM', Options.options.clients)
     conf.define('PORT_NUM_FOR_CLIENT', Options.options.application_ports)
 
-    conf.env['ADDON_DIR'] = os.path.normpath(os.path.join(conf.env['LIBDIR'], 'jack'))
-    conf.define('ADDON_DIR', conf.env['ADDON_DIR'])
-    conf.define('JACK_LOCATION', os.path.normpath(os.path.join(conf.env['PREFIX'], 'bin')))
-    conf.define('USE_POSIX_SHM', 1)
+    if conf.env['IS_WINDOWS']:
+        # we define this in the environment to maintain compatability with
+        # existing install paths that use ADDON_DIR rather than have to
+        # have special cases for windows each time.
+        conf.env['ADDON_DIR'] = conf.env['BINDIR'] + '/jack'
+        # don't define ADDON_DIR in config.h, use the default 'jack' defined in
+        # windows/JackPlatformPlug_os.h
+    else:
+        conf.env['ADDON_DIR'] = os.path.normpath(os.path.join(conf.env['LIBDIR'], 'jack'))
+        conf.define('ADDON_DIR', conf.env['ADDON_DIR'])
+        conf.define('JACK_LOCATION', os.path.normpath(os.path.join(conf.env['PREFIX'], 'bin')))
+
+    if not conf.env['IS_WINDOWS']:
+        conf.define('USE_POSIX_SHM', 1)
     conf.define('JACKMP', 1)
     if conf.env['BUILD_JACKDBUS'] == True:
         conf.define('JACK_DBUS', 1)
@@ -260,10 +302,7 @@ def configure(conf):
             svnrev = m.group(1)
 
     if Options.options.mixed == True:
-        env_variant2 = conf.env.copy()
-        conf.set_env_name('lib32', env_variant2)
-        env_variant2.set_variant('lib32')
-        conf.setenv('lib32')
+        conf.setenv(lib32, env=conf.env.derive())
         conf.env.append_unique('CXXFLAGS', '-m32')
         conf.env.append_unique('CFLAGS', '-m32')
         conf.env.append_unique('LINKFLAGS', '-m32')
@@ -284,14 +323,20 @@ def configure(conf):
 
     print("Build with a maximum of %d JACK clients" % Options.options.clients)
     print("Build with a maximum of %d ports per application" % Options.options.application_ports)
- 
+
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
-    display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
+    display_msg("Library directory", conf.all_envs[""]['LIBDIR'], 'CYAN')
+    if conf.env['BUILD_WITH_32_64'] == True:
+        display_msg("32-bit library directory", conf.all_envs[lib32]['LIBDIR'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
     display_feature('Build debuggable binaries', conf.env['BUILD_DEBUG'])
-    display_msg('C compiler flags', repr(conf.env['CFLAGS']))
-    display_msg('C++ compiler flags', repr(conf.env['CXXFLAGS']))
-    display_msg('Linker flags', repr(conf.env['LINKFLAGS']))
+    display_msg('C compiler flags', repr(conf.all_envs[""]['CFLAGS']))
+    display_msg('C++ compiler flags', repr(conf.all_envs[""]['CXXFLAGS']))
+    display_msg('Linker flags', repr(conf.all_envs[""]['LINKFLAGS']))
+    if conf.env['BUILD_WITH_32_64'] == True:
+        display_msg('32-bit C compiler flags', repr(conf.all_envs[lib32]['CFLAGS']))
+        display_msg('32-bit C++ compiler flags', repr(conf.all_envs[lib32]['CXXFLAGS']))
+        display_msg('32-bit linker flags', repr(conf.all_envs[lib32]['LINKFLAGS']))
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
     display_feature('Build Opus netjack2', conf.env['WITH_OPUS'])
     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
@@ -309,7 +354,12 @@ def configure(conf):
         display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
         display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
         display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
-       
+        display_feature('Build with IIO support', conf.env['BUILD_DRIVER_IIO'] == True)
+
+    if conf.env['IS_WINDOWS']:
+        display_feature('Build with WinMME support', conf.env['BUILD_DRIVER_WINMME'] == True)
+        display_feature('Build with Portaudio support', conf.env['BUILD_DRIVER_PORTAUDIO'] == True)
+
     if conf.env['BUILD_JACKDBUS'] == True:
         display_msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], 'CYAN')
         #display_msg('Settings persistence', xxx)
@@ -328,13 +378,33 @@ def configure(conf):
             print(Logs.colors.NORMAL, end=' ')
     print()
 
-def build(bld):
-    print("make[1]: Entering directory `" + os.getcwd() + "/" + out + "'")
-    if not os.access('svnversion.h', os.R_OK):
-        create_svnversion_task(bld)
+def init(ctx):
+    for y in (BuildContext, CleanContext, InstallContext, UninstallContext):
+        name = y.__name__.replace('Context','').lower()
+        class tmp(y):
+            cmd = name + '_' + lib32
+            variant = lib32
 
-   # process subfolders from here
+def build(bld):
+    if not bld.variant:
+        out2 = out
+    else:
+        out2 = out + "/" + bld.variant
+    print("make[1]: Entering directory `" + os.getcwd() + "/" + out2 + "'")
+
+    if not bld.variant:
+        if not os.access('svnversion.h', os.R_OK):
+            create_svnversion_task(bld)
+        if bld.env['BUILD_WITH_32_64'] == True:
+            waflib.Options.commands.append(bld.cmd + '_' + lib32)
+
+    # process subfolders from here
     bld.add_subdirs('common')
+
+    if bld.variant:
+        # only the wscript in common/ knows how to handle variants
+        return
+
     if bld.env['IS_LINUX']:
         bld.add_subdirs('linux')
         bld.add_subdirs('example-clients')
@@ -342,7 +412,7 @@ def build(bld):
         bld.add_subdirs('man')
         if bld.env['BUILD_JACKDBUS'] == True:
            bld.add_subdirs('dbus')
-  
+
     if bld.env['IS_MACOSX']:
         bld.add_subdirs('macosx')
         bld.add_subdirs('example-clients')
@@ -356,6 +426,11 @@ def build(bld):
         bld.add_subdirs('tests')
         if bld.env['BUILD_JACKDBUS'] == True:
             bld.add_subdirs('dbus')
+
+    if bld.env['IS_WINDOWS']:
+        bld.add_subdirs('windows')
+        bld.add_subdirs('example-clients')
+        #bld.add_subdirs('tests')
 
     if bld.env['BUILD_DOXYGEN_DOCS'] == True:
         html_docs_source_dir = "build/default/html"
