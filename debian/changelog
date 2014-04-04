@@ -1,3 +1,11 @@
+jackd2 (1.9.9.5+20140404git3d7c67dc~dfsg-1) unstable; urgency=low
+
+  * Enable ffado on all Linux platforms (Closes: #727248)
+  * Imported Upstream version 1.9.9.5+20140404git3d7c67dc
+  * Fix startup problems on newer ARM kernels
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Fri, 04 Apr 2014 14:04:15 +0200
+
 jackd2 (1.9.9.5+20130622git7de15e7a-1) unstable; urgency=low
 
   [ Jonas Smedegaard ]
