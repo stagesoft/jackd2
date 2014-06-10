@@ -94,7 +94,7 @@ namespace Jack
     NetMidiBuffer::NetMidiBuffer(session_params_t* params, uint32_t nports, char* net_buffer)
     {
         fNPorts = nports;
-        fMaxBufsize = fNPorts * sizeof(sample_t) * params->fPeriodSize ;
+        fMaxBufsize = fNPorts * sizeof(sample_t) * params->fPeriodSize;
         fMaxPcktSize = params->fMtu - sizeof(packet_header_t);
         fBuffer = new char[fMaxBufsize];
         fPortBuffer = new JackMidiBuffer* [fNPorts];
@@ -102,7 +102,6 @@ namespace Jack
             fPortBuffer[port_index] = NULL;
         }
         fNetBuffer = net_buffer;
-
         fCycleBytesSize = params->fMtu
                 * (max(params->fSendMidiChannels, params->fReturnMidiChannels)
                 * params->fPeriodSize * sizeof(sample_t) / (params->fMtu - sizeof(packet_header_t)));
@@ -1271,7 +1270,7 @@ namespace Jack
         jack_info("Transport cycle state : %u", data->fState);
         jack_info("**********************************************");
     }
-
+  
     SERVER_EXPORT void MidiBufferHToN(JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer)
     {
         dst_buffer->magic = htonl(src_buffer->magic);
@@ -1280,7 +1279,6 @@ namespace Jack
         dst_buffer->write_pos = htonl(src_buffer->write_pos);
         dst_buffer->event_count = htonl(src_buffer->event_count);
         dst_buffer->lost_events = htonl(src_buffer->lost_events);
-        dst_buffer->mix_index = htonl(src_buffer->mix_index);
     }
 
     SERVER_EXPORT void MidiBufferNToH(JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer)
@@ -1291,7 +1289,6 @@ namespace Jack
         dst_buffer->write_pos = ntohl(src_buffer->write_pos);
         dst_buffer->event_count = ntohl(src_buffer->event_count);
         dst_buffer->lost_events = ntohl(src_buffer->lost_events);
-        dst_buffer->mix_index = ntohl(src_buffer->mix_index);
     }
 
     SERVER_EXPORT void TransportDataHToN(net_transport_data_t* src_params, net_transport_data_t* dst_params)
