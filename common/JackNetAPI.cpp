@@ -245,7 +245,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                 }
             }
 
-            if (rx_bytes == sizeof(session_params_t ))  {
+            if (rx_bytes == sizeof(session_params_t))  {
                 switch (GetPacketType(&fParams)) {
 
                     case SLAVE_AVAILABLE:
@@ -861,8 +861,8 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         // One cycle
         Process();
         
-        // Then use PACKET_TIMEOUT for next cycles
-        SetPacketTimeOut(PACKET_TIMEOUT);
+        // Then use PACKET_TIMEOUT * fParams.fNetworkLatency for next cycles
+        SetPacketTimeOut(PACKET_TIMEOUT * fParams.fNetworkLatency);
     }
 
     int Process()
