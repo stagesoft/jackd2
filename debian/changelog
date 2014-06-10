@@ -1,3 +1,9 @@
+jackd2 (1.9.10+20140610git97e0e80b~dfsg-1) unstable; urgency=low
+
+  * Imported Upstream version 1.9.10+20140610git97e0e80b~dfsg
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Tue, 10 Jun 2014 13:35:58 +0000
+
 jackd2 (1.9.9.5+20140404git3d7c67dc~dfsg-1) unstable; urgency=low
 
   * Enable ffado on all Linux platforms (Closes: #727248)
