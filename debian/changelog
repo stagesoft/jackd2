@@ -1,3 +1,9 @@
+jackd2 (1.9.10+20140719git3eb0ae6a~dfsg-1) unstable; urgency=medium
+
+  * Imported Upstream version 1.9.10+20140719git3eb0ae6a~dfsg
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Thu, 31 Jul 2014 02:33:24 +0000
+
 jackd2 (1.9.10+20140610git97e0e80b~dfsg-1) unstable; urgency=low
 
   * Imported Upstream version 1.9.10+20140610git97e0e80b~dfsg
