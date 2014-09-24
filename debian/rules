@@ -1,5 +1,9 @@
 #!/usr/bin/make -f
 
+# Let's try to cut down noisy symbols to the official API
+export DEB_CFLAGS_MAINT_APPEND = -fvisibility=hidden
+export DEB_CXXFLAGS_MAINT_APPEND = -fvisibility=hidden
+
 -include /usr/share/cdbs/1/rules/upstream-tarball.mk
 -include /usr/share/cdbs/1/rules/utils.mk
 include /usr/share/cdbs/1/rules/debhelper.mk
@@ -35,16 +39,12 @@ DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./waf
 # Minimum assured version referenced upstream as library API/ABI
 ABI = 0.118.0
 
-# Let's try to cut down noisy symbols to the official API
-CFLAGS += -fvisibility=hidden
-CXXFLAGS += -fvisibility=hidden
-
 waf-configure-options = --prefix=/usr --classic
 waf-configure-options += --libdir=/usr/lib/$(DEB_HOST_MULTIARCH)
 waf-configure-options += $(if $(filter linux,$(DEB_HOST_ARCH_OS)),--alsa --dbus)
 waf-configure-options += $(if $(filter amd64 i386 powerpc,$(DEB_HOST_ARCH)),--firewire)
 
-DEB_MAKE_INVOKE = ./waf-light -v --destdir=$(CURDIR)/debian/tmp
+DEB_MAKE_INVOKE = $(DEB_MAKE_EXTRA_ARGS) ./waf-light -v --destdir=$(CURDIR)/debian/tmp
 DEB_MAKE_INSTALL_TARGET = install
 
 # TODO: use distclean and drop related clean target, when (or if)
@@ -75,7 +75,7 @@ common-configure-arch common-configure-indep:: common-configure-impl
 common-configure-impl:: debian/stamp-waf-configure
 debian/stamp-waf-configure:
 	chmod +x ./waf-light
-	./waf-light configure $(waf-configure-options)
+	$(DEB_MAKE_EXTRA_ARGS) ./waf-light configure $(waf-configure-options)
 	touch $@
 clean::
 	rm -f debian/stamp-waf-configure
