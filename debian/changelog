@@ -1,3 +1,11 @@
+jackd2 (1.9.10+20140719git3eb0ae6a~dfsg-2) unstable; urgency=medium
+
+  * Fix FTBFS with clang (Closes: #757820)
+  * Add Turkish translation (Closes: #760066)
+  * Pass dpkg-buildflags to waf (Closes: #756174)
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Wed, 24 Sep 2014 21:48:32 +0200
+
 jackd2 (1.9.10+20140719git3eb0ae6a~dfsg-1) unstable; urgency=medium
 
   * Imported Upstream version 1.9.10+20140719git3eb0ae6a~dfsg
