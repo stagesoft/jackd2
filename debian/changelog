@@ -1,3 +1,9 @@
+jackd2 (1.9.10+20140719git3eb0ae6a~dfsg-4) UNRELEASED; urgency=medium
+
+  * Make builds reproducible (Closes: #796807)
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Tue, 25 Aug 2015 15:44:05 +0200
+
 jackd2 (1.9.10+20140719git3eb0ae6a~dfsg-3) unstable; urgency=medium
 
   * Team upload.
