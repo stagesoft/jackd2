@@ -33,9 +33,6 @@ DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.rc
 # pure garbage in upstream tarball
 DEB_UPSTREAM_REPACKAGE_EXCLUDES += .DS_Store
 
-# sources not in prefered form of modification
-DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./waf
-
 # Minimum assured version referenced upstream as library API/ABI
 ABI = 0.118.0
 
@@ -44,7 +41,7 @@ waf-configure-options += --libdir=/usr/lib/$(DEB_HOST_MULTIARCH)
 waf-configure-options += $(if $(filter linux,$(DEB_HOST_ARCH_OS)),--alsa --dbus)
 waf-configure-options += $(if $(filter amd64 i386 powerpc,$(DEB_HOST_ARCH)),--firewire)
 
-DEB_MAKE_INVOKE = $(DEB_MAKE_EXTRA_ARGS) ./waf-light -v --destdir=$(CURDIR)/debian/tmp
+DEB_MAKE_INVOKE = $(DEB_MAKE_EXTRA_ARGS) ./waf -v --destdir=$(CURDIR)/debian/tmp
 DEB_MAKE_INSTALL_TARGET = install
 
 # TODO: use distclean and drop related clean target, when (or if)
@@ -74,8 +71,7 @@ clean::
 common-configure-arch common-configure-indep:: common-configure-impl
 common-configure-impl:: debian/stamp-waf-configure
 debian/stamp-waf-configure:
-	chmod +x ./waf-light
-	$(DEB_MAKE_EXTRA_ARGS) ./waf-light configure $(waf-configure-options)
+	$(DEB_MAKE_EXTRA_ARGS) ./waf configure $(waf-configure-options)
 	touch $@
 clean::
 	rm -f debian/stamp-waf-configure
