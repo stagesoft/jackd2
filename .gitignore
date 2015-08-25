@@ -1,8 +1,8 @@
 /.pc
 build/
 man/*.1
-.waf*
 .lock*
+__pycache__
 android/.server/
 android/.client/
 codeBlocks
