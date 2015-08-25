@@ -1,8 +1,9 @@
-jackd2 (1.9.10+20140719git3eb0ae6a~dfsg-4) UNRELEASED; urgency=medium
+jackd2 (1.9.10+20150825git1ed50c92~dfsg-1) unstable; urgency=low
 
   * Make builds reproducible (Closes: #796807)
+  * Imported Upstream version 1.9.10+20150825git1ed50c92~dfsg
 
- -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Tue, 25 Aug 2015 15:44:05 +0200
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Tue, 25 Aug 2015 17:13:51 +0200
 
 jackd2 (1.9.10+20140719git3eb0ae6a~dfsg-3) unstable; urgency=medium
 
