@@ -1,3 +1,2 @@
-waf.patch
 clang-ftbfs.diff
 reproducible-build.patch
