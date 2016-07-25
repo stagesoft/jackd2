@@ -1,3 +1,10 @@
+jackd2 (1.9.10+20150825git1ed50c92~dfsg-2) unstable; urgency=medium
+
+  * Team upload.
+  * Fix FTBFS with gcc 6. Closes: #811720
+
+ -- Felipe Sateler <fsateler@debian.org>  Sun, 24 Jul 2016 23:18:31 -0400
+
 jackd2 (1.9.10+20150825git1ed50c92~dfsg-1) unstable; urgency=low
 
   * Make builds reproducible (Closes: #796807)
