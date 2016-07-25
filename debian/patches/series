@@ -1,1 +1,2 @@
 reproducible-build.patch
+gcc6-ftbfs.patch
