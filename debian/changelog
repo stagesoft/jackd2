@@ -1,3 +1,10 @@
+jackd2 (1.9.10+20150825git1ed50c92~dfsg-3) UNRELEASED; urgency=medium
+
+  * Team upload.
+  *
+
+ -- James Cowgill <jcowgill@debian.org>  Tue, 18 Oct 2016 15:59:26 +0000
+
 jackd2 (1.9.10+20150825git1ed50c92~dfsg-2) unstable; urgency=medium
 
   * Team upload.
