@@ -1,9 +1,10 @@
-jackd2 (1.9.10+20150825git1ed50c92~dfsg-3) UNRELEASED; urgency=medium
+jackd2 (1.9.10+20150825git1ed50c92~dfsg-3) unstable; urgency=medium
 
   * Team upload.
-  *
+  * Fix bus errors ARM, MIPS and PowerPC due to use of packed structs.
+    (Closes: #728710)
 
- -- James Cowgill <jcowgill@debian.org>  Tue, 18 Oct 2016 15:59:26 +0000
+ -- James Cowgill <jcowgill@debian.org>  Wed, 19 Oct 2016 10:29:38 +0000
 
 jackd2 (1.9.10+20150825git1ed50c92~dfsg-2) unstable; urgency=medium
 
