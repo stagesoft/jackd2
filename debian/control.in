@@ -57,10 +57,11 @@ Depends: ${shlibs:Depends},
 Conflicts: jackd2 (>> ${binary:Version}),
  jackd2 (<< ${binary:Version}),
  libjack0,
- libjack-0.116
+ libjack-0.116,
+ libjack-0.125
 Suggests: jackd2 (= ${binary:Version})
-Provides: libjack-0.116
-Replaces: libjack-0.116
+Provides: libjack-0.116, libjack-0.125
+Replaces: libjack-0.116, libjack-0.125
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
 Description: JACK Audio Connection Kit (libraries)
