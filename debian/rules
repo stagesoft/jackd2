@@ -35,12 +35,14 @@ DEB_UPSTREAM_REPACKAGE_EXCLUDES += .DS_Store
 # Minimum assured version referenced upstream as library API/ABI
 ABI = 0.118.0
 
+WAF_EXTRA_ARGS = $(filter-out -j%,$(DEB_MAKE_EXTRA_ARGS))
+
 waf-configure-options = --prefix=/usr --classic
 waf-configure-options += --libdir=/usr/lib/$(DEB_HOST_MULTIARCH)
 waf-configure-options += $(if $(filter linux,$(DEB_HOST_ARCH_OS)),--alsa --dbus)
 waf-configure-options += $(if $(filter amd64 i386 powerpc,$(DEB_HOST_ARCH)),--firewire)
 
-DEB_MAKE_INVOKE = $(DEB_MAKE_EXTRA_ARGS) ./waf -v --destdir=$(CURDIR)/debian/tmp
+DEB_MAKE_INVOKE = $(WAF_EXTRA_ARGS) ./waf -v --destdir=$(CURDIR)/debian/tmp
 DEB_MAKE_INSTALL_TARGET = install
 
 # TODO: use distclean and drop related clean target, when (or if)
@@ -70,7 +72,7 @@ clean::
 common-configure-arch common-configure-indep:: common-configure-impl
 common-configure-impl:: debian/stamp-waf-configure
 debian/stamp-waf-configure:
-	$(DEB_MAKE_EXTRA_ARGS) ./waf configure $(waf-configure-options)
+	$(WAF_EXTRA_ARGS) ./waf configure $(waf-configure-options) $(DEB_MAKE_PARALLEL)
 	touch $@
 clean::
 	rm -f debian/stamp-waf-configure
