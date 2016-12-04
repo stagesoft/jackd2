@@ -93,8 +93,7 @@ Depends: libjack-jackd2-0 (= ${binary:Version}),
  ${asound:Depends},
  ${misc:Depends},
  ${shlibs:Depends},
- pkg-config,
- libdbus-1-dev
+ pkg-config
 Conflicts: libjack0.100.0-dev (<< 0.102.20-2),
  libjack-dev
 Provides: libjack0.100.0-dev,
