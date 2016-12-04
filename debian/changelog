@@ -1,9 +1,14 @@
-jackd2 (1.9.10+20150825git1ed50c92~dfsg-4) UNRELEASED; urgency=medium
+jackd2 (1.9.10+20150825git1ed50c92~dfsg-4) unstable; urgency=medium
 
   * Team upload.
-  *
+  * Tighten generated dependencies for new jack_port_rename api.
+    (Closes: #835589, #845655)
+  * Fix manual debhelper dependency in d/control.
+  * Fix FTBFS with DEB_BUILD_PARALLEL=1. (Closes: #766993)
+    Thanks to YunQiang Su.
+  * Drop libjack-jackd2-dev dependency on libdbus-1-dev. (Closes: #799977)
 
- -- James Cowgill <jcowgill@debian.org>  Sat, 03 Dec 2016 14:54:48 +0000
+ -- James Cowgill <jcowgill@debian.org>  Sun, 04 Dec 2016 11:25:01 +0000
 
 jackd2 (1.9.10+20150825git1ed50c92~dfsg-3) unstable; urgency=medium
 
