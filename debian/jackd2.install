@@ -1,5 +1,4 @@
 usr/bin/jack*
-usr/lib/*/libjackserver.so.*
 usr/lib/*/jack/netmanager.so
 usr/lib/*/jack/profiler.so
 usr/lib/*/jack/inprocess.so

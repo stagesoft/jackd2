@@ -1,3 +1,11 @@
+jackd2 (1.9.10+20150825git1ed50c92~dfsg-5) unstable; urgency=medium
+
+  * Move libjackserver into package libjack-jackd2-0.  This avoids a
+    dangling symbolic link in the package libjack-jackd2-dev.
+    (Closes: #858525)
+
+ -- Reinhard Tartler <siretart@tauware.de>  Mon, 27 Mar 2017 22:44:11 -0400
+
 jackd2 (1.9.10+20150825git1ed50c92~dfsg-4) unstable; urgency=medium
 
   * Team upload.
