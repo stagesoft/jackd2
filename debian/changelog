@@ -1,3 +1,16 @@
+jackd2 (1.9.10+20150825git1ed50c92~dfsg-6) UNRELEASED; urgency=medium
+
+  * Team upload.
+
+  [ Ondřej Nový ]
+  * d/copyright: Use https protocol in Format field.
+  * d/control: Set Vcs-* to salsa.debian.org.
+
+  [ Mattia Rizzolo ]
+  * Fix FTBFS with GCC 7.  Closes: #853461
+
+ -- Mattia Rizzolo <mattia@debian.org>  Thu, 22 Feb 2018 11:16:07 +0100
+
 jackd2 (1.9.10+20150825git1ed50c92~dfsg-5) unstable; urgency=medium
 
   * Move libjackserver into package libjack-jackd2-0.  This avoids a

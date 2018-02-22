@@ -1,3 +1,4 @@
 reproducible-build.patch
 gcc6-ftbfs.patch
 packed-structs.patch
+gcc7-ftbfs.patch
