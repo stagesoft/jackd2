@@ -60,6 +60,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #if defined(_WIN32) && !defined(__CYGWIN__) && !defined(GNU_WIN32)
 
+    #ifdef __MINGW32__
+    #  include <winsock2.h> // mingw gives warning if we include windows.h before winsock2.h
+    #endif
+
     #include <windows.h>
 
     #ifdef _MSC_VER     /* Microsoft compiler */
@@ -120,9 +124,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #endif /* __APPLE__ || __linux__ || __sun__ || sun */
 
-#if defined(__arm__)
+#if defined(__arm__) || defined(__aarch64__) || defined(__mips__) || defined(__ppc__) || defined(__powerpc__)
     #undef POST_PACKED_STRUCTURE
     #define POST_PACKED_STRUCTURE
-#endif /* __arm__ */
+#endif /* __arm__ || __aarch64__ || __ppc__ || __powerpc__ */
 
 #endif /* __jack_systemdeps_h__ */
