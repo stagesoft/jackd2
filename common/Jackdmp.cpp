@@ -91,7 +91,8 @@ static void copyright(FILE* file)
 {
     fprintf(file, "jackdmp " VERSION "\n"
             "Copyright 2001-2005 Paul Davis and others.\n"
-            "Copyright 2004-2014 Grame.\n"
+            "Copyright 2004-2016 Grame.\n"
+            "Copyright 2016-2017 Filipe Coelho.\n"
             "jackdmp comes with ABSOLUTELY NO WARRANTY\n"
             "This is free software, and you are welcome to redistribute it\n"
             "under certain conditions; see the file COPYING for details\n");
@@ -161,7 +162,7 @@ static void print_server_drivers(jackctl_server_t *server, FILE* file)
     const JSList * node_ptr = jackctl_server_get_drivers_list(server);
 
     fprintf(file, "Available backends:\n");
-    
+
     while (node_ptr) {
         jackctl_driver_t* driver = (jackctl_driver_t *)node_ptr->data;
         fprintf(file, "      %s (%s)\n", jackctl_driver_get_name(driver), (jackctl_driver_get_type(driver) == JackMaster) ? "master" : "slave");
@@ -175,7 +176,7 @@ static void print_server_internals(jackctl_server_t *server, FILE* file)
     const JSList * node_ptr = jackctl_server_get_internals_list(server);
 
     fprintf(file, "Available internals:\n");
-    
+
     while (node_ptr) {
         jackctl_internal_t* internal = (jackctl_internal_t *)node_ptr->data;
         fprintf(file, "      %s\n", jackctl_internal_get_name(internal));
@@ -201,6 +202,7 @@ static void usage(FILE* file, jackctl_server_t *server, bool full = true)
             "               [ --port-max OR -p maximum-number-of-ports]\n"
             "               [ --slave-backend OR -X slave-backend-name ]\n"
             "               [ --internal-client OR -I internal-client-name ]\n"
+            "               [ --internal-session-file OR -C internal-session-file ]\n"
             "               [ --verbose OR -v ]\n"
 #ifdef __linux__
             "               [ --clocksource OR -c [ h(pet) | s(ystem) ]\n"
@@ -231,7 +233,7 @@ static void usage(FILE* file, jackctl_server_t *server, bool full = true)
             "         -d master-backend-name [ ... master-backend args ... ]\n"
             "       jackdmp -d master-backend-name --help\n"
             "             to display options for each master backend\n\n");
-    
+
     if (full) {
         print_server_drivers(server, file);
         print_server_internals(server, file);
@@ -241,6 +243,15 @@ static void usage(FILE* file, jackctl_server_t *server, bool full = true)
 // Prototype to be found in libjackserver
 extern "C" void silent_jack_error_callback(const char *desc);
 
+void print_version()
+{
+    printf( "jackdmp version " VERSION " tmpdir "
+            jack_server_dir " protocol %d" "\n",
+            JACK_PROTOCOL_VERSION);
+    exit(-1);
+
+}
+
 int main(int argc, char** argv)
 {
     jackctl_server_t * server_ctl;
@@ -249,7 +260,13 @@ int main(int argc, char** argv)
     jackctl_driver_t * master_driver_ctl;
     jackctl_driver_t * loopback_driver_ctl = NULL;
     int replace_registry = 0;
-    const char *options = "-d:X:I:P:uvshVrRL:STFl:t:mn:p:"
+
+    for(int a = 1; a < argc; ++a) {
+        if( !strcmp(argv[a], "--version") || !strcmp(argv[a], "-V") ) {
+            print_version();
+        }
+    }
+    const char *options = "-d:X:I:P:uvshrRL:STFl:t:mn:p:C:"
         "a:"
 #ifdef __linux__
         "c:"
@@ -260,6 +277,7 @@ int main(int argc, char** argv)
 #ifdef __linux__
                                        { "clock-source", 1, 0, 'c' },
 #endif
+                                       { "internal-session-file", 1, 0, 'C' },
                                        { "loopback-driver", 1, 0, 'L' },
                                        { "audio-driver", 1, 0, 'd' },
                                        { "midi-driver", 1, 0, 'X' },
@@ -277,7 +295,6 @@ int main(int argc, char** argv)
                                        { "realtime-priority", 1, 0, 'P' },
                                        { "timeout", 1, 0, 't' },
                                        { "temporary", 0, 0, 'T' },
-                                       { "version", 0, 0, 'V' },
                                        { "silent", 0, 0, 's' },
                                        { "sync", 0, 0, 'S' },
                                        { "autoconnect", 1, 0, 'a' },
@@ -286,11 +303,11 @@ int main(int argc, char** argv)
 
     int i,opt = 0;
     int option_index = 0;
+    char* internal_session_file = NULL;
     char* master_driver_name = NULL;
     char** master_driver_args = NULL;
     int master_driver_nargs = 1;
     int loopback = 0;
-    bool show_version = false;
     jackctl_sigmask_t * sigmask;
     jackctl_parameter_t* param;
     union jackctl_parameter_value value;
@@ -429,6 +446,10 @@ int main(int argc, char** argv)
                 }
                 break;
 
+            case 'C':
+                internal_session_file = optarg;
+                break;
+
             case 'P':
                 param = jackctl_get_parameter(server_parameters, "realtime-priority");
                 if (param != NULL) {
@@ -469,10 +490,6 @@ int main(int argc, char** argv)
                 }
                 break;
 
-            case 'V':
-                show_version = true;
-                break;
-
             default:
                 fprintf(stderr, "unknown option character %c\n", optopt);
                 /*fallthru*/
@@ -488,14 +505,6 @@ int main(int argc, char** argv)
     if (param != NULL) {
         value.b = replace_registry;
         jackctl_parameter_set_value(param, &value);
-    }
-
-    if (show_version) {
-        printf( "jackdmp version " VERSION
-                " tmpdir " jack_server_dir
-                " protocol %d"
-                "\n", JACK_PROTOCOL_VERSION);
-        return -1;
     }
 
     if (!master_driver_name) {
@@ -600,6 +609,13 @@ int main(int argc, char** argv)
         }
         if (!jackctl_server_load_internal(server_ctl, internal_driver_ctl)) {
             fprintf(stderr, "Internal client \"%s\" cannot be loaded\n", *it);
+            goto stop_server;
+        }
+    }
+
+    if (internal_session_file != NULL) {
+        if (!jackctl_server_load_session_file(server_ctl, internal_session_file)) {
+            fprintf(stderr, "Internal session file %s cannot be loaded!\n", internal_session_file);
             goto stop_server;
         }
     }
