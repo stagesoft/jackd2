@@ -6,6 +6,7 @@ Uploaders: Adrian Knoth <adi@drcomp.erfurt.thur.de>, Jonas Smedegaard <dr@jones.
 Build-Depends: @cdbs@,
  d-shlibs,
  python (>= 2.6.6-3~),
+ dh-python,
  libsamplerate-dev,
  libasound2-dev (>= 1.0.18) [linux-any],
  libdbus-1-dev,
