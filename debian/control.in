@@ -61,7 +61,7 @@ Conflicts: jackd2 (>> ${binary:Version}),
  libjack-0.125
 Suggests: jackd2 (= ${binary:Version})
 Provides: libjack-0.116, libjack-0.125
-Replaces: libjack-0.116, libjack-0.125
+Replaces: libjack-0.116, libjack-0.125, jackd2 (<< 1.9.10+20150825git1ed50c92~dfsg-5)
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
 Description: JACK Audio Connection Kit (libraries)
