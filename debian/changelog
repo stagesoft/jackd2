@@ -1,3 +1,19 @@
+jackd2 (1.9.12~dfsg-1) unstable; urgency=medium
+
+  * New upstream version 1.9.12~dfsg
+  * Drop gcc7 FTBFS patch
+  * Drop packed structs patch
+  * Drop gcc6 FTBFS patch
+  * Refresh/forward-port debian/patches/reproducible-build.patch
+  * Bump standards version
+  * Update Vcs tags in control.in, too
+  * Add missing replaces to debian/control.in
+  * Add debian/patches/spelling.patch
+  * Add missing build-dependency dh-python to control.in
+  * Regenerate control
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Sun, 25 Feb 2018 19:15:44 +0100
+
 jackd2 (1.9.10+20150825git1ed50c92~dfsg-6) unstable; urgency=medium
 
   * Team upload.
