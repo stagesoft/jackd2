@@ -1,3 +1,9 @@
+jackd2 (1.9.12~dfsg-2) unstable; urgency=medium
+
+  * Source-only re-upload to avoid pre-built amd64 binary
+
+ -- Adrian Knoth <adi@drcomp.erfurt.thur.de>  Sun, 25 Feb 2018 20:41:33 +0100
+
 jackd2 (1.9.12~dfsg-1) unstable; urgency=medium
 
   * New upstream version 1.9.12~dfsg
