@@ -15,7 +15,7 @@ Description: Fix spelling mistakes
  .SH DESCRIPTION
 --- a/common/JackInternalSessionLoader.cpp
 +++ b/common/JackInternalSessionLoader.cpp
-@@ -71,7 +71,7 @@ int JackInternalSessionLoader::Load(cons
+@@ -71,7 +71,7 @@
               * Therefore only compare the first letter of the command.
               */
          } else {
@@ -26,7 +26,7 @@ Description: Fix spelling mistakes
  
 --- a/common/JackMidiRawInputWriteQueue.cpp
 +++ b/common/JackMidiRawInputWriteQueue.cpp
-@@ -83,7 +83,7 @@ JackMidiRawInputWriteQueue::HandleEventL
+@@ -83,7 +83,7 @@
  {
      jack_error("JackMidiRawInputWriteQueue::HandleEventLoss - A %d byte MIDI "
                 "event scheduled for frame '%d' could not be processed because "
@@ -37,7 +37,7 @@ Description: Fix spelling mistakes
  
 --- a/common/JackPort.cpp
 +++ b/common/JackPort.cpp
-@@ -97,7 +97,7 @@ void JackPort::SetLatency(jack_nframes_t
+@@ -97,7 +97,7 @@
      fLatency = nframes;
  
      /* setup the new latency values here,
@@ -48,7 +48,7 @@ Description: Fix spelling mistakes
  		fCaptureLatency.min = nframes;
 --- a/common/jack/jack.h
 +++ b/common/jack/jack.h
-@@ -1082,7 +1082,7 @@ size_t jack_port_type_get_buffer_size (j
+@@ -1082,7 +1082,7 @@
   * expressed a min/max pair.
   *
   * In most common setups, the minimum and maximum latency
@@ -59,7 +59,7 @@ Description: Fix spelling mistakes
   * situation that may either need fixing or more
 --- a/common/netjack.c
 +++ b/common/netjack.c
-@@ -199,7 +199,7 @@ int netjack_wait( netjack_driver_state_t
+@@ -199,7 +199,7 @@
              //XXX: hmm... i need to remember why resync_threshold wasnt right.
              //if( offset < netj->resync_threshold )
              if( offset < 10 ) {
@@ -68,7 +68,7 @@ Description: Fix spelling mistakes
                  // this seems to be one or 2 lost packets.
                  //
                  // this can also be reordered packet jitter.
-@@ -283,7 +283,7 @@ int netjack_wait( netjack_driver_state_t
+@@ -283,7 +283,7 @@
  
                      netj->running_free = 1;
  
@@ -77,7 +77,7 @@ Description: Fix spelling mistakes
                      // reset source address. and open possibility for new master.
                      // maybe dsl reconnect. Also restart of netsource without fix
                      // reply address changes port.
-@@ -597,7 +597,7 @@ netjack_driver_state_t *netjack_init (ne
+@@ -597,7 +597,7 @@
  
      // Fill in netj values.
      // might be subject to autoconfig...
@@ -86,7 +86,7 @@ Description: Fix spelling mistakes
  
      netj->sample_rate = sample_rate;
      netj->period_size = period_size;
-@@ -697,7 +697,7 @@ netjack_startup( netjack_driver_state_t
+@@ -697,7 +697,7 @@
          socklen_t address_size = sizeof (struct sockaddr_in);
  #endif
          //jack_info ("Waiting for an incoming packet !!!");
@@ -95,7 +95,7 @@ Description: Fix spelling mistakes
  
          while(1) {
              if( ! netjack_poll( netj->sockfd, 1000 ) ) {
-@@ -788,7 +788,7 @@ netjack_startup( netjack_driver_state_t
+@@ -788,7 +788,7 @@
  
      if( netj->bitdepth == CELT_MODE ) {
          // celt mode.
@@ -104,7 +104,7 @@ Description: Fix spelling mistakes
          netj->resample_factor = (netj->resample_factor * netj->period_size * 1024 / netj->sample_rate / 8) & (~1);
          netj->resample_factor_up = (netj->resample_factor_up * netj->period_size * 1024 / netj->sample_rate / 8) & (~1);
  
-@@ -796,7 +796,7 @@ netjack_startup( netjack_driver_state_t
+@@ -796,7 +796,7 @@
          netj->net_period_up = netj->resample_factor_up;
      } else if( netj->bitdepth == OPUS_MODE ) {
          // Opus mode.
@@ -115,7 +115,7 @@ Description: Fix spelling mistakes
      } else {
 --- a/common/netjack_packet.c
 +++ b/common/netjack_packet.c
-@@ -286,7 +286,7 @@ cache_packet_reset (cache_packet *pack)
+@@ -286,7 +286,7 @@
      int i;
      pack->valid = 0;
  
@@ -124,7 +124,7 @@ Description: Fix spelling mistakes
      //      fragement array is cleared in _set_framecnt()
  
      for (i = 0; i < pack->num_fragments; i++)
-@@ -318,7 +318,7 @@ cache_packet_add_fragment (cache_packet
+@@ -318,7 +318,7 @@
      jack_nframes_t framecnt    = ntohl (pkthdr->framecnt);
  
      if (framecnt != pack->framecnt) {
@@ -135,7 +135,7 @@ Description: Fix spelling mistakes
  
 --- a/dbus/controller_iface_patchbay.c
 +++ b/dbus/controller_iface_patchbay.c
-@@ -1528,7 +1528,7 @@ jack_controller_graph_order_callback(
+@@ -1528,7 +1528,7 @@
      if (patchbay_ptr->graph.version == 1)
      {
          /* we have empty initial graph, increment graph version,
@@ -146,7 +146,7 @@ Description: Fix spelling mistakes
      }
 --- a/doxyfile.in
 +++ b/doxyfile.in
-@@ -657,7 +657,7 @@ EXAMPLE_PATH           =
+@@ -657,7 +657,7 @@
  EXAMPLE_PATTERNS       =
  
  # If the EXAMPLE_RECURSIVE tag is set to YES then subdirectories will be
@@ -157,7 +157,7 @@ Description: Fix spelling mistakes
  
 --- a/example-clients/alsa_in.c
 +++ b/example-clients/alsa_in.c
-@@ -106,7 +106,7 @@ alsa_format_t formats[] = {
+@@ -106,7 +106,7 @@
  #define NUMFORMATS (sizeof(formats)/sizeof(formats[0]))
  int format=0;
  
@@ -168,7 +168,7 @@ Description: Fix spelling mistakes
  //    printf( "xrun !!!.... %d\n", err );
 --- a/example-clients/alsa_out.c
 +++ b/example-clients/alsa_out.c
-@@ -106,7 +106,7 @@ alsa_format_t formats[] = {
+@@ -106,7 +106,7 @@
  #define NUMFORMATS (sizeof(formats)/sizeof(formats[0]))
  int format=0;
  
@@ -179,7 +179,7 @@ Description: Fix spelling mistakes
  //    printf( "xrun !!!.... %d\n", err );
 --- a/example-clients/netsource.c
 +++ b/example-clients/netsource.c
-@@ -244,7 +244,7 @@ alloc_ports (int n_capture_audio, int n_
+@@ -244,7 +244,7 @@
  /**
   * The Sync callback... sync state is set elsewhere...
   * we will see if this is working correctly.
@@ -190,7 +190,7 @@ Description: Fix spelling mistakes
  sync_cb (jack_transport_state_t state, jack_position_t *pos, void *arg)
 --- a/man/alsa_in.0
 +++ b/man/alsa_in.0
-@@ -90,7 +90,7 @@ However most CPU time is spent in the re
+@@ -90,7 +90,7 @@
  If you have a PCI card, then the default value (15) of this parameter is too high for \-p64 \-n2... Setting it to 5 should fix that.
  Be aware that setting this parameter too low, lets the hf noise on the delay measurement come through onto the resamplerate, so this
  might degrade the quality of the output. (but its a threshold value, and it has been chosen, to mask the noise of a USB card,
@@ -212,7 +212,7 @@ Description: Fix spelling mistakes
  .PP
 --- a/man/jackd.0
 +++ b/man/jackd.0
-@@ -370,7 +370,7 @@ Whether to use Autoconfig, or just start
+@@ -370,7 +370,7 @@
  Send packets N times (default: 1)
  .TP 
  \fB\-e, \-\-native\-endian \fIint\fR
@@ -223,7 +223,7 @@ Description: Fix spelling mistakes
  attempted jitterbuffer microseconds on master (default: 0)
 --- a/tests/test.cpp
 +++ b/tests/test.cpp
-@@ -1576,15 +1576,15 @@ int main (int argc, char *argv[])
+@@ -1576,15 +1576,15 @@
       * (This mode seems to be problematic in standard jack version 0.100. It seems that nobody
       * is used to apply this mode because the tie mode doesn't work at all. A patch seems difficult to produce
       * in this version of jack. Tie mode work well in MP version.)
@@ -244,7 +244,7 @@ Description: Fix spelling mistakes
      Log("Testing connections datas in tie mode...\n");
 --- a/windows/JackWinNamedPipeClientChannel.cpp
 +++ b/windows/JackWinNamedPipeClientChannel.cpp
-@@ -152,7 +152,7 @@ bool JackWinNamedPipeClientChannel::Exec
+@@ -152,7 +152,7 @@
      return true;
  
  error:
@@ -253,3 +253,73 @@ Description: Fix spelling mistakes
      fNotificationListenPipe.Close();
      fRequest->Close();
      fClient->ShutDown(jack_status_t(JackFailure | JackServerError), JACK_SERVER_FAILURE);
+--- a/common/JackNetOneDriver.cpp
++++ b/common/JackNetOneDriver.cpp
+@@ -959,7 +959,7 @@
+         jack_driver_descriptor_add_parameter(desc, &filler, "redundancy", 'R', JackDriverParamUInt, &value, NULL, "Send packets N times", NULL);
+ 
+         value.ui = false;
+-        jack_driver_descriptor_add_parameter(desc, &filler, "native-endian", 'e', JackDriverParamBool, &value, NULL, "Dont convert samples to network byte order", NULL);
++        jack_driver_descriptor_add_parameter(desc, &filler, "native-endian", 'e', JackDriverParamBool, &value, NULL, "Don't convert samples to network byte order", NULL);
+ 
+         value.i = 0;
+         jack_driver_descriptor_add_parameter(desc, &filler, "jitterval", 'J', JackDriverParamInt, &value, NULL, "Attempted jitterbuffer microseconds on master", NULL);
+--- a/common/JackProxyDriver.h
++++ b/common/JackProxyDriver.h
+@@ -73,10 +73,10 @@
+             int* fUpstreamCapturePortConnected;      /*<! map of capture ports connected upstream, for optimization purpose */
+             int* fUpstreamPlaybackPortConnected;     /*<! map of playback ports connected upstream, for optimization purpose */
+ 
+-            bool fAutoSave;                          /*<! wether the local connections should be saved/restored when upstream connection is restarted */
+-            bool fAutoConnect;                       /*<! wether the upstream ports should be automatically connected to upstream physical ports */
+-            bool fDetectPlaybackChannels;            /*<! wether the number of playback ports registered should match the number of upstream physical playback ports */
+-            bool fDetectCaptureChannels;             /*<! wether the number of capture ports registered should match the number of upstream physical capture ports */
++            bool fAutoSave;                          /*<! whether the local connections should be saved/restored when upstream connection is restarted */
++            bool fAutoConnect;                       /*<! whether the upstream ports should be automatically connected to upstream physical ports */
++            bool fDetectPlaybackChannels;            /*<! whether the number of playback ports registered should match the number of upstream physical playback ports */
++            bool fDetectCaptureChannels;             /*<! whether the number of capture ports registered should match the number of upstream physical capture ports */
+ 
+             bool Initialize();                       /*<! establish upstream connection and register the client callbacks */
+ 
+--- a/dbus/sigsegv.c
++++ b/dbus/sigsegv.c
+@@ -94,7 +94,7 @@
+     }
+     else
+     {
+-        jack_error("Unknown bad signal catched!");
++        jack_error("Unknown bad signal caught!");
+     }
+ 
+     if (info->si_code >= 0 && info->si_code < 3) 
+--- a/example-clients/wait.c
++++ b/example-clients/wait.c
+@@ -19,7 +19,7 @@
+ 	fprintf(stderr, "        -s, --server <name>   Connect to the jack server named <name>\n");
+ 	fprintf(stderr, "        -w, --wait            Wait for server to become available\n");
+ 	fprintf(stderr, "        -q, --quit            Wait until server is quit\n");
+-	fprintf(stderr, "        -c, --check           Check wether server is running\n");
++	fprintf(stderr, "        -c, --check           Check whether server is running\n");
+ 	fprintf(stderr, "        -t, --timeout         Wait timeout in seconds\n");
+ 	fprintf(stderr, "        -h, --help            Display this help message\n");
+ 	fprintf(stderr, "For more information see http://jackaudio.org/\n");
+--- a/linux/alsa/JackAlsaAdapter.h
++++ b/linux/alsa/JackAlsaAdapter.h
+@@ -421,7 +421,7 @@
+                         }
+                         break;
+                     default :
+-                        check_error_msg ( -10000, "unknow access mode" );
++                        check_error_msg ( -10000, "unknown access mode" );
+                         break;
+                 }
+                 return 0;
+@@ -507,7 +507,7 @@
+                         }
+                         break;
+                     default :
+-                        check_error_msg ( -10000, "unknow access mode" );
++                        check_error_msg ( -10000, "unknown access mode" );
+                         break;
+                 }
+                 return 0;
