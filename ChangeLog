@@ -36,10 +36,27 @@ Matt Flax
 Lars-Peter Clausen
 Alexandru Tofan
 Kim Jeong Yeon
+Filipe Coelho
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2017-12-13 Filipe Coelho <falktx@falktx.com>
+
+        * Version 1.9.12
+
+2017-06-13 Filipe Coelho <falktx@falktx.com>
+
+	* Version 1.9.11-RC1
+
+2015-07-19 Filipe Coelho <falktx@falktx.com>
+
+	* Implement new jack_port_rename API
+
+2014-07-20 Stephane Letz  <letz@grame.fr>
+
+	* Version 1.9.11 started.
 
 2012-12-10 Stephane Letz  <letz@grame.fr>
 

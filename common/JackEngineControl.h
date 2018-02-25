@@ -63,7 +63,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     int fServerPriority;
     int fClientPriority;
     int fMaxClientPriority;
-    char fServerName[JACK_SERVER_NAME_SIZE];
+    char fServerName[JACK_SERVER_NAME_SIZE+1];
     JackTransportEngine fTransport;
     jack_timer_type_t fClockSource;
     int fDriverNum;
@@ -104,7 +104,12 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
         fRealTime = rt;
         fSavedRealTime = false;
         fServerPriority = priority;
+        
+    #ifdef WIN32
+        fClientPriority = (rt) ? priority - 3 : 0;
+    #else
         fClientPriority = (rt) ? priority - 5 : 0;
+    #endif
         fMaxClientPriority = (rt) ? priority - 1 : 0;
         fVerbose = verbose;
         fPrevCycleTime = 0;

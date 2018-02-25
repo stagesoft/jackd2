@@ -13,7 +13,6 @@ example_programs = {
     'jack_zombie' : 'zombie.c',
     'jack_load' : 'ipload.c',
     'jack_unload' : 'ipunload.c',
-    'jack_showtime' : 'showtime.c',
     'jack_alias' : 'alias.c',
     'jack_bufsize' : 'bufsize.c',
     'jack_wait' : 'wait.c',
@@ -29,7 +28,8 @@ example_programs = {
     'jack_net_master' : 'netmaster.c',
     'jack_latent_client' : 'latent_client.c',
     'jack_midi_dump' : 'midi_dump.c',
-    'jack_midi_latency_test' : 'midi_latency_test.c'
+    'jack_midi_latency_test' : 'midi_latency_test.c',
+    'jack_simdtests' : 'simdtests.cpp'
     }
 
 example_libs = {
@@ -37,24 +37,11 @@ example_libs = {
     }
 
 def configure(conf):
-    e = conf.check_cc(header_name='sndfile.h', define_name="HAVE_SNDFILE")
- 
-    if conf.is_defined('HAVE_SNDFILE'):
-        conf.env['LIB_SNDFILE'] = ['sndfile']
+    conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = conf.env['READLINE']
 
-    conf.check_cfg(package='celt', atleast_version='0.5.0', args='--cflags --libs', mandatory=False)
+    conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.env['SNDFILE']
 
-    e = conf.check_cc(lib='readline', define_name="HAVE_READLINE", mandatory=False)
-
-    # define_name="HAVE_READLINE" has no effect, LIB_READLINE is defined if readline is available
-    #if conf.is_defined('HAVE_READLINE'):
-    #    conf.env['LIB_READLINE'] = ['readline']
-
-    conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = bool(conf.env['LIB_READLINE'])
-
-    conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.is_defined('HAVE_SNDFILE')
-
-    conf.env['BUILD_EXAMPLE_ALSA_IO'] = conf.is_defined('HAVE_SAMPLERATE') and conf.env['BUILD_DRIVER_ALSA']
+    conf.env['BUILD_EXAMPLE_ALSA_IO'] = conf.env['SAMPLERATE'] and conf.env['BUILD_DRIVER_ALSA']
 
 def build(bld):
     if bld.env['IS_LINUX']:
@@ -79,33 +66,30 @@ def build(bld):
         else:
             use = ['clientlib']
 
-        prog = bld(features='c cprogram')
+        if bld.env['IS_MACOSX']:
+            prog = bld(features='c cprogram', framework = ['Foundation'])
+        else:
+            prog = bld(features='c cprogram')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = example_program_source
         prog.use = use
-        if bld.env['IS_MACOSX']:
-            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
-            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
-            prog.env.append_value("LINKFLAGS", "")
         if bld.env['IS_LINUX']:
             prog.use += ['RT', 'M']
         if bld.env['IS_SUN']:
             prog.use += ['M']
 
         prog.target = example_program
-   
+
     if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT']:
         prog = bld(features = 'c cprogram')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'transport.c'
         prog.use = ['clientlib']
-        if bld.env['IS_MACOSX']:
-            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
-            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
-            prog.env.append_value("LINKFLAGS", "")
         if bld.env['IS_LINUX']:
             prog.use += ['RT', 'READLINE']
         if bld.env['IS_MACOSX']:
+            prog.use += ['READLINE']
+        if bld.env['IS_WINDOWS']:
             prog.use += ['READLINE']
         prog.target = 'jack_transport'
 
@@ -115,9 +99,6 @@ def build(bld):
         prog.source = 'capture_client.c'
         prog.use = ['clientlib']
         if bld.env['IS_MACOSX']:
-            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
-            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
-            prog.env.append_value("LINKFLAGS", "")
             prog.use += ['SNDFILE']
         if bld.env['IS_LINUX']:
             prog.use += ['RT', 'SNDFILE']
@@ -131,7 +112,7 @@ def build(bld):
         prog = bld(features = 'c cprogram')
         prog.includes = os_incdir + ['.', '..', '../common/jack', '../common']
         prog.source = ['netsource.c', '../common/netjack_packet.c']
-        prog.env.append_value("CFLAGS", "-DNO_JACK_ERROR")
+        prog.env.append_value('CFLAGS', '-DNO_JACK_ERROR')
         prog.use = ['CELT', 'SAMPLERATE', 'OPUS', 'M', 'clientlib']
         prog.target = 'jack_netsource'
         prog.defines = ['HAVE_CONFIG_H']
@@ -140,14 +121,14 @@ def build(bld):
         prog = bld(features = 'c cprogram')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = ['alsa_in.c', '../common/memops.c']
-        prog.env.append_value("CFLAGS", "-DNO_JACK_ERROR")
+        prog.env.append_value('CFLAGS', '-DNO_JACK_ERROR')
         prog.use = ['clientlib', 'ALSA', 'SAMPLERATE', 'M']
         prog.target = 'alsa_in'
 
         prog = bld(features = 'c cprogram')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = ['alsa_out.c', '../common/memops.c']
-        prog.env.append_value("CFLAGS", "-DNO_JACK_ERROR")
+        prog.env.append_value('CFLAGS', '-DNO_JACK_ERROR')
         prog.use = ['clientlib', 'ALSA', 'SAMPLERATE', 'M']
         prog.target = 'alsa_out'
 
@@ -158,12 +139,8 @@ def build(bld):
         lib.includes = os_incdir + ['../common/jack', '../common']
         lib.target = example_lib
         lib.source = example_lib_source
-        if bld.env['IS_MACOSX']:
-            lib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
-            #lib.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
-            lib.env.append_value("LINKFLAGS", "")
         if bld.env['IS_SUN']:
-            lib.env.append_value("LINKFLAGS", "-lm")
+            lib.env.append_value('LINKFLAGS', '-lm')
         lib.use = 'serverlib'
         lib.install_path = '${ADDON_DIR}/'
 

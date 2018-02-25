@@ -186,11 +186,10 @@ void Jack_Client_Registration_Callback(const char* name, int val, void *arg)
 		client_register--;
 }
 
-int Jack_Port_Rename_Callback(jack_port_id_t port, const char* old_name, const char* new_name, void *arg)
+void Jack_Port_Rename_Callback(jack_port_id_t port, const char* old_name, const char* new_name, void *arg)
 {
      Log("Rename callback has been successfully called with old_name '%s' and new_name '%s'. (msg from callback)\n", old_name, new_name);
      port_rename_clbk = 1;
-     return 0;
 }
 
 int Jack_Update_Buffer_Size(jack_nframes_t nframes, void *arg)
@@ -480,7 +479,7 @@ int process4(jack_nframes_t nframes, void *arg)
 	jack_nframes_t delta_time = cur_time - last_time;
 
 	Log("calling process4 callback : jack_frame_time = %ld delta_time = %ld\n", cur_time, delta_time);
-	if (delta_time > 0  && (jack_nframes_t)abs(delta_time - cur_buffer_size) > tolerance) {
+	if (delta_time > 0  && abs((int64_t)delta_time - (int64_t)cur_buffer_size) > (int64_t)tolerance) {
 		printf("!!! ERROR !!! jack_frame_time seems to return incorrect values cur_buffer_size = %d, delta_time = %d tolerance %d\n", cur_buffer_size, delta_time, tolerance);
 	}
 

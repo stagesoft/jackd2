@@ -299,6 +299,7 @@ namespace Jack
 
         for (uint port_index = 0; port_index < port_num; port_index++) {
             int active_port = ntohl(*active_port_address);
+            assert(active_port < fNPorts);
             fConnectedPorts[active_port] = true;
             active_port_address++;
         }
@@ -332,8 +333,6 @@ namespace Jack
         fPacketSize = PACKET_AVAILABLE_SIZE(params);
 
         UpdateParams(max(params->fReturnAudioChannels, params->fSendAudioChannels));
-
-        fSubPeriodBytesSize = fSubPeriodSize * sizeof(sample_t);
 
         fCycleDuration = float(fSubPeriodSize) / float(params->fSampleRate);
         fCycleBytesSize = params->fMtu * (fPeriodSize / fSubPeriodSize);
@@ -779,8 +778,8 @@ namespace Jack
                 memset(fCompressedBuffer[port_index], 0, fCompressedMaxSizeByte * sizeof(char));
             }
 
-            int res1 = (fNPorts * fCompressedMaxSizeByte + CDO) % PACKET_AVAILABLE_SIZE(params);
-            int res2 = (fNPorts * fCompressedMaxSizeByte + CDO) / PACKET_AVAILABLE_SIZE(params);
+            int res1 = (fNPorts * (fCompressedMaxSizeByte + CDO)) % PACKET_AVAILABLE_SIZE(params);
+            int res2 = (fNPorts * (fCompressedMaxSizeByte + CDO)) / PACKET_AVAILABLE_SIZE(params);
 
             fNumPackets = (res1) ? (res2 + 1) : res2;
 

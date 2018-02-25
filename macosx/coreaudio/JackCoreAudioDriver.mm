@@ -1149,7 +1149,7 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
     pluginAOPA.mScope = kAudioObjectPropertyScopeGlobal;
     pluginAOPA.mElement = kAudioObjectPropertyElementMaster;
     outDataSize = sizeof(CFStringRef);
-    osErr = AudioObjectSetPropertyData(*outAggregateDevice, &pluginAOPA, 0, NULL, outDataSize, &captureDeviceUID[0]);  // First capture is master...
+    osErr = AudioObjectSetPropertyData(*outAggregateDevice, &pluginAOPA, 0, NULL, outDataSize, &playbackDeviceUID[0]);  // First playback is master...
     if (osErr != noErr) {
         jack_error("CreateAggregateDeviceAux : AudioObjectSetPropertyData for master device error");
         printError(osErr);
@@ -2262,8 +2262,8 @@ int JackCoreAudioDriver::Attach()
     UInt32 size;
     Boolean isWritable;
     char channel_name[64];
-    char name[REAL_JACK_PORT_NAME_SIZE];
-    char alias[REAL_JACK_PORT_NAME_SIZE];
+    char name[REAL_JACK_PORT_NAME_SIZE+1];
+    char alias[REAL_JACK_PORT_NAME_SIZE+1];
 
     jack_log("JackCoreAudioDriver::Attach : fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
