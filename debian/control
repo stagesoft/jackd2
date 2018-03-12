@@ -91,7 +91,7 @@ Package: libjack-jackd2-dev
 Architecture: any
 Section: libdevel
 Multi-Arch: same
-Depends: libjack-jackd2-0 (= ${binary:Version}), 
+Depends: libjack-jackd2-0 (= ${binary:Version}),
  ${asound:Depends},
  ${misc:Depends},
  ${shlibs:Depends},
