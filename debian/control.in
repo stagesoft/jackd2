@@ -19,7 +19,7 @@ Build-Depends: @cdbs@,
  libopus-dev,
  po-debconf
 Standards-Version: 3.9.8
-Homepage: http://jackaudio.org/
+Homepage: https://jackaudio.org/
 Vcs-Git: https://salsa.debian.org/multimedia-team/jackd2.git
 Vcs-Browser: https://salsa.debian.org/multimedia-team/jackd2
 
