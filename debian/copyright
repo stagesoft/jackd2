@@ -740,7 +740,7 @@ License: LGPL-2.1+
  .
  You should have received a copy of the 'GNU Lesser General Public
  License' along with this program.  If not, see
- <http://www.gnu.org/licenses/>.
+ <https//www.gnu.org/licenses/>.
 
 License: GPL-2+
  This program is free software; you can redistribute it and/or modify it
@@ -759,7 +759,7 @@ License: GPL-2+
  in '/usr/share/common-licenses/GPL-2'.
  .
  You should have received a copy of the 'GNU General Public License'
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ along with this program.  If not, see <https//www.gnu.org/licenses/>.
 
 License: GPL-2
  This program is free software; you can redistribute it and/or modify it
@@ -913,4 +913,4 @@ License: LGPL-2+
  .
  You should have received a copy of the GNU Library General Public
  License along with this program.  If not, see
- <http://www.gnu.org/licenses/>.
+ <https//www.gnu.org/licenses/>.
