@@ -63,7 +63,7 @@ JackInternalClient::~JackInternalClient()
     delete fChannel;
 }
 
-int JackInternalClient::Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status)
+int JackInternalClient::Open(const char* server_name, const char* name, jack_uuid_t uuid, jack_options_t options, jack_status_t* status)
 {
     int result;
     jack_log("JackInternalClient::Open name = %s", name);
@@ -196,7 +196,10 @@ int JackLoadableInternalClient2::Init(const char* so_name)
 JackLoadableInternalClient1::JackLoadableInternalClient1(JackServer* server, JackSynchro* table, const char* object_data)
         : JackLoadableInternalClient(server, table)
 {
-    strncpy(fObjectData, object_data, JACK_LOAD_INIT_LIMIT);
+    if (object_data != NULL)
+        strncpy(fObjectData, object_data, JACK_LOAD_INIT_LIMIT);
+    else
+        memset(fObjectData, 0, sizeof(fObjectData));
 }
 
 JackLoadableInternalClient2::JackLoadableInternalClient2(JackServer* server, JackSynchro* table, const JSList*  parameters)
@@ -215,7 +218,7 @@ JackLoadableInternalClient::~JackLoadableInternalClient()
     }
 }
 
-int JackLoadableInternalClient1::Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status)
+int JackLoadableInternalClient1::Open(const char* server_name, const char* name, jack_uuid_t uuid, jack_options_t options, jack_status_t* status)
 {
     int res = -1;
 
@@ -231,7 +234,7 @@ int JackLoadableInternalClient1::Open(const char* server_name, const char* name,
     return res;
 }
 
-int JackLoadableInternalClient2::Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status)
+int JackLoadableInternalClient2::Open(const char* server_name, const char* name, jack_uuid_t uuid, jack_options_t options, jack_status_t* status)
 {
     int res = -1;
 

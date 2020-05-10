@@ -125,21 +125,13 @@ namespace Jack
         0x00 / 000000 / 0	0	Best Effort	BE	AC_BE
         */
         
-        /*
         socklen_t len = sizeof(tos);
         
         res = getsockopt(fSockfd, IPPROTO_IP, IP_TOS, &tos, &len);
-        printf("getsockopt IPPROTO_IP res = %d  tos = %d\n", res, tos);
         
         tos = 46 * 4;       // see <netinet/in.h> 
         res = setsockopt(fSockfd, IPPROTO_IP, IP_TOS, &tos, sizeof(tos));
-        
-        printf("setsockopt IPPROTO_IP res = %d  tos = %d\n", res, tos );
-        
-        res = getsockopt(fSockfd, IPPROTO_IP, IP_TOS, &tos, &len);
-        printf("getsockopt IPPROTO_IP res = %d  tos = %d\n", res, tos);
-        */
-  
+
         return fSockfd;
     }
 
@@ -169,7 +161,7 @@ namespace Jack
 
     int JackNetUnixSocket::Bind()
     {
-        return bind(fSockfd, reinterpret_cast<socket_address_t*>(&fRecvAddr), sizeof(socket_address_t));
+        return ::bind(fSockfd, reinterpret_cast<socket_address_t*>(&fRecvAddr), sizeof(socket_address_t));
     }
 
     int JackNetUnixSocket::BindWith(const char* ip)

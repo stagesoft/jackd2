@@ -1,6 +1,7 @@
 /*
 Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2013 Grame
+Copyright (C) 2016-2019 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -41,6 +42,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <cstdlib>
 #include <dbus/dbus.h>
 #include "audio_reserve.h"
+#endif
+
+#if HAVE_SYSTEMD
+#include <systemd/sd-daemon.h>
 #endif
 
 /*
@@ -92,7 +97,7 @@ static void copyright(FILE* file)
     fprintf(file, "jackdmp " VERSION "\n"
             "Copyright 2001-2005 Paul Davis and others.\n"
             "Copyright 2004-2016 Grame.\n"
-            "Copyright 2016-2017 Filipe Coelho.\n"
+            "Copyright 2016-2019 Filipe Coelho.\n"
             "jackdmp comes with ABSOLUTELY NO WARRANTY\n"
             "This is free software, and you are welcome to redistribute it\n"
             "under certain conditions; see the file COPYING for details\n");
@@ -323,11 +328,11 @@ int main(int argc, char** argv)
     copyright(stdout);
 #if defined(JACK_DBUS) && defined(__linux__)
     if (getenv("JACK_NO_AUDIO_RESERVATION"))
-        server_ctl = jackctl_server_create(NULL, NULL);
+        server_ctl = jackctl_server_create2(NULL, NULL, NULL);
     else
-        server_ctl = jackctl_server_create(audio_acquire, audio_release);
+        server_ctl = jackctl_server_create2(audio_acquire, audio_release, audio_reserve_loop);
 #else
-    server_ctl = jackctl_server_create(NULL, NULL);
+    server_ctl = jackctl_server_create2(NULL, NULL, NULL);
 #endif
     if (server_ctl == NULL) {
         fprintf(stderr, "Failed to create server object\n");
@@ -624,6 +629,10 @@ int main(int argc, char** argv)
     notify_sent = true;
     return_value = 0;
 
+#if HAVE_SYSTEMD
+    sd_notify(0, "READY=1");
+#endif
+
     // Waits for signal
 #ifdef __ANDROID__
     //reserve SIGUSR2 signal for switching master driver
@@ -637,6 +646,10 @@ int main(int argc, char** argv)
     }
 #else
     jackctl_wait_signals(sigmask);
+#endif
+
+#if HAVE_SYSTEMD
+    sd_notify(0, "STOPPING=1");
 #endif
 
  stop_server:
