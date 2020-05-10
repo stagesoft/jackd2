@@ -1,5 +1,5 @@
 /*
- *  simdtests.c -- test accuraccy and performance of simd optimizations
+ *  simdtests.c -- test accuracy and performance of simd optimizations
  *
  *  Copyright (C) 2017 Andreas Mueller.
  *
@@ -40,7 +40,7 @@
 #endif
 #endif
 
-#ifdef __ARM_NEON__
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
 #include <arm_neon.h>
 #endif
 
@@ -61,6 +61,10 @@ namespace origerated {
 
 #ifdef __ARM_NEON__
 #undef __ARM_NEON__
+#endif
+
+#ifdef __ARM_NEON
+#undef __ARM_NEON
 #endif
 
 #include "../common/memops.c"
@@ -347,7 +351,7 @@ int main(int argc, char *argv[])
 			uint32_t float_error_count = 0;
 			// output error (avoid spam -> limit error lines per test case)
 			for(uint32_t sample=0; sample<TESTBUFF_SIZE; sample++) {
-				// For easier estimation/readabilty we scale floats back to integer
+				// For easier estimation/readability we scale floats back to integer
 				jack_default_audio_sample_t sample_scaling;
 				switch(test_cases[testcase].sample_size) {
 					case 2:

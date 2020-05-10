@@ -138,7 +138,10 @@ bool JackLinuxFutex::Allocate(const char* name, const char* server_name, int val
         return false;
     }
 
-    ftruncate(fSharedMem, sizeof(FutexData));
+    if (ftruncate(fSharedMem, sizeof(FutexData)) != 0) {
+        jack_error("Allocate: can't set shared memory size in named futex name = %s err = %s", fName, strerror(errno));
+        return false;
+    }
 
     if (fPromiscuous && (jack_promiscuous_perms(fSharedMem, fName, fPromiscuousGid) < 0)) {
         close(fSharedMem);
@@ -147,7 +150,9 @@ bool JackLinuxFutex::Allocate(const char* name, const char* server_name, int val
         return false;
     }
 
-    if ((fFutex = (FutexData*)mmap(NULL, sizeof(FutexData), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_LOCKED, fSharedMem, 0)) == NULL) {
+    FutexData* futex = (FutexData*)mmap(NULL, sizeof(FutexData), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_LOCKED, fSharedMem, 0);
+
+    if (futex == NULL || futex == MAP_FAILED) {
         jack_error("Allocate: can't check in named futex name = %s err = %s", fName, strerror(errno));
         close(fSharedMem);
         fSharedMem = -1;
@@ -157,11 +162,12 @@ bool JackLinuxFutex::Allocate(const char* name, const char* server_name, int val
 
     fPrivate = internal;
 
-    fFutex->futex = value;
-    fFutex->internal = internal;
-    fFutex->wasInternal = internal;
-    fFutex->needsChange = false;
-    fFutex->externalCount = 0;
+    futex->futex = value;
+    futex->internal = internal;
+    futex->wasInternal = internal;
+    futex->needsChange = false;
+    futex->externalCount = 0;
+    fFutex = futex;
     return true;
 }
 
@@ -182,24 +188,27 @@ bool JackLinuxFutex::Connect(const char* name, const char* server_name)
         return false;
     }
 
-    if ((fFutex = (FutexData*)mmap(NULL, sizeof(FutexData), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_LOCKED, fSharedMem, 0)) == NULL) {
+    FutexData* futex = (FutexData*)mmap(NULL, sizeof(FutexData), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_LOCKED, fSharedMem, 0);
+
+    if (futex == NULL || futex == MAP_FAILED) {
         jack_error("Connect: can't connect named futex name = %s err = %s", fName, strerror(errno));
         close(fSharedMem);
         fSharedMem = -1;
         return false;
     }
 
-    if (! fPrivate && fFutex->wasInternal)
+    if (! fPrivate && futex->wasInternal)
     {
         const char* externalSync = getenv("JACK_INTERNAL_CLIENT_SYNC");
 
-        if (externalSync != NULL && strstr(fName, externalSync) != NULL && ++fFutex->externalCount == 1)
+        if (externalSync != NULL && strstr(fName, externalSync) != NULL && ++futex->externalCount == 1)
         {
             jack_error("Note: client %s running as external client temporarily", fName);
-            fFutex->needsChange = true;
+            futex->needsChange = true;
         }
     }
 
+    fFutex = futex;
     return true;
 }
 
