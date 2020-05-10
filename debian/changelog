@@ -1,3 +1,25 @@
+jackd2 (1.9.14~dfsg-1) UNRELEASED; urgency=medium
+
+  [ Ondřej Nový ]
+  * d/control: Remove trailing whitespaces
+
+  [ Felipe Sateler ]
+  * Change maintainer address to debian-multimedia@lists.debian.org
+
+  [ Ondřej Nový ]
+  * Use debhelper-compat instead of debian/compat
+
+  [ Olivier Humbert ]
+  * d/control: http -> https
+  * d/control.in: http -> https
+  * d/copyright: http -> https
+
+  [ Ross Gammon ]
+  * New upstream version 1.9.14
+  * Add a gitlab-ci.yml file
+
+ -- Ross Gammon <rossgammon@debian.org>  Sun, 10 May 2020 18:57:38 +0200
+
 jackd2 (1.9.12~dfsg-2) unstable; urgency=medium
 
   * Source-only re-upload to avoid pre-built amd64 binary
