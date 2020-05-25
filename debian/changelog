@@ -17,8 +17,17 @@ jackd2 (1.9.14~dfsg-1) UNRELEASED; urgency=medium
   [ Ross Gammon ]
   * New upstream version 1.9.14
   * Add a gitlab-ci.yml file
+  * Fix name of gilab-ci file
+  * Update watch file to use repack suffix in downloaded tarball
+  * New upstream version 1.9.14~dfsg
+  * Unapply patches from source
+  * Refresh patches & drop the one applied upstream
+  * Add pyc files to clean target
 
- -- Ross Gammon <rossgammon@debian.org>  Sun, 10 May 2020 18:57:38 +0200
+  [ Erich Eickmeyer ]
+  * Change compat level to 10, add back compat file
+
+ -- Ross Gammon <rossgammon@debian.org>  Mon, 25 May 2020 20:57:04 +0200
 
 jackd2 (1.9.12~dfsg-2) unstable; urgency=medium
 
