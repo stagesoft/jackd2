@@ -19,7 +19,7 @@ Build-Depends: cdbs (>= 0.4.93~),
  libffado-dev (>= 2.0.0) [linux-any],
  libopus-dev,
  po-debconf
-Standards-Version: 3.9.8
+Standards-Version: 4.5.0
 Homepage: https://jackaudio.org/
 Vcs-Git: https://salsa.debian.org/multimedia-team/jackd2.git
 Vcs-Browser: https://salsa.debian.org/multimedia-team/jackd2
