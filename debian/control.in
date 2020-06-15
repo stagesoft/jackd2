@@ -1,7 +1,7 @@
 Source: jackd2
 Section: sound
 Priority: optional
-Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
+Maintainer: Debian Multimedia Maintainers <debian-multimedia@lists.debian.org>
 Uploaders: Adrian Knoth <adi@drcomp.erfurt.thur.de>, Jonas Smedegaard <dr@jones.dk>, Reinhard Tartler <siretart@tauware.de>
 Build-Depends: @cdbs@,
  d-shlibs,
@@ -18,7 +18,8 @@ Build-Depends: @cdbs@,
  libffado-dev (>= 2.0.0) [linux-any],
  libopus-dev,
  po-debconf
-Standards-Version: 3.9.8
+Standards-Version: 4.5.0
+Rules-Requires-Root: no
 Homepage: https://jackaudio.org/
 Vcs-Git: https://salsa.debian.org/multimedia-team/jackd2.git
 Vcs-Browser: https://salsa.debian.org/multimedia-team/jackd2
@@ -90,7 +91,7 @@ Package: libjack-jackd2-dev
 Architecture: any
 Section: libdevel
 Multi-Arch: same
-Depends: libjack-jackd2-0 (= ${binary:Version}), 
+Depends: libjack-jackd2-0 (= ${binary:Version}),
  ${asound:Depends},
  ${misc:Depends},
  ${shlibs:Depends},
