@@ -1,3 +1,9 @@
+jackd2 (1.9.12~dfsg-headless2) buster; urgency=medium
+
+  * Remove dbus dependencies to allow headless operations
+  * Add System init script
+
+ -- Ion Reguera <ion@stagelab.net>  Wed, 3 Jun 2020 20:33:03 +0100
 jackd2 (1.9.12~dfsg-2) unstable; urgency=medium
 
   * Source-only re-upload to avoid pre-built amd64 binary
