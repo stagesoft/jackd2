@@ -4,7 +4,6 @@
 [linux-any] usr/lib/*/jack/audioadapter.so
 [linux-any] usr/lib/*/jack/jack_alsa.so
 [linux-any] usr/lib/*/jack/jack_alsarawmidi.so
-[linux-any] usr/share/dbus-1
 debian/audio.conf usr/share/jackd
 debian/bash_completion.d/* usr/share/bash-completion/completions
 usr/bin/jack*

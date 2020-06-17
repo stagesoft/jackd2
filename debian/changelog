@@ -1,3 +1,11 @@
+ackd2 (1.9.21~dfsg-3-headless)bookworm; urgency=medium
+
+  * Remove dbus dependencies to allow headless operations
+  * Add System init script
+
+ -- Ion Reguera <ion@stagelab.net>  Wed, 3 Jun 2024 20:33:03 +0100
+
+
 jackd2 (1.9.21~dfsg-3) unstable; urgency=medium
 
   * Team upload.
