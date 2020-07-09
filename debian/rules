@@ -89,7 +89,7 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 endif	
 
 binary-install/jackd2::
-	dh_python2 -pjackd2
+	dh_python3 -pjackd2
 
 # TODO: drop libstdc++6 override when bug#374049 closed in stable
 binary-post-install/libjack0::

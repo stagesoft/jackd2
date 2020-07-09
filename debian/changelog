@@ -27,7 +27,10 @@ jackd2 (1.9.14~dfsg-1) UNRELEASED; urgency=medium
   [ Erich Eickmeyer ]
   * Change compat level to 10, add back compat file
 
- -- Ross Gammon <rossgammon@debian.org>  Mon, 25 May 2020 20:57:04 +0200
+  [ Sandro Tosi ]
+  * Switch to python3; Closes: #936757, #959177
+
+ -- Sandro Tosi <morph@debian.org>  Thu, 09 Jul 2020 00:06:57 -0400
 
 jackd2 (1.9.12~dfsg-2) unstable; urgency=medium
 
