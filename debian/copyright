@@ -1,5 +1,5 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: jackdmp
+Upstream-Name: jack2
 Upstream-Contact: JACK developers <jack-devel@jackaudio.org>
 Source: https://github.com/jackaudio/jack2
  Repackaged, excluding non-DFSG files
