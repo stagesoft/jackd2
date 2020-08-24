@@ -1,8 +1,14 @@
-jackd2 (1.9.14~dfsg-1) UNRELEASED; urgency=medium
+jackd2 (1.9.14~dfsg-1) unstable; urgency=medium
+
+  * Team upload
 
   [ Sebastian Ramacher ]
-  * debian/control: Remove obsolete Pre-Depends
-  * debian/copyright: Remove waf from files-Excluded (Closes: #884082)
+  * debian/control:
+    - Remove obsolete Pre-Depends
+    - Remove d-shlibs from B-Ds
+    - Add libsystemd-dev to B-Ds to build with sd_notify support
+    - Remove unused asound:Depends
+  * debian/copyright: Remove waf from Files-Excluded (Closes: #884082)
   * debian/jackd2.maintscript: Update maintscript to remove old conffiles
     (Closes: #726079)
   * debian/audio.conf: Fix command (Closes: #951432)
@@ -10,7 +16,7 @@ jackd2 (1.9.14~dfsg-1) UNRELEASED; urgency=medium
   [ Jonas Smedegaard ]
   * remove myelf as uploader
 
- -- Jonas Smedegaard <dr@jones.dk>  Mon, 24 Aug 2020 11:25:27 +0200
+ -- Sebastian Ramacher <sramacher@debian.org>  Mon, 24 Aug 2020 21:13:05 +0200
 
 jackd2 (1.9.14~dfsg-0.1) unstable; urgency=medium
 
