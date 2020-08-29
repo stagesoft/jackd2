@@ -4,7 +4,6 @@ Priority: optional
 Maintainer: Debian Multimedia Maintainers <debian-multimedia@lists.debian.org>
 Uploaders: Adrian Knoth <adi@drcomp.erfurt.thur.de>, Reinhard Tartler <siretart@tauware.de>
 Build-Depends: @cdbs@,
- d-shlibs,
  python3,
  dh-python,
  libsamplerate-dev,
