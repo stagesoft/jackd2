@@ -17,6 +17,7 @@ Build-Depends: cdbs (>= 0.4.93~),
  libraw1394-dev [linux-any],
  libffado-dev (>= 2.0.0) [linux-any],
  libopus-dev,
+ libsystemd-dev [linux-any],
  po-debconf
 Standards-Version: 4.5.0
 Rules-Requires-Root: no
