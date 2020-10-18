@@ -10,12 +10,12 @@ def configure(conf):
 
     if conf.env['IS_WINDOWS']:
         try:
-            conf.check(function_name='regcomp', header_name='regex.h', lib='regex', uselib_store='REGEX', define_name='HAVE_REGEX_H')
+            conf.check(header_name='regex.h', lib='regex', uselib_store='REGEX', define_name='HAVE_REGEX_H')
         except:
-            conf.check(function_name='regcomp', header_name='regex.h', lib='tre', uselib_store='REGEX', define_name='HAVE_REGEX_H')
-        conf.check(function_name='htons', header_name='winsock2.h', lib='ws2_32', uselib_store='WS2_32', define_name='HAVE_WINSOCK2_H')
-        conf.check(function_name='timeGetDevCaps', header_name=['windows.h', 'mmsystem.h'], lib='winmm', uselib_store='WINMM', define_name='HAVE_MMSYSTEM_H')
-        conf.check(function_name='EnumProcesses', header_name=['windows.h', 'psapi.h'], lib='psapi', uselib_store='PSAPI', define_name='HAVE_PSAPI_H')
+            conf.check(header_name='tre/regex.h', lib='tre', uselib_store='REGEX', define_name='HAVE_TRE_REGEX_H')
+        conf.check(header_name='winsock2.h', lib='ws2_32', uselib_store='WS2_32', define_name='HAVE_WINSOCK2_H')
+        conf.check(header_name=['windows.h', 'mmsystem.h'], lib='winmm', uselib_store='WINMM', define_name='HAVE_MMSYSTEM_H')
+        conf.check(header_name=['windows.h', 'psapi.h'], lib='psapi', uselib_store='PSAPI', define_name='HAVE_PSAPI_H')
 
 def create_jack_process_obj(bld, target, sources, uselib = None, framework = None):
     process = bld(features = ['cxx', 'cxxshlib'])
@@ -74,7 +74,7 @@ def build(bld):
         includes.append('..')
     else:
         includes.append('../..')
-    uselib = ['PTHREAD', 'CELT', 'OPUS', 'DB']
+    uselib = ['CELT', 'OPUS', 'DB', 'PTHREAD']
 
     if bld.env['IS_LINUX']:
         common_libsources += [
@@ -116,8 +116,7 @@ def build(bld):
             '../posix/JackPosixThread.cpp',
             '../posix/JackPosixMutex.cpp',
             '../macosx/JackMachThread.mm',
-            #'../macosx/JackMachSemaphore.mm',
-            '../posix/JackPosixSemaphore.cpp',
+            '../macosx/JackMachSemaphore.mm',
             '../posix/JackSocket.cpp',
             '../macosx/JackMachTime.c',
             ]
@@ -132,26 +131,38 @@ def build(bld):
             '../windows/JackWinTime.c',
             ]
         includes = ['../windows' ] + includes
+        libsuffix = "64" if (bld.env['DEST_CPU'] == "x86_64" and not bld.variant) else ""
+        buildbindir = os.path.join('..', bld.path.get_bld().srcpath().rstrip(bld.path.srcpath()))
+        staticbuild = bool('BUILD_STATIC' in bld.env and bld.env['BUILD_STATIC'])
         uselib.append('REGEX')
         uselib.append('WS2_32')
         uselib.append('PSAPI')
         uselib.append('WINMM')
 
+    else:
+        libsuffix = ""
+
     clientlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
     if bld.env['IS_MACOSX']:
         clientlib.framework = ['CoreAudio', 'Accelerate']
     clientlib.defines = 'HAVE_CONFIG_H'
+    clientlib.includes = includes
+    clientlib.name = 'clientlib'
+    clientlib.target = 'jack'+libsuffix
+    clientlib.install_path = '${LIBDIR}'
     clientlib.use = uselib
     if bld.env['IS_WINDOWS']:
-         clientlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
-         clientlib.install_path = '${BINDIR}'
-    else:
-         clientlib.install_path = '${LIBDIR}'
+        clientlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
+        clientlib.env['cxxstlib_PATTERN'] = 'lib%s.a'
+        clientlib.env['implib_PATTERN'] = 'lib%s.dll.a'
+        if staticbuild:
+            clientlib.env['SHLIB_MARKER'] = ''
+        clientlib.env.append_value('LINKFLAGS', ['-static-libstdc++', '--disable-auto-import'])
+        clientlib.env.append_value('LINKFLAGS', ['-Wl,--output-def,lib%s.def' % clientlib.target])
+        bld.install_files(clientlib.install_path, [os.path.join(buildbindir, 'lib%s.def' % clientlib.target)])
+
     if bld.env['AUTOSTART_METHOD'] == 'dbus':
         clientlib.use.append('DBUS-1')
-    clientlib.includes = includes
-    clientlib.name         = 'clientlib'
-    clientlib.target       = 'jack'
     clientlib.source = [] + common_libsources
     clientlib.source += [
         'JackLibClient.cpp',
@@ -185,7 +196,8 @@ def build(bld):
             '../windows/JackMMCSS.cpp',
             ]
 
-    clientlib.vnum = bld.env['JACK_API_VERSION']
+    if not bld.env['IS_WINDOWS']:
+        clientlib.vnum = bld.env['JACK_API_VERSION']
 
     if bld.env['IS_LINUX']:
         clientlib.env.append_value('CPPFLAGS', '-fvisibility=hidden')
@@ -207,14 +219,19 @@ def build(bld):
         serverlib.framework = ['CoreAudio', 'CoreFoundation', 'Accelerate']
     serverlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
     serverlib.includes = includes
-    serverlib.name         = 'serverlib'
-    serverlib.target       = 'jackserver'
+    serverlib.name = 'serverlib'
+    serverlib.target = 'jackserver'+libsuffix
+    serverlib.install_path = '${LIBDIR}'
     serverlib.use = uselib
     if bld.env['IS_WINDOWS']:
-         serverlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
-         serverlib.install_path = '${BINDIR}'
-    else:
-         serverlib.install_path = '${LIBDIR}'
+        serverlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
+        serverlib.env['cxxstlib_PATTERN'] = 'lib%s.a'
+        serverlib.env['implib_PATTERN'] = 'lib%s.dll.a'
+        if staticbuild:
+            serverlib.env['SHLIB_MARKER'] = ''
+        serverlib.env.append_value('LINKFLAGS', ['-static-libstdc++', '--disable-auto-import'])
+        serverlib.env.append_value('LINKFLAGS', ['-Wl,--output-def,lib%s.def' % serverlib.target])
+        bld.install_files(serverlib.install_path, [os.path.join(buildbindir, 'lib%s.def' % serverlib.target)])
     serverlib.source = [] + common_libsources
     serverlib.source += [
         'JackAudioDriver.cpp',
@@ -287,7 +304,8 @@ def build(bld):
             '../windows/JackNetWinSocket.cpp',
             ]
 
-    serverlib.vnum = bld.env['JACK_API_VERSION']
+    if not bld.env['IS_WINDOWS']:
+        serverlib.vnum = bld.env['JACK_API_VERSION']
 
     if bld.env['IS_LINUX']:
         serverlib.env.append_value('CPPFLAGS', '-fvisibility=hidden')
@@ -305,18 +323,22 @@ def build(bld):
             netlib.framework =  ['CoreAudio']
         netlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
         netlib.includes = includes
-        netlib.name         = 'netlib'
-        netlib.target       = 'jacknet'
+        netlib.name = 'netlib'
+        netlib.target = 'jacknet'+libsuffix
+        netlib.install_path = '${LIBDIR}'
         netlib.use = ['SAMPLERATE', 'CELT', 'OPUS', 'PTHREAD']
         if bld.env['IS_WINDOWS']:
-             netlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
-             netlib.install_path = '${BINDIR}'
-             netlib.use += ['WS2_32', 'WINMM']
-        elif bld.env['IS_MACOSX']:
-             netlib.install_path = '${LIBDIR}'
-        else:
-             netlib.use += ['RT']
-             netlib.install_path = '${LIBDIR}'
+            netlib.use += ['WS2_32', 'WINMM']
+            netlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
+            netlib.env['cxxstlib_PATTERN'] = 'lib%s.a'
+            netlib.env['implib_PATTERN'] = 'lib%s.dll.a'
+            if staticbuild:
+                netlib.env['SHLIB_MARKER'] = ''
+            netlib.env.append_value('LINKFLAGS', ['-static-libstdc++', '--disable-auto-import'])
+            netlib.env.append_value('LINKFLAGS', ['-Wl,--output-def,lib%s.def' % netlib.target])
+            bld.install_files(netlib.install_path, [os.path.join(buildbindir, 'lib%s.def' % netlib.target)])
+        elif not bld.env['IS_MACOSX']:
+            netlib.use += ['RT']
         netlib.source = [
             'JackNetAPI.cpp',
             'JackNetInterface.cpp',
@@ -344,7 +366,8 @@ def build(bld):
         if bld.env['IS_WINDOWS']:
             netlib.source += ['../windows/JackNetWinSocket.cpp','../windows/JackWinThread.cpp', '../windows/JackMMCSS.cpp', '../windows/JackWinTime.c']
 
-        netlib.vnum = bld.env['JACK_API_VERSION']
+        if not bld.env['IS_WINDOWS']:
+            netlib.vnum = bld.env['JACK_API_VERSION']
 
     create_jack_process_obj(bld, 'netmanager', 'JackNetManager.cpp', serverlib)
 
@@ -388,12 +411,12 @@ def build(bld):
     if bld.env['BUILD_ADAPTER'] and bld.env['IS_LINUX'] and bld.env['BUILD_DRIVER_ALSA']:
          audio_adapter_sources += ['../linux/alsa/JackAlsaAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
-         process.use = ['ALSA', 'SAMPLERATE']
+         process.use += ['ALSA', 'SAMPLERATE']
 
     if bld.env['BUILD_ADAPTER'] and bld.env['IS_SUN']:
          audio_adapter_sources += ['../solaris/oss/JackOSSAdapter.cpp', 'memops.c']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
-         process.use = 'SAMPLERATE'
+         process.use += 'SAMPLERATE'
 
     if bld.env['BUILD_ADAPTER'] and bld.env['IS_WINDOWS']:
          audio_adapter_sources += ['../windows/portaudio/JackPortAudioAdapter.cpp', '../windows/portaudio/JackPortAudioDevices.cpp']
@@ -408,7 +431,8 @@ def build(bld):
         features = 'subst_pc',
         source = '../jack.pc.in',
         target = 'jack.pc',
-        install_path = '${LIBDIR}/pkgconfig/',
+        install_path = '${PKGCONFDIR}',
         INCLUDEDIR = os.path.normpath(bld.env['PREFIX'] + '/include'),
+        CLIENTLIB = clientlib.target,
         SERVERLIB = serverlib.target,
         )
