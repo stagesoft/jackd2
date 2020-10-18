@@ -4,7 +4,7 @@ Upstream-Contact: JACK developers <jack-devel@jackaudio.org>
 Source: https://github.com/jackaudio/jack2
  Repackaged, excluding non-DFSG files
 Files-Excluded:
- ./windows/**.rc
+ windows/*.rc
 
 Files: *
 Copyright: 2004-2012, Grame <grame@grame.fr>
