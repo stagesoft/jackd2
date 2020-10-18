@@ -1,3 +1,13 @@
+jackd2 (1.9.16~dfsg-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream release
+  * debian/copyright:
+    - Fix pattern in Files-Excluded
+    - Update paths of moved files
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Sun, 18 Oct 2020 16:56:14 +0200
+
 jackd2 (1.9.14~dfsg-1) unstable; urgency=medium
 
   * Team upload
