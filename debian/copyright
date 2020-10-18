@@ -214,8 +214,8 @@ License: LGPL-2.1+
 
 Files: common/memops.c
  common/memops.h
- example-clients/evmon.c
- example-clients/freewheel.c
+ tools/evmon.c
+ tools/freewheel.c
  linux/alsa/alsa_driver.c
  linux/alsa/alsa_driver.h
  linux/alsa/generic.h
@@ -298,9 +298,9 @@ Copyright: 2009, Grame
   2011, Devin Anderson
 License: GPL-2+
 
-Files: example-clients/bufsize.c
- example-clients/samplerate.c
- example-clients/transport.c
+Files: tools/bufsize.c
+ tools/samplerate.c
+ tools/transport.c
  linux/alsa/bitset.h
 Copyright: 2003, 2005, Jack O'Quin
 License: GPL-2+
@@ -413,7 +413,7 @@ Files: example-clients/midiseq.c
 Copyright: 2004, Ian Esten
 License: GPL-2+
 
-Files: example-clients/connect.c
+Files: tools/connect.c
  example-clients/zombie.c
 Copyright: 2002, Jeremy Hall
 License: GPL-2+
@@ -426,7 +426,7 @@ Copyright: 2001, Paul Davis
 License: GPL-2+
 
 Files: common/netjack_packet.c
- example-clients/netsource.c
+ tools/netsource.c
 Copyright: 2006, Torben Hohn <torbenh@gmx.de>
   2008, Marc-Olivier Barre <marco@marcochapeau.org>
   2008, Pieter Palmers <pieterpalmers@users.sourceforge.net>
@@ -605,7 +605,7 @@ Copyright: 2001, Steve Harris
 License: GPL-2+
 
 Files: common/netjack_packet.h
- example-clients/session_notify.c
+ tools/session_notify.c
 Copyright: 2006, Torben Hohn <torbenh@gmx.de>
 License: GPL-2+
 
