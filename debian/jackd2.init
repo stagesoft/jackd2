@@ -17,7 +17,7 @@ PIDFILE=/var/run/$NAME.pid
 DESC="Jack daemon"
 USER=stagelab
 LOG_LEVEL=3
-DAEMON_ARGS="-R -dalsa -dhw:PCH -r44000 -p512 -n3"
+DAEMON_ARGS="-R -dalsa -dhw:PCH -r44100 -p512 -n3"
 #CONFIG_DIR="/var/lib/jackd/conf"
 
 # Reads config file (will override defaults above)
