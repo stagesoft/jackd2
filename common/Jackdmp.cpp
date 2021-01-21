@@ -97,7 +97,7 @@ static void copyright(FILE* file)
     fprintf(file, "jackdmp " VERSION "\n"
             "Copyright 2001-2005 Paul Davis and others.\n"
             "Copyright 2004-2016 Grame.\n"
-            "Copyright 2016-2020 Filipe Coelho.\n"
+            "Copyright 2016-2021 Filipe Coelho.\n"
             "jackdmp comes with ABSOLUTELY NO WARRANTY\n"
             "This is free software, and you are welcome to redistribute it\n"
             "under certain conditions; see the file COPYING for details\n");
@@ -253,8 +253,6 @@ void print_version()
     printf( "jackdmp version " VERSION " tmpdir "
             jack_server_dir " protocol %d" "\n",
             JACK_PROTOCOL_VERSION);
-    exit(-1);
-
 }
 
 int main(int argc, char** argv)
@@ -269,6 +267,7 @@ int main(int argc, char** argv)
     for(int a = 1; a < argc; ++a) {
         if( !strcmp(argv[a], "--version") || !strcmp(argv[a], "-V") ) {
             print_version();
+            return 0;
         }
     }
     const char *options = "-d:X:I:P:uvshrRL:STFl:t:mn:p:C:"
@@ -495,11 +494,13 @@ int main(int argc, char** argv)
                 }
                 break;
 
+            case 'h':
+                usage(stdout, server_ctl);
+                return_value = 0;
+                goto destroy_server;
+
             default:
                 fprintf(stderr, "unknown option character %c\n", optopt);
-                /*fallthru*/
-
-            case 'h':
                 usage(stdout, server_ctl);
                 goto destroy_server;
         }

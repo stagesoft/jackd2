@@ -575,12 +575,10 @@ def apply_vnum(self):
 
 	cnum = getattr(self, 'cnum', str(nums[0]))
 	cnums = cnum.split('.')
-	if len(cnums)>len(nums) or nums[0:len(cnums)] != cnums:
-		raise Errors.WafError('invalid compatibility version %s' % cnum)
 
 	libname = node.name
 	if libname.endswith('.dylib'):
-		name3 = libname.replace('.dylib', '.%s.dylib' % self.vnum)
+		name3 = libname.replace('.dylib', '.%s.dylib' % cnums[0])
 		name2 = libname.replace('.dylib', '.%s.dylib' % cnum)
 	else:
 		name3 = libname + '.' + self.vnum
