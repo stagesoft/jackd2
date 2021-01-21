@@ -1,3 +1,17 @@
+jackd2 (1.9.17~dfsg-1) unstable; urgency=medium
+
+  * Team upload
+
+  [ Olivier Humbert ]
+  * d/control: freebob isn't provided anymore
+  * d/control.in: freebob isn't provided anymore
+
+  [ Sebastian Ramacher ]
+  * New upstream release
+  * debian/control: Bump Standards-Version
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Thu, 21 Jan 2021 21:52:23 +0100
+
 jackd2 (1.9.16~dfsg-1) unstable; urgency=medium
 
   * Team upload
