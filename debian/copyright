@@ -636,6 +636,10 @@ License: public-domain~Kroon
  would be appreciated, but is not a prerequisite for usage.  Feedback on
  it's use would encourage further development and maintenance.
 
+Files: tools/zalsa/*
+Copyright: 2012-2018, Fons Adriaensen
+License: GPL-3+
+
 License: LGPL-2.1+
  This library is free software; you can redistribute it and/or modify it
  under the terms of the GNU Lesser General Public License as published
