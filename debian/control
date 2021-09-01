@@ -4,21 +4,22 @@ Priority: optional
 Maintainer: Debian Multimedia Maintainers <debian-multimedia@lists.debian.org>
 Uploaders: Adrian Knoth <adi@drcomp.erfurt.thur.de>, Reinhard Tartler <siretart@tauware.de>
 Build-Depends: cdbs (>= 0.4.93~),
- debhelper (>= 10),
  python3,
  dh-python,
- libsamplerate-dev,
  libasound2-dev (>= 1.0.18) [linux-any],
  libdb-dev,
  libdbus-1-dev,
  libexpat1-dev,
- libsndfile1-dev,
- libncurses-dev,
- libreadline-dev,
- libraw1394-dev [linux-any],
  libffado-dev (>= 2.0.0) [linux-any],
+ libncurses-dev,
  libopus-dev,
+ libraw1394-dev [linux-any],
+ libreadline-dev,
+ libsamplerate-dev,
+ libsndfile1-dev,
  libsystemd-dev [linux-any],
+ libzita-alsa-pcmi-dev,
+ libzita-resampler-dev,
  po-debconf
 Standards-Version: 4.6.0
 Rules-Requires-Root: no

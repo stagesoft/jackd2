@@ -1,11 +1,13 @@
 usr/bin/jack*
-usr/lib/*/jack/netmanager.so
-usr/lib/*/jack/profiler.so
 usr/lib/*/jack/inprocess.so
-usr/lib/*/jack/jack_net.so
+usr/lib/*/jack/jack_dummy.so
 usr/lib/*/jack/jack_loopback.so
+usr/lib/*/jack/jack_net.so
 usr/lib/*/jack/jack_netone.so
 usr/lib/*/jack/netadapter.so
-usr/lib/*/jack/jack_dummy.so
+usr/lib/*/jack/netmanager.so
+usr/lib/*/jack/profiler.so
+usr/lib/*/jack/zalsa_in.so
+usr/lib/*/jack/zalsa_out.so
 debian/bash_completion.d/* usr/share/bash-completion/completions
 debian/audio.conf usr/share/jackd
