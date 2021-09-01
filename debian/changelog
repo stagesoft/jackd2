@@ -1,3 +1,20 @@
+jackd2 (1.9.19~dfsg-1) unstable; urgency=medium
+
+  * Team upload
+
+  [ Erich Eickmeyer ]
+  * Add libdb-dev is a build dependency for metadata per upstream
+
+  [ Sebastian Ramacher ]
+  * New upstream release
+  * debian/copyright:
+    - Remove bogus paragraphs
+    - Add new paragraph for zalsa
+  * debian/copyright: Bump Standards-Version
+  * debian/: Build with zalsa client
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Thu, 02 Sep 2021 00:18:19 +0200
+
 jackd2 (1.9.17~dfsg-1) unstable; urgency=medium
 
   * Team upload
