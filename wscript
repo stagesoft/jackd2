@@ -11,7 +11,7 @@ import sys
 from waflib import Logs, Options, Task, Utils
 from waflib.Build import BuildContext, CleanContext, InstallContext, UninstallContext
 
-VERSION='1.9.17'
+VERSION='1.9.19'
 APPNAME='jack'
 JACK_API_VERSION = '0.1.0'
 
@@ -174,6 +174,11 @@ def options(opt):
             help='Use Berkeley DB (metadata)')
     db.check(header_name='db.h')
     db.check(lib='db')
+    zalsa = opt.add_auto_option(
+            'zalsa',
+            help='Build internal zita-a2j/j2a client')
+    zalsa.check(lib='zita-alsa-pcmi')
+    zalsa.check(lib='zita-resampler')
 
     # dbus options
     opt.recurse('dbus')
@@ -223,7 +228,7 @@ def configure(conf):
                 mandatory=False)
 
     conf.env.append_unique('CFLAGS', '-Wall')
-    conf.env.append_unique('CXXFLAGS', '-Wall')
+    conf.env.append_unique('CXXFLAGS', ['-Wall', '-Wno-invalid-offsetof'])
     conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
 
     if not conf.env['IS_MACOSX']:
