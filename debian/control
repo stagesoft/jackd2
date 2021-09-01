@@ -5,6 +5,7 @@ Maintainer: Debian Multimedia Maintainers <debian-multimedia@lists.debian.org>
 Uploaders: Adrian Knoth <adi@drcomp.erfurt.thur.de>, Reinhard Tartler <siretart@tauware.de>
 Build-Depends: cdbs (>= 0.4.93~),
  python3,
+ debhelper (>= 10),
  dh-python,
  libasound2-dev (>= 1.0.18) [linux-any],
  libdb-dev,
