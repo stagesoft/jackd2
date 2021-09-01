@@ -12,8 +12,9 @@ jackd2 (1.9.19~dfsg-1) unstable; urgency=medium
     - Add new paragraph for zalsa
   * debian/copyright: Bump Standards-Version
   * debian/: Build with zalsa client
+  * debian/jackd2.maintscript: Remove now obsolete rm_conffile
 
- -- Sebastian Ramacher <sramacher@debian.org>  Thu, 02 Sep 2021 00:18:19 +0200
+ -- Sebastian Ramacher <sramacher@debian.org>  Thu, 02 Sep 2021 00:31:19 +0200
 
 jackd2 (1.9.17~dfsg-1) unstable; urgency=medium
 
