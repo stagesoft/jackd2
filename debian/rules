@@ -1,84 +1,39 @@
 #!/usr/bin/make -f
 
-# Let's try to cut down noisy symbols to the official API
-export DEB_CFLAGS_MAINT_APPEND = -fvisibility=hidden
-export DEB_CXXFLAGS_MAINT_APPEND = -fvisibility=hidden
+include /usr/share/dpkg/architecture.mk
 
--include /usr/share/cdbs/1/rules/upstream-tarball.mk
--include /usr/share/cdbs/1/rules/utils.mk
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/makefile.mk
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+else
+NUMJOBS = 1
+endif
 
-# suppress optional build-dependencies
-CDBS_BUILD_DEPENDS_rules_upstream-tarball =
-CDBS_BUILD_DEPENDS_rules_utils_copyright-check =
+CONFIGURE_OPTIONS = $(if $(filter linux,$(DEB_HOST_ARCH_OS)),--alsa --dbus)
+CONFIGURE_OPTIONS += $(if $(filter amd64 i386 powerpc,$(DEB_HOST_ARCH)),--firewire)
 
-# Explicitly require these versions until cdbs knows about multiarch
-CDBS_BUILD_DEPENDS += , cdbs (>= 0.4.93~), debhelper (>= 9)
-CDBS_BUILD_DEPENDS_rules_debhelper_buildinfo =
+%:
+	dh $@
 
-# Set tag to full 40 char git tag for git snapshot release
-tag = $(DEB_UPSTREAM_TARBALL_VERSION)
-DEB_UPSTREAM_URL = https://github.com/jackaudio/jack2/archive
-DEB_UPSTREAM_TARBALL_BASENAME = $(tag)
-DEB_UPSTREAM_TARBALL_SRCDIR = jack2-$(tag)
+override_dh_auto_configure:
+	python3 ./waf configure \
+		--prefix=/usr --classic \
+		--libdir=/usr/lib/$(DEB_HOST_MULTIARCH) \
+		$(CONFIGURE_OPTIONS)
 
-# unneeded and possibly sourceless binaries
-DEB_UPSTREAM_REPACKAGE_EXCLUDES += *.a *.dll *.Lib
+override_dh_auto_build:
+	python3 ./waf -v build --jobs=$(NUMJOBS)
 
-# unneeded sources copyright-protected without licence
-DEB_UPSTREAM_REPACKAGE_EXCLUDES += ./windows/**.rc
+override_dh_auto_install:
+	python3 ./waf -v install --destdir=debian/tmp
 
-# pure garbage in upstream tarball
-DEB_UPSTREAM_REPACKAGE_EXCLUDES += .DS_Store
+override_dh_auto_clean:
+	test -s ./waf && python3 ./waf -v distclean || true
+	find . -name "*.pyc" -delete
 
-# Minimum assured version referenced upstream as library API/ABI
-ABI = 0.118.0
+override_dh_makeshlibs:
+	dh_makeshlibs -Xinprocess -Xjack_alsa -Xjack_dummy
 
-WAF_EXTRA_ARGS = $(filter-out -j%,$(DEB_MAKE_EXTRA_ARGS))
-
-waf-configure-options = --prefix=/usr --classic
-waf-configure-options += --libdir=/usr/lib/$(DEB_HOST_MULTIARCH)
-waf-configure-options += $(if $(filter linux,$(DEB_HOST_ARCH_OS)),--alsa --dbus)
-waf-configure-options += $(if $(filter amd64 i386 powerpc,$(DEB_HOST_ARCH)),--firewire)
-
-DEB_MAKE_INVOKE = $(WAF_EXTRA_ARGS) ./waf -v --destdir=$(CURDIR)/debian/tmp
-DEB_MAKE_INSTALL_TARGET = install
-
-# TODO: use distclean and drop related clean target, when (or if)
-# upstream stop shipping waf dir
-DEB_MAKE_CLEAN_TARGET = clean
-clean::
-	rm -f .lock-wscript .lock-waf_linux2_build
-	find waflib -name "*.pyc" -delete || true
-	rm -f man/*.1
-	rm -rf build
-	rm -rf autooptions/__pycache__
-
-DEB_DH_MAKESHLIBS_ARGS = -Xintime -Xinprocess -Xjack_alsa -Xjack_oss -Xjack_dummy -Xjack_firewire
-
-# too noisy symbols, so only watch disappearing ones for now
-DEB_DH_MAKESHLIBS_ARGS += -- -c1
-
-# Generate (and cleanup) files containing variables static per build
-infiles = $(filter-out debian/control.in, $(wildcard debian/*.in))
-outfiles = $(basename $(infiles))
-DEB_PHONY_RULES += $(outfiles)
-pre-build:: $(outfiles)
-$(outfiles): update-config debian/stamp-copyright-check
-	sed 's/__ABI__/$(ABI)/' <$@.in >$@
-clean::
-	rm -f $(outfiles)
-
-common-configure-arch common-configure-indep:: common-configure-impl
-common-configure-impl:: debian/stamp-waf-configure
-debian/stamp-waf-configure:
-	$(WAF_EXTRA_ARGS) ./waf configure $(waf-configure-options) $(DEB_MAKE_PARALLEL)
-	touch $@
-clean::
-	rm -f debian/stamp-waf-configure
-
-install/jackd2::
+execute_after_dh_install:
 ifeq ($(DEB_HOST_ARCH_OS),linux)
 	dh_install -pjackd2 debian/tmp/usr/bin/alsa_in
 	dh_install -pjackd2 debian/tmp/usr/bin/alsa_out
@@ -88,5 +43,5 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	dh_install -pjackd2 debian/tmp/usr/share/dbus-1/*
 endif	
 
-binary-install/jackd2::
+override_dh_python3:
 	dh_python3 -pjackd2
