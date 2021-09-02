@@ -1,9 +1,21 @@
+jackd2 (1.9.19~dfsg-2) unstable; urgency=medium
+
+  * Team upload
+  * debian/:
+    - Convert to debhelper compat 13
+    - Filter linux-any specific files using dh-exec
+    - Fix FTCBFS (Closes: #912907)
+  * debian/control: Remove obsolete Depends and Replaces
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Thu, 02 Sep 2021 13:35:50 +0200
+
 jackd2 (1.9.19~dfsg-1) unstable; urgency=medium
 
   * Team upload
 
   [ Erich Eickmeyer ]
-  * Add libdb-dev is a build dependency for metadata per upstream
+  * Add libdb-dev is a build dependency for metadata per upstream (Closes:
+    #985050)
 
   [ Sebastian Ramacher ]
   * New upstream release
