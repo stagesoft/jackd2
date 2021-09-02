@@ -5,8 +5,8 @@ Maintainer: Debian Multimedia Maintainers <debian-multimedia@lists.debian.org>
 Uploaders: Adrian Knoth <adi@drcomp.erfurt.thur.de>,
            Reinhard Tartler <siretart@tauware.de>
 Build-Depends: debhelper-compat (= 13),
-               dh-sequence-python3,
                dh-exec,
+               dh-sequence-python3,
                libasound2-dev (>= 1.0.18) [linux-any],
                libdb-dev,
                libdbus-1-dev,
