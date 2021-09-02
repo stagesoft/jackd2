@@ -6,6 +6,9 @@ jackd2 (1.9.19~dfsg-2) unstable; urgency=medium
     - Filter linux-any specific files using dh-exec
     - Fix FTCBFS (Closes: #912907)
   * debian/control: Remove obsolete Depends and Replaces
+  * debian/copyright: Clean up copyright file and merge paragraphs
+  * debian/patches: Remove unused patch
+  * debian/libjack-jackd2-0.lintian-overrides: Fix lintian tag name
 
  -- Sebastian Ramacher <sramacher@debian.org>  Thu, 02 Sep 2021 13:35:50 +0200
 
