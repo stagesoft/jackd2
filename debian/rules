@@ -1,6 +1,7 @@
 #!/usr/bin/make -f
 
 include /usr/share/dpkg/architecture.mk
+include /usr/share/dpkg/buildtools.mk
 
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
@@ -18,7 +19,8 @@ override_dh_auto_configure:
 	python3 ./waf configure \
 		--prefix=/usr --classic \
 		--libdir=/usr/lib/$(DEB_HOST_MULTIARCH) \
-		$(CONFIGURE_OPTIONS)
+		$(CONFIGURE_OPTIONS) \
+		CC='$(CC)' CXX='$(CXX)' PKGCONFIG='$(PKG_CONFIG)'
 
 override_dh_auto_build:
 	python3 ./waf -v build --jobs=$(NUMJOBS)

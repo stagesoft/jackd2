@@ -22,7 +22,7 @@ Build-Depends: debhelper-compat (= 13),
                libzita-alsa-pcmi-dev,
                libzita-resampler-dev,
                po-debconf,
-               python3
+               python3:any
 Standards-Version: 4.6.0
 Rules-Requires-Root: no
 Homepage: https://jackaudio.org/
