@@ -33,8 +33,7 @@ Architecture: any
 Replaces: jack-daemon, jackd (<< 3), libjack0 (<= 1.9.5~dfsg-13)
 Provides: jack-daemon
 Conflicts: jack-daemon, jackd (<< 3)
-Depends: coreutils (>= 4.0),
-         debconf | debconf-2.0,
+Depends: debconf | debconf-2.0,
          libjack-jackd2-0 (= ${binary:Version}),
          python3-dbus,
          ${misc:Depends},
@@ -59,9 +58,7 @@ Conflicts: jackd2 (<< ${binary:Version}),
            libjack0
 Suggests: jackd2 (= ${binary:Version})
 Provides: libjack-0.116, libjack-0.125
-Replaces: jackd2 (<< 1.9.10+20150825git1ed50c92~dfsg-5),
-          libjack-0.116,
-          libjack-0.125
+Replaces: libjack-0.116, libjack-0.125
 Multi-Arch: same
 Description: JACK Audio Connection Kit (libraries)
  JACK is a low-latency sound server, allowing multiple applications to
