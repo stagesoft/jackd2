@@ -3,15 +3,13 @@
 from __future__ import print_function
 
 import os
-import subprocess
 import shutil
-import re
 import sys
 
 from waflib import Logs, Options, Task, Utils
 from waflib.Build import BuildContext, CleanContext, InstallContext, UninstallContext
 
-VERSION='1.9.19'
+VERSION='1.9.20'
 APPNAME='jack'
 JACK_API_VERSION = '0.1.0'
 
@@ -134,6 +132,12 @@ def options(opt):
             'celt',
             help='Build with CELT')
     celt.add_function(check_for_celt)
+    opt.add_auto_option(
+            'example-tools',
+            help='Build with jack-example-tools',
+            conf_dest='BUILD_JACK_EXAMPLE_TOOLS',
+            default=True,
+    )
 
     # Suffix _PKG to not collide with HAVE_OPUS defined by the option.
     opus = opt.add_auto_option(
@@ -191,6 +195,7 @@ def detect_platform(conf):
     platforms = [
         # ('KEY, 'Human readable name', ['strings', 'to', 'check', 'for'])
         ('IS_LINUX',   'Linux',   ['gnu0', 'gnukfreebsd', 'linux', 'posix']),
+        ('IS_FREEBSD', 'FreeBSD', ['freebsd']),
         ('IS_MACOSX',  'MacOS X', ['darwin']),
         ('IS_SUN',     'SunOS',   ['sunos']),
         ('IS_WINDOWS', 'Windows', ['cygwin', 'msys', 'win32'])
@@ -218,18 +223,21 @@ def configure(conf):
     if conf.env['IS_WINDOWS']:
         conf.env.append_unique('CCDEFINES', '_POSIX')
         conf.env.append_unique('CXXDEFINES', '_POSIX')
-        if Options.options.platform == 'msys':
+        if Options.options.platform in ('msys', 'win32'):
             conf.env.append_value('INCLUDES', ['/mingw64/include'])
             conf.check(
-                header_name='asio.h',
-                includes='/opt/asiosdk/common',
-                msg='Checking for ASIO SDK',
+                header_name='pa_asio.h',
+                msg='Checking for PortAudio ASIO support',
                 define_name='HAVE_ASIO',
                 mandatory=False)
 
     conf.env.append_unique('CFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', ['-Wall', '-Wno-invalid-offsetof'])
     conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
+
+    if conf.env['IS_FREEBSD']:
+        conf.check(lib='execinfo', uselib='EXECINFO', define_name='EXECINFO')
+        conf.check_cfg(package='libsysinfo', args='--cflags --libs')
 
     if not conf.env['IS_MACOSX']:
         conf.env.append_unique('LDFLAGS', '-Wl,--no-undefined')
@@ -292,9 +300,9 @@ def configure(conf):
         else:
             conf.env['SYSTEMD_USER_UNIT_DIR'] = None
 
-
-    conf.recurse('example-clients')
-    conf.recurse('tools')
+    if conf.env['BUILD_JACK_EXAMPLE_TOOLS']:
+        conf.recurse('example-clients')
+        conf.recurse('tools')
 
     # test for the availability of ucontext, and how it should be used
     for t in ['gp_regs', 'uc_regs', 'mc_gregs', 'gregs']:
@@ -388,7 +396,7 @@ def configure(conf):
         # existing install paths that use ADDON_DIR rather than have to
         # have special cases for windows each time.
         conf.env['ADDON_DIR'] = conf.env['LIBDIR'] + '/jack'
-        if Options.options.platform == 'msys':
+        if Options.options.platform in ('msys', 'win32'):
             conf.define('ADDON_DIR', 'jack')
             conf.define('__STDC_FORMAT_MACROS', 1) # for PRIu64
         else:
@@ -408,17 +416,6 @@ def configure(conf):
     if conf.env['BUILD_WITH_PROFILE']:
         conf.define('JACK_MONITOR', 1)
     conf.write_config_header('config.h', remove=False)
-
-    svnrev = None
-    try:
-        f = open('svnversion.h')
-        data = f.read()
-        m = re.match(r'^#define SVN_VERSION "([^"]*)"$', data)
-        if m != None:
-            svnrev = m.group(1)
-        f.close()
-    except IOError:
-        pass
 
     if Options.options.mixed:
         conf.setenv(lib32, env=conf.env.derive())
@@ -448,13 +445,7 @@ def configure(conf):
         conf.write_config_header('config.h')
 
     print()
-    print('==================')
-    version_msg = 'JACK ' + VERSION
-    if svnrev:
-        version_msg += ' exported from r' + svnrev
-    else:
-        version_msg += ' svn revision will checked and eventually updated during build'
-    print(version_msg)
+    print('JACK ' + VERSION)
 
     conf.msg('Maximum JACK clients', Options.options.clients, color='NORMAL')
     conf.msg('Maximum ports per application', Options.options.application_ports, color='NORMAL')
@@ -525,6 +516,9 @@ def obj_add_includes(bld, obj):
     if bld.env['IS_LINUX']:
         obj.includes += ['linux', 'posix']
 
+    if bld.env['IS_FREEBSD']:
+        obj.includes += ['freebsd', 'posix']
+
     if bld.env['IS_MACOSX']:
         obj.includes += ['macosx', 'posix']
 
@@ -551,6 +545,9 @@ def build_jackd(bld):
 
     if bld.env['IS_LINUX']:
         jackd.use += ['DL', 'M', 'PTHREAD', 'RT', 'STDC++']
+
+    if bld.env['IS_FREEBSD']:
+        jackd.use += ['M', 'PTHREAD']
 
     if bld.env['IS_MACOSX']:
         jackd.use += ['DL', 'PTHREAD']
@@ -664,6 +661,11 @@ def build_drivers(bld):
         'linux/firewire/JackFFADOMidiSendQueue.cpp'
     ]
 
+    freebsd_oss_src = [
+        'common/memops.c',
+        'freebsd/oss/JackOSSDriver.cpp'
+    ]
+
     iio_driver_src = [
         'linux/iio/JackIIODriver.cpp'
     ]
@@ -699,7 +701,8 @@ def build_drivers(bld):
     create_driver_obj(
         bld,
         target = 'net',
-        source = net_src)
+        source = net_src,
+        use = ['CELT'])
 
     create_driver_obj(
         bld,
@@ -769,6 +772,12 @@ def build_drivers(bld):
             use = ['serverlib'], # FIXME: Is this needed?
             framework = ['AudioUnit', 'CoreMIDI', 'CoreServices', 'Foundation'])
 
+    if bld.env['IS_FREEBSD']:
+        create_driver_obj(
+            bld,
+            target = 'oss',
+            source = freebsd_oss_src)
+
     if bld.env['IS_SUN']:
         create_driver_obj(
             bld,
@@ -792,38 +801,19 @@ def build(bld):
 
     bld.recurse('compat')
 
-    if not os.access('svnversion.h', os.R_OK):
-        def post_run(self):
-            sg = Utils.h_file(self.outputs[0].abspath(self.env))
-            #print sg.encode('hex')
-            Build.bld.node_sigs[self.env.variant()][self.outputs[0].id] = sg
-
-        script = bld.path.find_resource('svnversion_regenerate.sh')
-        script = script.abspath()
-
-        bld(
-                rule = '%s ${TGT}' % script,
-                name = 'svnversion',
-                runnable_status = Task.RUN_ME,
-                before = 'c cxx',
-                color = 'BLUE',
-                post_run = post_run,
-                source = ['svnversion_regenerate.sh'],
-                target = [bld.path.find_or_declare('svnversion.h')]
-        )
-
     if bld.env['BUILD_JACKD']:
         build_jackd(bld)
 
     build_drivers(bld)
 
-    bld.recurse('example-clients')
-    bld.recurse('tools')
+    if bld.env['BUILD_JACK_EXAMPLE_TOOLS']:
+        bld.recurse('example-clients')
+        bld.recurse('tools')
 
-    if bld.env['IS_LINUX']:
+    if bld.env['IS_LINUX'] or bld.env['IS_FREEBSD']:
         bld.recurse('man')
         bld.recurse('systemd')
-    if not bld.env['IS_WINDOWS']:
+    if not bld.env['IS_WINDOWS'] and bld.env['BUILD_JACK_EXAMPLE_TOOLS']:
         bld.recurse('tests')
     if bld.env['BUILD_JACKDBUS']:
         bld.recurse('dbus')
@@ -888,10 +878,6 @@ def build(bld):
                 shutil.rmtree(html_build_dir)
                 Logs.pprint('CYAN', 'Removing doxygen generated documentation done.')
 
-def dist(ctx):
-    # This code blindly assumes it is working in the toplevel source directory.
-    if not os.path.exists('svnversion.h'):
-        os.system('./svnversion_regenerate.sh svnversion.h')
 
 from waflib import TaskGen
 @TaskGen.extension('.mm')
