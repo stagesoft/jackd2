@@ -1,3 +1,21 @@
+jackd2 (1.9.20~dfsg-1) unstable; urgency=medium
+
+  * Team upload
+
+  [ Debian Janitor ]
+  * Set upstream metadata fields: Bug-Database, Bug-Submit.
+
+  [ Erich Eickmeyer ]
+  * Build without LTO Unfortunately, if built with LTO, jackd2 will hang and
+    deny any client connection. Per
+    https://github.com/jackaudio/jack2/issues/776
+
+  [ Sebastian Ramacher ]
+  * New upstream version 1.9.20~dfsg
+  * debian/patches: Remove obsolete patch. Upstream supports SOURCE_DATE_EPOCH
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Sun, 23 Jan 2022 17:38:32 +0100
+
 jackd2 (1.9.19~dfsg-2) unstable; urgency=medium
 
   * Team upload
