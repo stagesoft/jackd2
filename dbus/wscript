@@ -11,6 +11,7 @@ def options(opt):
 
 def configure(conf):
     conf.env['BUILD_JACKDBUS'] = False
+    conf.define('JACK_VERSION', conf.env['JACK_VERSION'])
 
     if not conf.check_cfg(package='dbus-1 >= 1.0.0', args='--cflags --libs', mandatory=False):
         print(Logs.colors.RED + 'ERROR !! jackdbus will not be built because libdbus-dev is missing' + Logs.colors.NORMAL)
@@ -39,6 +40,8 @@ def build(bld):
     obj = bld(features = ['c', 'cprogram'], idx=17)
     if bld.env['IS_LINUX']:
         sysdeps_dbus_include = ['../linux', '../posix']
+    if bld.env['IS_FREEBSD']:
+        sysdeps_dbus_include = ['../freebsd', '../posix']
     if bld.env['IS_MACOSX']:
         sysdeps_dbus_include = ['../macosx', '../posix']
 
@@ -67,6 +70,11 @@ def build(bld):
             '../linux/uptime.c',
         ]
         obj.use += ['PTHREAD', 'DL', 'RT', 'DBUS-1', 'EXPAT', 'STDC++']
+    if bld.env['IS_FREEBSD']:
+        obj.source += [
+            '../linux/uptime.c',
+        ]
+        obj.use += ['PTHREAD', 'EXECINFO', 'LIBSYSINFO', 'DBUS-1', 'EXPAT']
     if bld.env['IS_MACOSX']:
         obj.source += [
             '../macosx/uptime.c',
@@ -81,3 +89,6 @@ def build(bld):
             target = 'org.jackaudio.service',
             install_path = '${DBUS_SERVICES_DIR}/',
             BINDIR = bld.env['PREFIX'] + '/bin')
+
+    if not bld.env['IS_WINDOWS']:
+        bld.install_files('${PREFIX}/bin', 'jack_control', chmod=0o755)
