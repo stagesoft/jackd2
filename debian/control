@@ -7,11 +7,11 @@ Uploaders: Adrian Knoth <adi@drcomp.erfurt.thur.de>,
 Build-Depends: debhelper-compat (= 13),
                dh-exec,
                dh-sequence-python3,
-               libasound2-dev (>= 1.0.18) [linux-any],
+               libasound2-dev [linux-any],
                libdb-dev,
                libdbus-1-dev,
                libexpat1-dev,
-               libffado-dev (>= 2.0.0) [linux-any],
+               libffado-dev [linux-any],
                libncurses-dev,
                libopus-dev,
                libraw1394-dev [linux-any],
@@ -31,9 +31,9 @@ Vcs-Browser: https://salsa.debian.org/multimedia-team/jackd2
 
 Package: jackd2
 Architecture: any
-Replaces: jack-daemon, jackd (<< 3), libjack0 (<= 1.9.5~dfsg-13)
+Replaces: jack-daemon
 Provides: jack-daemon
-Conflicts: jack-daemon, jackd (<< 3)
+Conflicts: jack-daemon
 Depends: debconf | debconf-2.0,
          libjack-jackd2-0 (= ${binary:Version}),
          python3-dbus,
