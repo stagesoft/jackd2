@@ -52,9 +52,9 @@ Package: libjack-jackd2-0
 Architecture: any
 Section: libs
 Depends: ${misc:Depends}, ${shlibs:Depends}
-Conflicts: jackd2 (<< ${binary:Version}),
-           jackd2 (>> ${binary:Version}),
-           libjack-0.116,
+Breaks: jackd2 (<< ${binary:Version}),
+        jackd2 (>> ${binary:Version})
+Conflicts: libjack-0.116,
            libjack-0.125,
            libjack0
 Suggests: jackd2 (= ${binary:Version})
@@ -84,7 +84,8 @@ Architecture: any
 Section: libdevel
 Multi-Arch: same
 Depends: libjack-jackd2-0 (= ${binary:Version}), pkg-config, ${misc:Depends}
-Conflicts: libjack-dev, libjack0.100.0-dev (<< 0.102.20-2)
+Breaks: libjack0.100.0-dev (<< 0.102.20-2)
+Conflicts: libjack-dev
 Provides: libjack-dev, libjack-dev-session, libjack0.100.0-dev
 Replaces: libjack0.71.2-0 (<< 0.75.0-1)
 Description: JACK Audio Connection Kit (development files)
