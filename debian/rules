@@ -20,7 +20,7 @@ CONFIGURE_OPTIONS += $(if $(filter amd64 i386 powerpc,$(DEB_HOST_ARCH)),--firewi
 
 override_dh_auto_configure:
 	python3 ./waf configure \
-		--prefix=/usr --classic \
+		--prefix=/usr --classic --example-tools \
 		--libdir=/usr/lib/$(DEB_HOST_MULTIARCH) \
 		$(CONFIGURE_OPTIONS) \
 		CC='$(CC)' CXX='$(CXX)' PKGCONFIG='$(PKG_CONFIG)'
