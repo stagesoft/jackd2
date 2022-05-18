@@ -1,3 +1,21 @@
+jackd2 (1.9.21~dfsg-1) UNRELEASED; urgency=medium
+
+  * Team upload.
+
+  [ Debian Janitor ]
+  * Remove constraints unnecessary since buster
+
+  [ Dennis Braun ]
+  * New upstream version 1.9.21~dfsg
+  * Bump Standards Version to 4.6.1
+  * Fix Conflicts/Breaks of libjack-jackd2-0 and libjack-jackd2-dev
+  * d/rules: Add hardening
+  * d/rules: Build with --example-tools, not anymore default
+  * d/upstream/metadata: Add Archive, Repository & Repository-Browse fields
+  * Add Peter Bridgman to d/copyright
+
+ -- Dennis Braun <d_braun@kabelmail.de>  Wed, 18 May 2022 20:20:39 +0200
+
 jackd2 (1.9.20~dfsg-1) unstable; urgency=medium
 
   * Team upload
