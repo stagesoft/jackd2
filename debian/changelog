@@ -1,4 +1,4 @@
-jackd2 (1.9.21~dfsg-1) UNRELEASED; urgency=medium
+jackd2 (1.9.21~dfsg-1) unstable; urgency=medium
 
   * Team upload.
 
@@ -14,7 +14,12 @@ jackd2 (1.9.21~dfsg-1) UNRELEASED; urgency=medium
   * d/upstream/metadata: Add Archive, Repository & Repository-Browse fields
   * Add Peter Bridgman to d/copyright
 
- -- Dennis Braun <d_braun@kabelmail.de>  Wed, 18 May 2022 20:20:39 +0200
+  [ Sebastian Ramacher ]
+  * debian/control:
+    - Remove useless Breaks
+    - Remove obsolete Replaces
+
+ -- Dennis Braun <d_braun@kabelmail.de>  Thu, 26 May 2022 12:35:45 +0200
 
 jackd2 (1.9.20~dfsg-1) unstable; urgency=medium
 
