@@ -52,8 +52,6 @@ Package: libjack-jackd2-0
 Architecture: any
 Section: libs
 Depends: ${misc:Depends}, ${shlibs:Depends}
-Breaks: jackd2 (<< ${binary:Version}),
-        jackd2 (>> ${binary:Version})
 Conflicts: libjack-0.116,
            libjack-0.125,
            libjack0
