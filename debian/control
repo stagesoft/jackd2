@@ -85,7 +85,6 @@ Depends: libjack-jackd2-0 (= ${binary:Version}), pkg-config, ${misc:Depends}
 Breaks: libjack0.100.0-dev (<< 0.102.20-2)
 Conflicts: libjack-dev
 Provides: libjack-dev, libjack-dev-session, libjack0.100.0-dev
-Replaces: libjack0.71.2-0 (<< 0.75.0-1)
 Description: JACK Audio Connection Kit (development files)
  JACK is a low-latency sound server, allowing multiple applications to
  connect to one audio device, and to share audio between themselves.
