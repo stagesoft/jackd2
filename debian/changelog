@@ -1,3 +1,11 @@
+jackd2 (1.9.21~dfsg-2) UNRELEASED; urgency=medium
+
+  * Team upload
+  * Bump Standards-Version to 4.6.2
+  * Fix FTBFS: ValueError: invalid mode: 'rUb' (Closes: #1028710)
+
+ -- Dennis Braun <snd@debian.org>  Tue, 17 Jan 2023 20:31:19 +0100
+
 jackd2 (1.9.21~dfsg-1) unstable; urgency=medium
 
   * Team upload.
