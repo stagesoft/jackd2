@@ -23,7 +23,7 @@ Build-Depends: debhelper-compat (= 13),
                libzita-resampler-dev,
                po-debconf,
                python3:any
-Standards-Version: 4.6.1
+Standards-Version: 4.6.2
 Rules-Requires-Root: no
 Homepage: https://jackaudio.org/
 Vcs-Git: https://salsa.debian.org/multimedia-team/jackd2.git
