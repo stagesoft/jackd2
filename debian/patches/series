@@ -1,1 +1,3 @@
 1001-Fix_FTBFS.patch
+0001-man-fill_template-Use-numeric-year-month-date-for-ma.patch
+0003-man-fill_template-Use-POSIX-compatible-comparison.patch

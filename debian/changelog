@@ -1,3 +1,18 @@
+jackd2 (1.9.21~dfsg-3) UNRELEASED; urgency=medium
+
+  * Import Vagrant Cascadian's reproducible builds patches:
+    - Add 0001-man-fill_template-Use-numeric-year-month-date-for-ma.patch.
+      Without this patch, manpages may contain a locale-translated month name,
+      as well as a different date based on the build environment timezone.
+      (Closes: #1035331).
+    - Add 0003-man-fill_template-Use-POSIX-compatible-comparison.patch.  When
+      built in an environment where /bin/sh -> bash, all of these manpages are
+      built and included in the package.  When /bin/sh -> dash, the manpages
+      that users depend on are absent from bin:jackd2.
+      (Closes: #1035329, #1035308).
+
+ -- Nicholas D Steeves <sten@debian.org>  Mon, 01 May 2023 11:09:43 -0400
+
 jackd2 (1.9.21~dfsg-2) unstable; urgency=medium
 
   * Team upload
