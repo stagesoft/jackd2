@@ -1,7 +1,7 @@
 From c4196d81e2f92f0664251a04834791952d59a023 Mon Sep 17 00:00:00 2001
 From: Vagrant Cascadian <vagrant@reproducible-builds.org>
 Date: Sun, 30 Apr 2023 15:52:59 -0700
-Subject: [PATCH 3/5] man/fill_template: Use POSIX compatible comparison.
+Subject: man/fill_template: Use POSIX compatible comparison.
 
 Bash supports == comparison, but other /bin/sh implementations may
 not.

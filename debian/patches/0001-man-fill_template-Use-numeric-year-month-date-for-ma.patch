@@ -1,8 +1,7 @@
 From 5fe932e274c720b68aff40125f1069fde1490935 Mon Sep 17 00:00:00 2001
 From: Vagrant Cascadian <vagrant@reproducible-builds.org>
 Date: Sun, 30 Apr 2023 15:44:21 -0700
-Subject: [PATCH 1/5] man/fill_template: Use numeric year-month-date for
- manpage.
+Subject: man/fill_template: Use numeric year-month-date for manpage.
 
 The month may be rendered for the locale of the build environment.
 
