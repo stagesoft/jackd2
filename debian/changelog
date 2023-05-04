@@ -1,5 +1,6 @@
-jackd2 (1.9.21~dfsg-3) UNRELEASED; urgency=medium
+jackd2 (1.9.21~dfsg-3) unstable; urgency=medium
 
+  * Team upload.
   * Import Vagrant Cascadian's reproducible builds patches:
     - Add 0001-man-fill_template-Use-numeric-year-month-date-for-ma.patch.
       Without this patch, manpages may contain a locale-translated month name,
@@ -15,7 +16,7 @@ jackd2 (1.9.21~dfsg-3) UNRELEASED; urgency=medium
       that users depend on are absent from bin:jackd2.
       (Closes: #1035329, #1035308).
 
- -- Nicholas D Steeves <sten@debian.org>  Mon, 01 May 2023 11:09:43 -0400
+ -- Nicholas D Steeves <sten@debian.org>  Thu, 04 May 2023 15:29:39 -0400
 
 jackd2 (1.9.21~dfsg-2) unstable; urgency=medium
 
