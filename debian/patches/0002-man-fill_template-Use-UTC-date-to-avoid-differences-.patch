@@ -1,0 +1,26 @@
+From 021e05e61bc9ae982063d666de33473e391a0602 Mon Sep 17 00:00:00 2001
+From: Vagrant Cascadian <vagrant@reproducible-builds.org>
+Date: Sun, 30 Apr 2023 15:52:22 -0700
+Subject: man/fill_template: Use UTC date to avoid differences
+ based on timezone.
+
+https://reproducible-builds.org/docs/timezones/
+---
+ man/fill_template | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/man/fill_template b/man/fill_template
+index d1df18d..641cab8 100644
+--- a/man/fill_template
++++ b/man/fill_template
+@@ -1,6 +1,6 @@
+ #!/bin/sh
+ d=""
+-[ -z "$SOURCE_DATE_EPOCH" ] || d=--date=@$SOURCE_DATE_EPOCH
++[ -z "$SOURCE_DATE_EPOCH" ] || d="--utc --date=@$SOURCE_DATE_EPOCH"
+ 
+ if [ "$2" == "True" ]; then
+   for i in *.0 ; do
+-- 
+2.39.2
+

@@ -5,6 +5,10 @@ jackd2 (1.9.21~dfsg-3) UNRELEASED; urgency=medium
       Without this patch, manpages may contain a locale-translated month name,
       as well as a different date based on the build environment timezone.
       (Closes: #1035331).
+    - Add 0002-man-fill_template-Use-UTC-date-to-avoid-differences-.patch.
+      This patch solves variance in generated man page date stamps introduced
+      when man pages generated in different timezones are compared to each
+      other.
     - Add 0003-man-fill_template-Use-POSIX-compatible-comparison.patch.  When
       built in an environment where /bin/sh -> bash, all of these manpages are
       built and included in the package.  When /bin/sh -> dash, the manpages
